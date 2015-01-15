@@ -25,7 +25,7 @@
 #include <vector>
 #include <list>
 
-#include <xinput.h>
+#include "ParticleSystem.h"
 
 using namespace std;
 
@@ -73,6 +73,8 @@ ShaderManager shaderManager;
 vector<Model*> objectList;
 
 bool printText = false;
+
+ParticleSystem particleSystem;
 
 int main(int argc, char** argv)
 {
@@ -135,8 +137,12 @@ int main(int argc, char** argv)
 
 	shaderManager.CreateShaderProgram("text", "Shaders/diffuse.vs", "Shaders/black.ps");
 
+	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
+
 	objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 	//objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.001), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse")));
+
+	particleSystem.Generate();
 
 	glutMainLoop();
     
@@ -166,6 +172,8 @@ void update()
 	{
 		objectList[i]->Update(deltaTime);
 	}
+
+	particleSystem.Update(deltaTime);
 	
 	processContinuousInput();
 	draw();
@@ -196,6 +204,16 @@ void draw()
 			objectList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
+
+	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
+
+	int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); 
+
+	int projLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "proj"); 
+	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+	particleSystem.Render();
 
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 

@@ -1,11 +1,14 @@
-uniform mat4 modelview;
+#version 330
+
+uniform mat4 view;
 uniform mat4 proj;
 
-layout(location = 0) in vec4 position;
+layout(location = 0) in vec3 vertex_position;
 
 void main()
 {
-	vec4 eyePos = modelview * gl_Vertex;
+	vec4 Vertex = vec4(vertex_position.x, vertex_position.y, vertex_position.z, 1.0);
+	vec4 eyePos = view * Vertex;
     gl_Position = proj * eyePos;
 
 	float dist = length(eyePos.xyz);

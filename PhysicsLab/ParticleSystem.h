@@ -75,11 +75,6 @@ struct Particle
 			acceleration = forceAccumulator / mass;
         }
 	}
-
-	void Draw()
-	{
-
-	}
 };
 
 class ParticleSystem
@@ -106,15 +101,19 @@ class ParticleSystem
 
 			for(int i = 0; i < 1000; i++)
 			{
-				glm::vec3 pos = glm::vec3(RandomFloat(-5, 5), 10, RandomFloat(-5, 5));
+				glm::vec3 pos = glm::vec3(RandomFloat(-0.5, 0.5), 10, RandomFloat(-0.5, 0.5));
 				particles.push_back(new Particle(pos));
 			}
 
-			Generate();
+			//vao = 0;
+			//positionBuffer = 0;
+
+			mode = IntegratorMode::Euler;
 		}
 
 		~ParticleSystem()
 		{
+			//clean up particles
 		}
 
 		void Generate()
@@ -124,10 +123,10 @@ class ParticleSystem
 
 			glGenBuffers(1, &positionBuffer);
 			glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float)* 4 * particles.size(), nullptr/*nothing*/, GL_STREAM_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float)* 3 * particles.size(), nullptr/*nothing*/, GL_STREAM_DRAW);
 			
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, (4)*sizeof(float), (void *)((0)*sizeof(float)));//?
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (3)*sizeof(float), (void *)((0)*sizeof(float)));//?
 
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);//?
@@ -135,36 +134,28 @@ class ParticleSystem
 
 		void Update(double deltaTime)
 		{
+			std::vector<glm::vec3> positions;
+
 			for(int i = 0; i < particles.size(); i++)
+			{
 				particles[i]->Integrate(IntegratorMode::Euler, env, deltaTime/1000);
+				positions.push_back(particles[i]->position);
+			}
 
 			//Send new positions to buffer
+			glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, particles.size()*sizeof(positions[0]), &positions[0]);
 
-			/*assert(d_system != nullptr);
-				assert(d_buffer_position > 0 && d_buffer_column > 0);
-
-				const size_t count = d_system->alive_particles_count();
-				if (count > 0)
-				{
-					glBindBuffer(GL_ARRAY_BUFFER, d_buffer_position);
-					float *ptr = (float *)(d_system->finalData()->m_position.get());
-					glBufferSubData(GL_ARRAY_BUFFER, 0, count*sizeof(float)* 4, ptr);
-
-					glBindBuffer(GL_ARRAY_BUFFER, d_buffer_column);
-					ptr = (float*)(d_system->finalData()->m_col.get());
-					glBufferSubData(GL_ARRAY_BUFFER, 0, count*sizeof(float)* 4, ptr);
-
-					glBindBuffer(GL_ARRAY_BUFFER, 0);
-				}*/
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		void Render()
 		{
-			//glBindVertexArray(vao);
+			glBindVertexArray(vao);
 
 			//glPointSize(whatever);              //specify size of points in pixels
-			//glDrawArrays(GL_POINTS, 0, particles.size());
+			glDrawArrays(GL_POINTS, 0, particles.size());
  
-			//glBindVertexArray(0);
+			glBindVertexArray(0);
 		}
 };
