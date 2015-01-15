@@ -137,7 +137,7 @@ bool Model::Load(const char* file_name)
 	if(positions.size() > 0)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[POS_VB]);
-		glBufferData(GL_ARRAY_BUFFER, /*3 * vertexCount * sizeof (GLfloat)*/sizeof(positions[0]) * positions.size(), &positions[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(positions[0]) * positions.size(), &positions[0], GL_STATIC_DRAW);
    
 		glEnableVertexAttribArray(POS_VB);
 		glVertexAttribPointer(POS_VB, 3, GL_FLOAT, GL_FALSE, 0, 0);  

@@ -92,6 +92,7 @@ class ParticleSystem
 		Environment env;
 
 		GLuint vao;
+		GLuint positionBuffer;
 
 	public:
 
@@ -108,16 +109,53 @@ class ParticleSystem
 				glm::vec3 pos = glm::vec3(RandomFloat(-5, 5), 10, RandomFloat(-5, 5));
 				particles.push_back(new Particle(pos));
 			}
+
+			Generate();
 		}
 
 		~ParticleSystem()
 		{
 		}
 
+		void Generate()
+		{
+			glGenVertexArrays(1, &vao);
+			glBindVertexArray(vao);
+
+			glGenBuffers(1, &positionBuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float)* 4 * particles.size(), nullptr/*nothing*/, GL_STREAM_DRAW);
+			
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, (4)*sizeof(float), (void *)((0)*sizeof(float)));//?
+
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);//?
+		}
+
 		void Update(double deltaTime)
 		{
 			for(int i = 0; i < particles.size(); i++)
 				particles[i]->Integrate(IntegratorMode::Euler, env, deltaTime/1000);
+
+			//Send new positions to buffer
+
+			/*assert(d_system != nullptr);
+				assert(d_buffer_position > 0 && d_buffer_column > 0);
+
+				const size_t count = d_system->alive_particles_count();
+				if (count > 0)
+				{
+					glBindBuffer(GL_ARRAY_BUFFER, d_buffer_position);
+					float *ptr = (float *)(d_system->finalData()->m_position.get());
+					glBufferSubData(GL_ARRAY_BUFFER, 0, count*sizeof(float)* 4, ptr);
+
+					glBindBuffer(GL_ARRAY_BUFFER, d_buffer_column);
+					ptr = (float*)(d_system->finalData()->m_col.get());
+					glBufferSubData(GL_ARRAY_BUFFER, 0, count*sizeof(float)* 4, ptr);
+
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+				}*/
 		}
 
 		void Render()
