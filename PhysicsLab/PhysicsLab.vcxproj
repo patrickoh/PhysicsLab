@@ -105,11 +105,10 @@
     <None Include="Shaders\black.ps" />
     <None Include="Shaders\diffuse.ps" />
     <None Include="Shaders\diffuse.vs" />
+    <None Include="Shaders\particle.ps" />
+    <None Include="Shaders\particle.vs" />
     <None Include="Shaders\red.ps" />
     <None Include="Shaders\white.ps" />
-    <None Include="Shaders\node.vs" />
-    <None Include="Shaders\skinned.ps" />
-    <None Include="Shaders\skinned.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

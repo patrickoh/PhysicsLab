@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Physics">
       <UniqueIdentifier>{b5ecfc0c-302f-4191-af0a-c45d5908761a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Pixel Shaders">
+      <UniqueIdentifier>{653b7cc1-b1d4-4325-9895-c7d4274efe19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Vertex Shaders">
+      <UniqueIdentifier>{1824fa2f-9dd4-4f3c-b08e-0376cb897a7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -79,29 +85,26 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\black.ps">
+      <Filter>Resource Files\Pixel Shaders</Filter>
+    </None>
     <None Include="Shaders\diffuse.ps">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Pixel Shaders</Filter>
     </None>
     <None Include="Shaders\diffuse.vs">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Vertex Shaders</Filter>
     </None>
-    <None Include="Shaders\skinned.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Shaders\skinned.ps">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Shaders\node.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Shaders\white.ps">
-      <Filter>Resource Files</Filter>
+    <None Include="Shaders\particle.vs">
+      <Filter>Resource Files\Vertex Shaders</Filter>
     </None>
     <None Include="Shaders\red.ps">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Pixel Shaders</Filter>
     </None>
-    <None Include="Shaders\black.ps">
-      <Filter>Resource Files</Filter>
+    <None Include="Shaders\particle.ps">
+      <Filter>Resource Files\Pixel Shaders</Filter>
+    </None>
+    <None Include="Shaders\white.ps">
+      <Filter>Resource Files\Pixel Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

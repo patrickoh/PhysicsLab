@@ -86,34 +86,47 @@ class ParticleSystem
 {
 	private:
 
-		std::vector<Particle> particles;
+		std::vector<Particle*> particles;
 		IntegratorMode mode;
 
 		Environment env;
 
+		GLuint vao;
+
 	public:
 
-		ParticleSystem();
-		~ParticleSystem();
-
-		void Init()
+		ParticleSystem()
 		{
 			env.gravity = 9.81f; //earth
-            env.wind = glm::vec3(3, 5, 0);
             
+			env.wind = glm::vec3(3, 5, 0);
 			env.fluid.density = 1.225f; //air
             env.fluid.viscosity = 18.1f; //air
 
 			for(int i = 0; i < 1000; i++)
 			{
 				glm::vec3 pos = glm::vec3(RandomFloat(-5, 5), 10, RandomFloat(-5, 5));
-				particles.push_back(Particle(pos));
+				particles.push_back(new Particle(pos));
 			}
+		}
+
+		~ParticleSystem()
+		{
 		}
 
 		void Update(double deltaTime)
 		{
 			for(int i = 0; i < particles.size(); i++)
-				particles[i].Integrate(IntegratorMode::Euler, env, deltaTime/1000);
+				particles[i]->Integrate(IntegratorMode::Euler, env, deltaTime/1000);
+		}
+
+		void Render()
+		{
+			//glBindVertexArray(vao);
+
+			//glPointSize(whatever);              //specify size of points in pixels
+			//glDrawArrays(GL_POINTS, 0, particles.size());
+ 
+			//glBindVertexArray(0);
 		}
 };

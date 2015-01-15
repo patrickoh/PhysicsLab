@@ -27,8 +27,6 @@
 
 #include <xinput.h>
 
-#include "ParticleSystem.h"
-
 using namespace std;
 
 //Callbacks
@@ -73,8 +71,6 @@ int frames = 0;
 
 ShaderManager shaderManager;
 vector<Model*> objectList;
-
-//ParticleSystem particleSystem;
 
 bool printText = false;
 
@@ -131,7 +127,6 @@ int main(int argc, char** argv)
 
 	shaderManager.Init();
 
-	shaderManager.CreateShaderProgram("skinned", "Shaders/skinned.vs", "Shaders/skinned.ps");
 	shaderManager.CreateShaderProgram("diffuse", "Shaders/diffuse.vs", "Shaders/diffuse.ps");
 
 	shaderManager.CreateShaderProgram("black", "Shaders/diffuse.vs", "Shaders/black.ps");
