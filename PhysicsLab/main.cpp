@@ -27,6 +27,12 @@
 
 #include "ParticleSystem.h"
 
+#include <AntTweakBar.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
 using namespace std;
 
 //Callbacks
@@ -41,6 +47,8 @@ void mouseWheel(int, int, int, int);
 void reshape(int w, int h);
 void update();
 void draw();
+
+void BuildTweakBar();
 
 bool directionKeys[4] = {false};
 
@@ -144,9 +152,39 @@ int main(int argc, char** argv)
 
 	particleSystem.Generate();
 
+	BuildTweakBar();
+
 	glutMainLoop();
     
 	return 0;
+}
+
+void BuildTweakBar()
+{
+	TwBar *bar; 
+
+    TwInit(TW_OPENGL, NULL);
+	TwGLUTModifiersFunc(glutGetModifiers);
+
+	TwWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    bar = TwNewBar("TweakBar");
+    TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
+    TwDefine(" TweakBar size='200 400' color='125 125 125' "); // change default tweak bar size and color
+
+	TwAddVarRW(bar, "WindDir", TW_TYPE_DIR3F, &particleSystem.env.wind, 
+               " label='Wind direction' opened=true help='Change the wind direction.' ");
+
+    {
+		TwEnumVal integratorEV[3] = { {IntegratorMode::Euler, "Euler"}, {IntegratorMode::RK4, "RK4"}, {IntegratorMode::None, "None"} };
+        TwType integratorType = TwDefineEnum("IntegratorType", integratorEV, 3);
+		TwAddVarRW(bar, "Integrator", integratorType, &particleSystem.mode, " keyIncr='<' keyDecr='>' help='Change integrator mode.' ");
+    }
+
+	TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem.liveParticles, " label='ParticleCount' ");
+
+	TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &particleSystem.simulationSpeed, 
+		 " label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
 }
 
 // GLUT CALLBACK FUNCTIONS
@@ -220,12 +258,21 @@ void draw()
 	if(printText)
 		printouts();
 
+	// Draw tweak bars
+    TwDraw();
+
 	glutSwapBuffers();
 }
 
 //KEYBOARD FUCNTIONS
 void keyPressed (unsigned char key, int x, int y) 
 {  
+	if( !TwEventKeyboardGLUT(key, x, y) )  // send event to AntTweakBar
+    { // event has not been handled by AntTweakBar
+      // your code here to handle the event
+      // ...
+    }
+
 	keyStates[key] = true; // Set the state of the current key to pressed  
 		
 	camera.ProcessKeyboardOnce(key, x, y);
@@ -284,6 +331,12 @@ void handleSpecialKeypress(int key, int x, int y)
 //DIRECTIONAL KEYS UP
 void handleSpecialKeyReleased(int key, int x, int y) 
 {
+	if( !TwEventSpecialGLUT(key, x, y) )  // send event to AntTweakBar
+    { // event has not been handled by AntTweakBar
+      // your code here to handle the event
+      // ...
+    }
+
 	switch (key) 
 	{
 		case GLUT_KEY_LEFT:
@@ -307,6 +360,12 @@ void handleSpecialKeyReleased(int key, int x, int y)
 //MOUSE FUCNTIONS
 void passiveMouseMotion(int x, int y)  
 {
+	if( !TwEventMouseMotionGLUT(x, y) )  // send event to AntTweakBar
+    { // event has not been handled by AntTweakBar
+      // your code here to handle the event
+      // ...
+    }
+
 	if(!freeMouse)
 	{
 		//As glutWarpPoint triggers an event callback to Mouse() we need to return to ensure it doesn't recursively call
@@ -325,9 +384,16 @@ void passiveMouseMotion(int x, int y)
 
 void mouseButton(int button, int state, int x, int y)
 {
+
+	if( !TwEventMouseButtonGLUT(button, state, x, y) )  // send event to AntTweakBar
+    { // event has not been handled by AntTweakBar
+      // your code here to handle the event
+      // ...
+    }
+
 	switch(button) {
 		case GLUT_LEFT_BUTTON:
-			if(freeMouse)
+			if(freeMouse && keyStates[KEY::KEY_SPACE])
 			{
 				freeMouse = false;
 				glutSetCursor(GLUT_CURSOR_NONE);

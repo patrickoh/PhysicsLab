@@ -53,14 +53,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\PhysicsLab\ImageMagick-6\Include;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\include;$(SolutionDir)\PhysicsLab\glew-1.10.0\include;$(SolutionDir)\PhysicsLab\freeglut\include;$(SolutionDir)\PhysicsLab\glm-0.9.5.4\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\include;$(SolutionDir)\PhysicsLab\ImageMagick-6\Include;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\include;$(SolutionDir)\PhysicsLab\glew-1.10.0\include;$(SolutionDir)\PhysicsLab\freeglut\include;$(SolutionDir)\PhysicsLab\glm-0.9.5.4\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\PhysicsLab\ImageMagick-6\Lib;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\PhysicsLab\freeglut\lib;$(SolutionDir)\PhysicsLab\glew-1.10.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_DB_Magick++_.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\lib;$(SolutionDir)\PhysicsLab\ImageMagick-6\Lib;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\PhysicsLab\freeglut\lib;$(SolutionDir)\PhysicsLab\glew-1.10.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_DB_Magick++_.lib;AntTweakBar.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>

@@ -1,7 +1,7 @@
 #include "ParticleSystem.h"
 #include "PhysicsHelper.h"
 
-glm::vec3 GravityForce(Environment env, Particle particle)
+glm::vec3 Gravity(Environment env, Particle particle)
 {
 	return particle.mass * env.gravity * glm::vec3(0,-1,0);
 }

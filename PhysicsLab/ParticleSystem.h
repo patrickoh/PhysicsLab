@@ -39,7 +39,7 @@ struct Environment
     Fluid fluid;
 };
 
-enum IntegratorMode { Euler, RK4 };
+enum IntegratorMode { Euler, RK4, None };
 
 struct Particle
 {
@@ -77,38 +77,36 @@ struct Particle
 		acceleration = glm::vec3(0);
 	}
 
-	glm::vec3 f(Environment env)
+	glm::vec3 fNet(Environment env)
 	{
-		return GravityForce(env, *this) + PressureDrag(env, *this, true);
+		return Gravity(env, *this) + PressureDrag(env, *this, true);
 	}
 
-	void Integrate(IntegratorMode mode, Environment env, float timeStep)
+	void Euler(Environment env, float timeStep)
 	{
-		if (mode == IntegratorMode::Euler)
-        {
-            position += timeStep * velocity;
-            velocity += timeStep * acceleration;
+        position += timeStep * velocity;
+        velocity += timeStep * acceleration;
 
-			acceleration = f(env) / mass;
-        }
-		else if (mode == IntegratorMode::RK4)
-        {
-			glm::vec3 p2 = position + velocity * (timeStep / 2);
-			glm::vec3 v2 = velocity + acceleration * (timeStep / 2);
-			glm::vec3 a2 = acceleration;//f(env) / mass;
+		acceleration = fNet(env) / mass;
+	}
 
-			glm::vec3 p3 = position + v2 * (timeStep / 2);
-			glm::vec3 v3 = velocity + a2 * (timeStep / 2);
-			glm::vec3 a3 = a2;//f(env) / mass;
+	void RK4(Environment env, float timeStep)
+	{
+		glm::vec3 p2 = position + velocity * (timeStep / 2);
+		glm::vec3 v2 = velocity + acceleration * (timeStep / 2);
+		glm::vec3 a2 = acceleration;//f(env) / mass;
 
-			glm::vec3 p4 = position + v3 * timeStep;
-			glm::vec3 v4 = velocity + a3 * timeStep;
-			glm::vec3 a4 = a3;//f(env) / mass;
+		glm::vec3 p3 = position + v2 * (timeStep / 2);
+		glm::vec3 v3 = velocity + a2 * (timeStep / 2);
+		glm::vec3 a3 = a2;//f(env) / mass;
 
-			position += (velocity + (2.0f * v2) + (2.0f * v3) + v4) * (timeStep / 6);
-			velocity += (acceleration + (2.0f * a2) + (2.0f * a3) + a4) * (timeStep / 6);
-			acceleration = f(env) / mass;
-        }
+		glm::vec3 p4 = position + v3 * timeStep;
+		glm::vec3 v4 = velocity + a3 * timeStep;
+		glm::vec3 a4 = a3;//f(env) / mass;
+
+		position += (velocity + (2.0f * v2) + (2.0f * v3) + v4) * (timeStep / 6);
+		velocity += (acceleration + (2.0f * a2) + (2.0f * a3) + a4) * (timeStep / 6);
+		acceleration = fNet(env) / mass;   
 	}
 };
 
@@ -153,22 +151,21 @@ class ParticleSystem
 
 		Emitter emitter;
 		
-		IntegratorMode mode;
-
-		Environment env;
-
 		GLuint vao;
 		GLuint positionBuffer;
-
-		float speedScalar;
 
 		int size;
 
 	public:
 
+		IntegratorMode mode;
+		Environment env;
+		int liveParticles;
+		float simulationSpeed;
+
 		ParticleSystem()
 		{
-			speedScalar = 0.4f;
+			simulationSpeed = 0.4f;
 
 			env.gravity = 9.81f; //earth
             
@@ -177,6 +174,7 @@ class ParticleSystem
             env.fluid.viscosity = 18.1f; //air
 
 			size = 1000;
+			liveParticles = 0;
 
 			for(int i = 0; i < size; i++)
 			{
@@ -228,14 +226,17 @@ class ParticleSystem
 				inactiveParticles.pop();
 			}
 
-			if(particles.size() == 0)
-				return;
+			//if(particles.size() == 0)
+				//return;
 
 			for(int i = 0; i < particles.size(); i++)
 			{
 				if(particles[i]->active)
 				{
-					particles[i]->Integrate(mode, env, deltaTime/1000 * speedScalar);
+					if(mode == IntegratorMode::Euler)
+						particles[i]->Euler(env, deltaTime/1000 * simulationSpeed);
+					else if (mode == IntegratorMode::RK4)
+						particles[i]->RK4(env, deltaTime/1000 * simulationSpeed);
 
 					if(particles[i]->position.y < 0)
 					{
@@ -246,6 +247,8 @@ class ParticleSystem
 					positions.push_back(particles[i]->position);
 				}
 			}
+
+			liveParticles = positions.size();
 
 			//Send new positions to buffer
 			glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
