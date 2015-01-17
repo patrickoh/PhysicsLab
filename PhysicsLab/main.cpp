@@ -83,7 +83,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInitWindowPosition (0, 0); 
-    glutCreateWindow("KH 0.5 Remix");
+    glutCreateWindow("Particles!");
 
 	//glutFullScreen();
 

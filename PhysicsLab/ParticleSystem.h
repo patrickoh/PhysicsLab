@@ -63,6 +63,9 @@ struct Particle
 		this->mass = 1;
 
 		dragCoefficient = 0.47f; //sphere  
+		
+		radius = 0.05f;
+        surfaceArea = 3.14159265 * glm::pow(radius, 2.0f); //sphere
 
 		active = true;
 	}
@@ -76,7 +79,7 @@ struct Particle
 
 	glm::vec3 f(Environment env)
 	{
-		return GravityForce(env, *this); //+ PressureDrag(env, *this, true);
+		return GravityForce(env, *this) + PressureDrag(env, *this, true);
 	}
 
 	void Integrate(IntegratorMode mode, Environment env, float timeStep)
@@ -116,31 +119,28 @@ struct Emitter
 	glm::vec3 centre;
 	//area
 
-	struct VelLimits
+	//particle lifetime
+	//colour
+	//animationColour()
+
+	//tex support?
+
+	//mesh object emitter.
+
+	float FuzzifyValue(float value, float variance)
 	{
-		float ymin, ymax;
-		float xmin, xmax;
-		float zmin, zmax;
-
-		VelLimits() {}
-
-		VelLimits(float xmin, float xmax, float ymin, float ymax, float zmin, float zmax) 
-			: xmin(xmin), xmax(xmax), ymin(ymin), ymax(ymax), zmin(zmin), zmax(zmax) {}
-
-	} velLimits;
+		return RandomFloat(value - variance/2, value + variance/2);
+	}
 
 	Emitter()
 	{
 		centre = glm::vec3(0);
-		velLimits = VelLimits(-1.0f, 1.0f, 3.0f, 5.0f, -1.0f, 1.0f);
 	}
 
 	void Emit(Particle* particle)
 	{
 		particle->position = centre;
-		particle->velocity = 
-			glm::vec3(RandomFloat(velLimits.xmin, velLimits.xmax), 
-				RandomFloat(velLimits.ymin, velLimits.ymax), RandomFloat(velLimits.zmin, velLimits.zmax));
+		particle->velocity = glm::vec3(FuzzifyValue(0, 2), FuzzifyValue(4, 2), FuzzifyValue(0, 2));
 	}
 };
 
@@ -172,7 +172,7 @@ class ParticleSystem
 
 			env.gravity = 9.81f; //earth
             
-			env.wind = glm::vec3(3, 5, 0);
+			env.wind = glm::vec3(300, 50, 400);
 			env.fluid.density = 1.225f; //air
             env.fluid.viscosity = 18.1f; //air
 
