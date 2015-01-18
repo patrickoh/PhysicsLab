@@ -49,6 +49,7 @@ void update();
 void draw();
 
 void BuildTweakBar();
+//void TW_CALL ResetPlaneCB(const void *value, void *clientData);
 
 bool directionKeys[4] = {false};
 
@@ -80,9 +81,11 @@ int frames = 0;
 ShaderManager shaderManager;
 vector<Model*> objectList;
 
-bool printText = false;
+Model* plane;
 
-ParticleSystem particleSystem;
+bool printText = true;
+
+ParticleSystem particleSystem(3000);
 
 int main(int argc, char** argv)
 {
@@ -124,7 +127,7 @@ int main(int argc, char** argv)
     }
 	#pragma endregion 
 
-	glClearColor(135.0/255.0, 206.0/255.0, 250.0/255.0, 1);
+	glClearColor(5.0/255.0, 5.0/255.0, 5.0/255.0, 1);
 	glEnable (GL_CULL_FACE); // cull face 
 	glCullFace (GL_BACK); // cull back face 
 	glFrontFace (GL_CCW); // GL_CCW for counter clock-wise
@@ -134,6 +137,7 @@ int main(int argc, char** argv)
 
 	//TODO - constructor for camera
 	camera.Init(glm::vec3(0.0f, 0.0f, 0.0f), 0.0002f, 0.01f); 
+	camera.mode = CameraMode::tp;
 
 	shaderManager.Init();
 
@@ -143,11 +147,13 @@ int main(int argc, char** argv)
 	shaderManager.CreateShaderProgram("white", "Shaders/diffuse.vs", "Shaders/white.ps");
 	shaderManager.CreateShaderProgram("red", "Shaders/diffuse.vs", "Shaders/red.ps");
 
-	shaderManager.CreateShaderProgram("text", "Shaders/diffuse.vs", "Shaders/black.ps");
+	shaderManager.CreateShaderProgram("text", "Shaders/diffuse.vs", "Shaders/white.ps");
 
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
 
-	objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+	plane = new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(2), "Models/plane.dae", shaderManager.GetShaderProgramID("white"));
+	plane->wireframe = true;
+	objectList.push_back(plane);
 	//objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.001), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse")));
 
 	particleSystem.Generate();
@@ -157,6 +163,12 @@ int main(int argc, char** argv)
 	glutMainLoop();
     
 	return 0;
+}
+
+void TW_CALL ResetPlaneCB(void *clientData)
+{
+	particleSystem.normal = glm::vec3(0,1,0);
+	plane->worldProperties.orientation = glm::mat4(1);
 }
 
 void BuildTweakBar()
@@ -172,19 +184,51 @@ void BuildTweakBar()
     TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
     TwDefine(" TweakBar size='200 400' color='125 125 125' "); // change default tweak bar size and color
 
-	TwAddVarRW(bar, "WindDir", TW_TYPE_DIR3F, &particleSystem.env.wind, 
-               " label='Wind direction' opened=true help='Change the wind direction.' ");
+	TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &particleSystem.gravity, " label='Gravity'");
 
-    {
+	TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &particleSystem.env.gravity, " label='GravityStr'");
+
+	TwAddSeparator(bar, "", "");
+	
+	TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &particleSystem.drag, " label='Drag'");
+	TwAddVarRW(bar, "Wind ", TW_TYPE_BOOL8, &particleSystem.wind, " label='Wind' group='Drag Settings'");
+
+	TwAddVarRW(bar, "Cd ", TW_TYPE_FLOAT, &particleSystem.dragCoefficient, " label='Cd' group='Drag Settings'");
+	TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &particleSystem.env.fluid.density, " label='Fluid Density' group='Drag Settings'");
+
+	TwAddVarRW(bar, "WindDir", TW_TYPE_DIR3F, &particleSystem.env.wind, 
+               " label='Wind direction' opened=true help='Change the wind direction.' group='Drag Settings' ");
+	TwAddVarRW(bar, "WindScalar ", TW_TYPE_FLOAT, &particleSystem.env.windScalar, " label='WindScalar' group='Drag Settings'");
+
+	TwAddSeparator(bar, "", "");
+
+	{
 		TwEnumVal integratorEV[3] = { {IntegratorMode::Euler, "Euler"}, {IntegratorMode::RK4, "RK4"}, {IntegratorMode::None, "None"} };
         TwType integratorType = TwDefineEnum("IntegratorType", integratorEV, 3);
 		TwAddVarRW(bar, "Integrator", integratorType, &particleSystem.mode, " keyIncr='<' keyDecr='>' help='Change integrator mode.' ");
     }
 
-	TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem.liveParticles, " label='ParticleCount' ");
-
 	TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &particleSystem.simulationSpeed, 
 		 " label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
+
+	TwAddSeparator(bar, "", "");
+
+	TwAddVarRW(bar, "Collision Response", TW_TYPE_BOOL8, &particleSystem.bCollisions, "group='Collision Settings'");
+
+	TwAddVarRW(bar, "Normal", TW_TYPE_DIR3F, &particleSystem.normal, 
+               " label='Plane Normal' opened=true help='Change the plane normal.' group='Collision Settings'");
+	//TwAddVarRW(bar, "Plane", TW_TYPE_DIR3D, &particleSystem.plane, 
+               //" label='Plane Position' opened=true help='Change the plane position.' ");
+
+	TwAddVarRW(bar, "Kr", TW_TYPE_FLOAT, &particleSystem.coefficientOfRestitution, "help='Coefficient of Restitution.' min=0.0 max=1.0 step=0.1 group='Collision Settings'");
+
+	// Add callback to toggle auto-rotate mode (callback functions are defined above).
+	TwAddButton(bar, "Reset Plane", ResetPlaneCB, NULL, "");
+
+	TwAddSeparator(bar, "", "");
+
+	TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem.liveParticles, " label='ParticleCount'");
+	TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem.mass, "min=0.1");
 }
 
 // GLUT CALLBACK FUNCTIONS
@@ -209,6 +253,14 @@ void update()
 	for(int i = 0; i< objectList.size(); i++)
 	{
 		objectList[i]->Update(deltaTime);
+	}
+
+	double cosAngle = glm::dot(glm::vec3(0,1,0), particleSystem.normal);
+	if(cosAngle < 0.9999f)
+	{
+		float turnAngle = glm::degrees(glm::acos(cosAngle));
+		glm::vec3 rotAxis = glm::normalize(glm::cross(glm::vec3(0,1,0), particleSystem.normal));
+		plane->worldProperties.orientation = glm::rotate(glm::mat4(1), turnAngle, rotAxis);
 	}
 
 	particleSystem.Update(deltaTime);
@@ -279,6 +331,20 @@ void keyPressed (unsigned char key, int x, int y)
 
 	if(key == KEY::KEY_h || key == KEY::KEY_H)
 		printText = !printText;
+
+	if(key == KEY::KEY_SPACE || key == KEY::KEY_ESCAPE)
+	{
+		if(!freeMouse)
+		{
+			freeMouse = true;
+			glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+		}
+		else
+		{
+			freeMouse = false;
+			glutSetCursor(GLUT_CURSOR_NONE);
+		}
+	}
 }  
   
 void keyUp (unsigned char key, int x, int y) 
@@ -289,14 +355,6 @@ void keyUp (unsigned char key, int x, int y)
 //Process keystates
 void processContinuousInput()
 {
-	if(keyStates[KEY::KEY_ESCAPE])
-	{
-		if(!freeMouse)
-		{
-			freeMouse = true;
-			glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
-		}
-	}
 	//exit(0);
 
 	camera.ProcessKeyboardContinuous(keyStates, deltaTime);
@@ -393,11 +451,6 @@ void mouseButton(int button, int state, int x, int y)
 
 	switch(button) {
 		case GLUT_LEFT_BUTTON:
-			if(freeMouse && keyStates[KEY::KEY_SPACE])
-			{
-				freeMouse = false;
-				glutSetCursor(GLUT_CURSOR_NONE);
-			}
 			break;
     }
 
@@ -422,21 +475,29 @@ void printouts()
 	//Bottom left is 0,0
 
 	ss.str(std::string()); // clear
+	ss << " Press 'spacebar' or 'esc' to toggle camera/cursor";
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-40, ss.str().c_str());
+
+	ss.str(std::string()); // clear
+	ss << " Press 'c' to switch camera modes";
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-60, ss.str().c_str());
+
+	/*ss.str(std::string()); // clear
 	ss << fps << " fps ";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-40, ss.str().c_str());
 
 	//PRINT CAMERA
 	ss.str(std::string()); // clear
 	ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.forward.x << ", " << camera.viewProperties.forward.y << ", " << camera.viewProperties.forward.z << ")";
-	drawText(20,WINDOW_HEIGHT-40, ss.str().c_str());
+	drawText(20,80, ss.str().c_str());
 
 	ss.str(std::string()); // clear
 	ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.position.x << ", " << camera.viewProperties.position.y << ", " << camera.viewProperties.position.z << ")";
-	drawText(20,WINDOW_HEIGHT-60, ss.str().c_str());
+	drawText(20,60, ss.str().c_str());
 
 	ss.str(std::string()); // clear
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
-	drawText(20,WINDOW_HEIGHT-80, ss.str().c_str());
+	drawText(20,40, ss.str().c_str());*/
 }
 
 

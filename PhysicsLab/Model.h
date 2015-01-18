@@ -79,11 +79,10 @@ class Model
 
 		int vertexCount;
 
-		bool wireframe;
-
 	public:
 		
 		bool drawMe;
+		bool wireframe;
 
 		glm::mat4 globalInverseTransform;
 

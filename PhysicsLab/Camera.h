@@ -170,7 +170,7 @@ class Camera
 
 		void ProcessKeyboardOnce(unsigned char key, int x, int y)
 		{
-			if (key == KEY::KEY_0)
+			if (key == KEY::KEY_C || key == KEY::KEY_c)
 			{
 				mode = static_cast<CameraMode>((mode+1) % NUM_CAM_MODES);
 			}
