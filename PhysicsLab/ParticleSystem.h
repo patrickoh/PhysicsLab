@@ -14,24 +14,10 @@
 
 using namespace std;
 
-//TODO 
-//	-implement recylcing
-//  -implement evolution?
-//	-at least 1000 particles
-//	-at least two forces
-//	-particle plane collision handling
-//		-recycle when hit
-//
-
-//optional
-//	-rk4
-//	-model something real
-//		-snow?
-
 struct Fluid
 {
    float density;
-   float viscosity;
+   //float viscosity;
 };
 
 struct Environment
@@ -52,12 +38,6 @@ struct BufferData
 
 enum IntegratorMode { Euler, RK4, None };
 
-enum Forces {
-  gravity    = 0x01,
-  drag       = 0x02,
-  wind       = 0x04
-};
-
 struct Particle
 {
 	bool active;
@@ -69,9 +49,6 @@ struct Particle
 	glm::vec4 colour;
 	float age;
 
-	glm::vec4 min_start_color; 
-	glm::vec4 max_start_color; 
-
 	Particle(glm::vec3 startPos)
 	{
 		position = startPos;
@@ -80,12 +57,6 @@ struct Particle
 
 		active = true;
 		age = 0;
-
-		min_start_color = glm::linearRand( glm::vec4( 0.7, 0.7, 0.7, 1.0 ), glm::vec4( 1.0, 1.0, 1.0, 1.0 ));
-		max_start_color = glm::linearRand(glm::vec4( 0.5, 0.0, 0.6, 0.0 ), glm::vec4(0.7, 0.5, 1.0, 0.0 ));
-
-		//colour = glm::vec4(127/255.0,127/255.0,127/255.0,1);
-		colour = min_start_color;
 	}
 
 	void Reset()
@@ -94,40 +65,30 @@ struct Particle
 		velocity = glm::vec3(0);
 		acceleration = glm::vec3(0);
 
-		min_start_color = glm::linearRand( glm::vec4( 0.7, 0.7, 0.7, 1.0 ), glm::vec4( 1.0, 1.0, 1.0, 1.0 ));
-		max_start_color = glm::linearRand(glm::vec4( 0.5, 0.0, 0.6, 0.0 ), glm::vec4(0.7, 0.5, 1.0, 0.0 ));
+		age = 0;
 	}	
 };
 
 struct Emitter
 {
-	//float emitRate;
-
+	int emitRate;
 	glm::vec3 centre;
+	
+	//TODO
 	//area
-
-	//particle lifetime
-	//colour
-	//animationColour()
-
 	//tex support?
-
 	//mesh object emitter.
-
-	float FuzzifyValue(float value, float variance)
-	{
-		return RandomFloat(value - variance/2, value + variance/2);
-	}
 
 	Emitter()
 	{
 		centre = glm::vec3(0);
+		emitRate = 10;
 	}
 
 	void Emit(Particle* particle)
 	{
 		particle->position = centre;
-		particle->velocity = glm::vec3(FuzzifyValue(0, 2), FuzzifyValue(4, 2), FuzzifyValue(0, 2));
+		particle->velocity = glm::linearRand(glm::vec3(-1.0f, 3.0f, -1.0f),glm::vec3(1.0f, 5.0f, 1.0f));
 	}
 };
 
@@ -137,8 +98,6 @@ class ParticleSystem
 
 		std::vector<Particle*> particles;
 		std::queue<Particle*> inactiveParticles;
-
-		Emitter emitter;
 
 		GLuint vao;
 		GLuint vbo;
@@ -173,6 +132,11 @@ class ParticleSystem
 		float mass;
 		float particleLife;
 
+		Emitter emitter;
+
+		glm::vec4 startColour;
+		glm::vec4 endColour;
+
 		ParticleSystem(int size = 1000)
 		{
 			plane = glm::vec3(0, 0, 0);
@@ -194,7 +158,7 @@ class ParticleSystem
 			env.windScalar = 1000.0f;
 
 			env.fluid.density = 1.225f; //air
-            env.fluid.viscosity = 18.1f; //air
+            //env.fluid.viscosity = 18.1f; //air
 
 			dragCoefficient = 0.47f; //sphere  
 			radius = 0.05f;
@@ -220,6 +184,9 @@ class ParticleSystem
 			bCollisions = true;
 
 			mode = IntegratorMode::RK4;
+
+			startColour = glm::vec4(1,1,1,1);
+			endColour = glm::vec4(1,0,0,1);
 		}
 
 		~ParticleSystem()
@@ -241,38 +208,26 @@ class ParticleSystem
 
 			glEnableVertexAttribArray(1); 
 			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(BufferData), (GLvoid*)offsetof(BufferData, colour));
-
-			//glGenBuffers(1, &posBuffer);
-			//glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * this->size, nullptr/*nothing*/, GL_STREAM_DRAW);
-			//glEnableVertexAttribArray(0);
-			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (3)*sizeof(float), (void *)((0)*sizeof(float)));//?
-
-			//glGenBuffers(1, &colBuffer);
-			//glBindBuffer(GL_ARRAY_BUFFER, colBuffer);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * this->size, nullptr/*nothing*/, GL_STREAM_DRAW);
-			//glEnableVertexAttribArray(1);
-			//glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, (4)*sizeof(float), (void *)((0)*sizeof(float)));//?
 			
 			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);//?
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		void Update(double deltaTime)
 		{
-			//std::vector<glm::vec3> positions;
-			//std::vector<glm::vec4> colours;
-
 			std::vector<BufferData> data;
 
 			float timestep = deltaTime/1000;
 
-			while(inactiveParticles.size() > 0)
+			for(int i = 0; i < emitter.emitRate; i++)
 			{
-				Particle* p = inactiveParticles.front();
-				emitter.Emit(p);
-				inactiveParticles.front()->active = true;
-				inactiveParticles.pop();
+				if(inactiveParticles.size() > 0)
+				{
+					Particle* p = inactiveParticles.front();
+					emitter.Emit(p);
+					inactiveParticles.front()->active = true;
+					inactiveParticles.pop();
+				}
 			}
 
 			for(int i = 0; i < particles.size(); i++)
@@ -295,26 +250,23 @@ class ParticleSystem
 						}
 						else
 						{
-							//inactiveParticles.push(particles[i]);
-							//particles[i]->active = false;
+							inactiveParticles.push(particles[i]);
+							particles[i]->active = false;
+							particles[i]->Reset();
 						}
 					}
 
-					//UPDATE COLOUR
+					//ADVANCE AGE & UPDATE COLOUR
 					particles[i]->age += timestep;
-					//particles[i]->colour = glm::mix(particles[i]->min_start_color,
-						//particles[i]->max_start_color, particles[i]->age / particleLife);
-
+					particles[i]->colour = glm::mix(startColour, endColour, particles[i]->age / particleLife);
 					if(particles[i]->age > particleLife)
 					{
 						inactiveParticles.push(particles[i]);
 						particles[i]->active = false;
-						particles[i]->age = 0;
+						particles[i]->Reset();
 					}
 
-					//positions.push_back(particles[i]->position);
-					//colours.push_back(particles[i]->colour);
-
+					//ADD TO BUFFER
 					BufferData bd;
 					bd.position = particles[i]->position;
 					bd.colour = particles[i]->colour;
@@ -326,13 +278,6 @@ class ParticleSystem
 
 			if(liveParticles > 0)
 			{
-				//Send new positions to buffer
-				/*glBindBuffer(GL_ARRAY_BUFFER, posBuffer);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, positions.size()*sizeof(positions[0]), &positions[0]);
-				
-				glBindBuffer(GL_ARRAY_BUFFER, colBuffer);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, colours.size()*sizeof(colours[0]), &colours[0]);*/
-
 				glBindBuffer(GL_ARRAY_BUFFER, vbo);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, data.size()*sizeof(data[0]), &data[0]);
 				

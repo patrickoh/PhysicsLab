@@ -85,7 +85,7 @@ Model* plane;
 
 bool printText = true;
 
-ParticleSystem particleSystem(3000);
+ParticleSystem particleSystem(10000);
 
 int main(int argc, char** argv)
 {
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInitWindowPosition (0, 0); 
-    glutCreateWindow("Particles!");
+    glutCreateWindow("Particles! by Pad");
 
 	//glutFullScreen();
 
@@ -182,51 +182,43 @@ void BuildTweakBar()
 
     bar = TwNewBar("TweakBar");
     TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
-    TwDefine(" TweakBar size='200 400' color='125 125 125' "); // change default tweak bar size and color
+    TwDefine(" TweakBar size='250 700' color='125 125 125' "); // change default tweak bar size and color
 
+	TwAddVarRW(bar, "EmitRate", TW_TYPE_INT32, &particleSystem.emitter.emitRate, "");
+	TwAddVarRW(bar, "Particle life", TW_TYPE_FLOAT, &particleSystem.particleLife, "min=0.0 step=0.25");
+	TwAddVarRW(bar, "StartColour", TW_TYPE_COLOR3F, &particleSystem.startColour, " group='Colours' ");
+	TwAddVarRW(bar, "EndColour", TW_TYPE_COLOR3F, &particleSystem.endColour, " group='Colours' ");
+
+	TwAddSeparator(bar, "", "");
 	TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &particleSystem.gravity, " label='Gravity'");
-
 	TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &particleSystem.env.gravity, " label='GravityStr'");
 
 	TwAddSeparator(bar, "", "");
-	
 	TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &particleSystem.drag, " label='Drag'");
-	TwAddVarRW(bar, "Wind ", TW_TYPE_BOOL8, &particleSystem.wind, " label='Wind' group='Drag Settings'");
-
 	TwAddVarRW(bar, "Cd ", TW_TYPE_FLOAT, &particleSystem.dragCoefficient, " label='Cd' group='Drag Settings'");
 	TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &particleSystem.env.fluid.density, " label='Fluid Density' group='Drag Settings'");
-
+	TwAddVarRW(bar, "Wind ", TW_TYPE_BOOL8, &particleSystem.wind, " label='Wind' group='Drag Settings'");
 	TwAddVarRW(bar, "WindDir", TW_TYPE_DIR3F, &particleSystem.env.wind, 
-               " label='Wind direction' opened=true help='Change the wind direction.' group='Drag Settings' ");
+               " label='Wind direction' opened=false help='Change the wind direction.' group='Drag Settings' ");
 	TwAddVarRW(bar, "WindScalar ", TW_TYPE_FLOAT, &particleSystem.env.windScalar, " label='WindScalar' group='Drag Settings'");
 
 	TwAddSeparator(bar, "", "");
-
 	{
 		TwEnumVal integratorEV[3] = { {IntegratorMode::Euler, "Euler"}, {IntegratorMode::RK4, "RK4"}, {IntegratorMode::None, "None"} };
         TwType integratorType = TwDefineEnum("IntegratorType", integratorEV, 3);
 		TwAddVarRW(bar, "Integrator", integratorType, &particleSystem.mode, " keyIncr='<' keyDecr='>' help='Change integrator mode.' ");
     }
-
 	TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &particleSystem.simulationSpeed, 
 		 " label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
 
 	TwAddSeparator(bar, "", "");
-
-	TwAddVarRW(bar, "Collision Response", TW_TYPE_BOOL8, &particleSystem.bCollisions, "group='Collision Settings'");
-
+	TwAddVarRW(bar, "Collision Response", TW_TYPE_BOOL8, &particleSystem.bCollisions, "");
 	TwAddVarRW(bar, "Normal", TW_TYPE_DIR3F, &particleSystem.normal, 
-               " label='Plane Normal' opened=true help='Change the plane normal.' group='Collision Settings'");
-	//TwAddVarRW(bar, "Plane", TW_TYPE_DIR3D, &particleSystem.plane, 
-               //" label='Plane Position' opened=true help='Change the plane position.' ");
-
-	TwAddVarRW(bar, "Kr", TW_TYPE_FLOAT, &particleSystem.coefficientOfRestitution, "help='Coefficient of Restitution.' min=0.0 max=1.0 step=0.1 group='Collision Settings'");
-
-	// Add callback to toggle auto-rotate mode (callback functions are defined above).
-	TwAddButton(bar, "Reset Plane", ResetPlaneCB, NULL, "");
+               " label='Plane Normal' opened=false help='Change the plane normal.' group='Plane Settings'");
+	TwAddVarRW(bar, "Kr", TW_TYPE_FLOAT, &particleSystem.coefficientOfRestitution, "help='Coefficient of Restitution.' min=0.0 max=1.0 step=0.1 group='Plane Settings'");
+	TwAddButton(bar, "Reset Plane", ResetPlaneCB, NULL, "group='Plane Settings'");
 
 	TwAddSeparator(bar, "", "");
-
 	TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem.liveParticles, " label='ParticleCount'");
 	TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem.mass, "min=0.1");
 }
