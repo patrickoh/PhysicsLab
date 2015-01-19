@@ -22,9 +22,6 @@
     <Filter Include="Header Files\Physics">
       <UniqueIdentifier>{f850a68d-414f-4005-9d86-119a9f15dc1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Physics">
-      <UniqueIdentifier>{b5ecfc0c-302f-4191-af0a-c45d5908761a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Pixel Shaders">
       <UniqueIdentifier>{653b7cc1-b1d4-4325-9895-c7d4274efe19}</UniqueIdentifier>
     </Filter>
@@ -44,9 +41,6 @@
     </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsHelper.cpp">
-      <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
@@ -70,9 +64,6 @@
     </ClInclude>
     <ClInclude Include="Keys.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsHelper.h">
-      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files\Physics</Filter>

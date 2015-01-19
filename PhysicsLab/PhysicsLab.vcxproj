@@ -85,7 +85,6 @@
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
   </ItemGroup>
@@ -96,7 +95,6 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="Model.h" />
-    <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ParticleSystem.h" />

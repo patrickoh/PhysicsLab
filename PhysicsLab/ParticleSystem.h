@@ -10,7 +10,6 @@
 #include <queue>
 
 #include "Model.h"
-#include "PhysicsHelper.h"
 
 using namespace std;
 
@@ -79,16 +78,21 @@ struct Emitter
 	//tex support?
 	//mesh object emitter.
 
+	glm::vec3 velRangeMin, velRangeMax; 
+
 	Emitter()
 	{
 		centre = glm::vec3(0);
 		emitRate = 10;
+
+		velRangeMin = glm::vec3(-1.0f, 3.0f, -1.0f);
+		velRangeMax = glm::vec3(1.0f, 5.0f, 1.0f);
 	}
 
 	void Emit(Particle* particle)
 	{
 		particle->position = centre;
-		particle->velocity = glm::linearRand(glm::vec3(-1.0f, 3.0f, -1.0f),glm::vec3(1.0f, 5.0f, 1.0f));
+		particle->velocity = glm::linearRand(velRangeMin, velRangeMax);
 	}
 };
 
@@ -110,9 +114,7 @@ class ParticleSystem
 	public:
 
 		IntegratorMode mode;
-
 		Environment env;
-		float windScalar;
 		
 		int liveParticles;
 		float simulationSpeed;
@@ -122,27 +124,29 @@ class ParticleSystem
 		bool drag;
 
 		bool bCollisions;
+		glm::vec3 plane, normal;
+		float coefficientOfRestitution; //Collision stuff
 
-		glm::vec3 plane;
-		glm::vec3 normal;
-		float coefficientOfRestitution;
-
-		float radius, surfaceArea, dragCoefficient; //drag stuff
+		float radius, surfaceArea, dragCoefficient; //Drag stuff
 
 		float mass;
-		float particleLife;
-
+		
 		Emitter emitter;
 
 		glm::vec4 startColour;
 		glm::vec4 endColour;
 
+		float particleLife;
+
 		ParticleSystem(int size = 1000)
 		{
-			plane = glm::vec3(0, 0, 0);
-			normal = glm::vec3(0,1,0);
+			startColour = glm::vec4(1,1,1,1);
+			endColour = glm::vec4(1,0,0,1);
 
 			particleLife = 5;
+			
+			plane = glm::vec3(0, 0, 0);
+			normal = glm::vec3(0,1,0);
 
 			coefficientOfRestitution = 0.5f;
 
@@ -170,10 +174,8 @@ class ParticleSystem
 			liveParticles = 0;
 
 			for(int i = 0; i < size; i++)
-			{
-				glm::vec3 pos = glm::vec3(RandomFloat(-0.5, 0.5), 10, RandomFloat(-0.5, 0.5));
-				
-				Particle* p = new Particle(pos);
+			{	
+				Particle* p = new Particle(emitter.centre);
 				
 				p->active = false;
 
@@ -184,14 +186,11 @@ class ParticleSystem
 			bCollisions = true;
 
 			mode = IntegratorMode::RK4;
-
-			startColour = glm::vec4(1,1,1,1);
-			endColour = glm::vec4(1,0,0,1);
 		}
 
 		~ParticleSystem()
 		{
-
+			//clean up particles
 		}
 
 		void Generate()
@@ -246,6 +245,7 @@ class ParticleSystem
 					{
 						if(bCollisions)
 						{
+							particles[i]->position += -glm::dot(particles[i]->position - plane, normal) * normal; //post processing method
 							particles[i]->velocity += (1 + coefficientOfRestitution) * -(particles[i]->velocity * normal) * normal;
 						}
 						else
@@ -257,7 +257,7 @@ class ParticleSystem
 					}
 
 					//ADVANCE AGE & UPDATE COLOUR
-					particles[i]->age += timestep;
+					particles[i]->age += timestep * simulationSpeed;
 					particles[i]->colour = glm::mix(startColour, endColour, particles[i]->age / particleLife);
 					if(particles[i]->age > particleLife)
 					{

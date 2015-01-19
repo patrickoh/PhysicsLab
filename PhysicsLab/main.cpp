@@ -189,6 +189,9 @@ void BuildTweakBar()
 	TwAddVarRW(bar, "StartColour", TW_TYPE_COLOR3F, &particleSystem.startColour, " group='Colours' ");
 	TwAddVarRW(bar, "EndColour", TW_TYPE_COLOR3F, &particleSystem.endColour, " group='Colours' ");
 
+	TwAddVarRW(bar, "VelRangeMin", TW_TYPE_DIR3F, &particleSystem.emitter.velRangeMin, " group='Initial Velocity' ");
+	TwAddVarRW(bar, "VelRangeMax", TW_TYPE_DIR3F, &particleSystem.emitter.velRangeMax, " group='Initial Velocity' ");
+
 	TwAddSeparator(bar, "", "");
 	TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &particleSystem.gravity, " label='Gravity'");
 	TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &particleSystem.env.gravity, " label='GravityStr'");
