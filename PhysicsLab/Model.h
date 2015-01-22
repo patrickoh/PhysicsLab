@@ -39,13 +39,13 @@ enum VB_TYPES
 struct WorldProperties
 {
 	glm::vec3 translation;
-	glm::mat4 orientation;
+	glm::quat orientation;
 	glm::vec3 scale;
 
 	WorldProperties()
 	{
 		translation = glm::vec3(0);
-		orientation = glm::mat4(1);
+		orientation = glm::quat();
 		scale = glm::vec3(0);
 	}
 };
@@ -84,9 +84,11 @@ class Model
 		bool drawMe;
 		bool wireframe;
 
+		vector<glm::vec3> vertices;
+
 		glm::mat4 globalInverseTransform;
 
-		Model(glm::vec3 position, glm::mat4 orientation, glm::vec3 scale, const char* file_name, GLuint shaderProgramID, bool serialise = true, bool wireframe = false);
+		Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const char* file_name, GLuint shaderProgramID, bool serialise = true, bool wireframe = false);
 		~Model();
 
 		WorldProperties worldProperties;
@@ -114,24 +116,32 @@ class Model
 		{ 
 			return 
 				glm::translate(glm::mat4(1.0f), worldProperties.translation) 
-				* worldProperties.orientation
+				* glm::toMat4(worldProperties.orientation)
 				* glm::scale(glm::mat4(1.0f), worldProperties.scale)
 				* globalInverseTransform;
 		}		
 
 		glm::vec3 GetEulerAngles()
 		{
-			return glm::eulerAngles(glm::toQuat(worldProperties.orientation));
+			return glm::eulerAngles(worldProperties.orientation);
 		}
 
 		glm::vec3 GetForward()
 		{
-			return glm::toQuat(worldProperties.orientation) * glm::vec3(0,0,1);
+			return worldProperties.orientation * glm::vec3(0,0,1);
+		}
+
+		std::vector<glm::vec3> GetTransformedVertices()
+		{
+			std::vector<glm::vec3> transformedVertices;
+			glm::mat4 modelMat = GetModelMatrix();
+
+			for(int i = 0; i < vertices.size(); i++)
+				transformedVertices.push_back(glm::vec3(glm::vec4(vertices[i], 1) * modelMat));
 		}
 
 		//Setters
 		void SetShaderProgramID(GLuint p_shaderProgramID) { shaderProgramID = p_shaderProgramID; }
-
 };
 
 #endif

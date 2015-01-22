@@ -171,3 +171,10 @@ glm::vec3 decomposeT(glm::mat4 m)
 
 	return translation;
 }
+
+glm::mat3 setAsCrossProductMatrix( glm::vec3 v )
+{
+	return /*glm::transpose(*/glm::mat3(0, -v.z,  v.y,
+          v.z,    0, -v.x,
+         -v.y,  v.x,    0 )/*)*/;
+}

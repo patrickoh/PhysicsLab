@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "RigidBody.h"
+
 using namespace std;
 
 //Callbacks
@@ -86,6 +88,8 @@ Model* plane;
 bool printText = true;
 
 ParticleSystem particleSystem(10000);
+
+RigidBody* rigidBody;
 
 int main(int argc, char** argv)
 {
@@ -151,14 +155,15 @@ int main(int argc, char** argv)
 
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
 
-	plane = new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(2), "Models/plane.dae", shaderManager.GetShaderProgramID("white"));
-	plane->wireframe = true;
-	objectList.push_back(plane);
-	//objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.001), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse")));
+	//plane->wireframe = true;
+	//objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.1), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+	
+	rigidBody = new RigidBody(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.11), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true));
+	objectList.push_back(rigidBody->model);;
 
-	particleSystem.Generate();
+	//particleSystem.Generate();
 
-	BuildTweakBar();
+	//BuildTweakBar();
 
 	glutMainLoop();
     
@@ -168,7 +173,7 @@ int main(int argc, char** argv)
 void TW_CALL ResetPlaneCB(void *clientData)
 {
 	particleSystem.normal = glm::vec3(0,1,0);
-	plane->worldProperties.orientation = glm::mat4(1);
+	plane->worldProperties.orientation = glm::quat();
 }
 
 void BuildTweakBar()
@@ -255,10 +260,11 @@ void update()
 	{
 		float turnAngle = glm::degrees(glm::acos(cosAngle));
 		glm::vec3 rotAxis = glm::normalize(glm::cross(glm::vec3(0,1,0), particleSystem.normal));
-		plane->worldProperties.orientation = glm::rotate(glm::mat4(1), turnAngle, rotAxis);
+		plane->worldProperties.orientation = glm::toQuat(glm::rotate(glm::mat4(1), turnAngle, rotAxis));
 	}
 
-	particleSystem.Update(deltaTime);
+	//particleSystem.Update(deltaTime);
+	rigidBody->Update(deltaTime);
 	
 	processContinuousInput();
 	draw();
@@ -290,15 +296,15 @@ void draw()
 		}
 	}	
 
-	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
+	//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
 
-	int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
-	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); 
+	//int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
+	//glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); 
 
-	int projLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "proj"); 
-	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	//int projLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "proj"); 
+	//glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-	particleSystem.Render();
+	//particleSystem.Render();
 
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 
@@ -306,7 +312,7 @@ void draw()
 		printouts();
 
 	// Draw tweak bars
-    TwDraw();
+    //TwDraw();
 
 	glutSwapBuffers();
 }
@@ -481,6 +487,19 @@ void printouts()
 	ss << fps << " fps ";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-40, ss.str().c_str());
 
+	
+	*/
+
+
+	ss.str(std::string()); // clear
+	glm::vec3 pos = rigidBody->model->worldProperties.translation;
+	ss << "rb.pos: (" << std::fixed << std::setprecision(PRECISION) << pos.x << ", " << pos.y << ", " << pos.z << ")";
+	drawText(20,140, ss.str().c_str());
+	ss.str(std::string()); // clear
+	glm::vec3 rot = rigidBody->model->GetEulerAngles();
+	ss << "rb.rot: (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
+	drawText(20,120, ss.str().c_str());
+
 	//PRINT CAMERA
 	ss.str(std::string()); // clear
 	ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.forward.x << ", " << camera.viewProperties.forward.y << ", " << camera.viewProperties.forward.z << ")";
@@ -492,7 +511,7 @@ void printouts()
 
 	ss.str(std::string()); // clear
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
-	drawText(20,40, ss.str().c_str());*/
+	drawText(20,40, ss.str().c_str());
 }
 
 

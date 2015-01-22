@@ -1,6 +1,6 @@
 #include "Model.h"
 
-Model::Model(glm::vec3 position, glm::mat4 orientation, glm::vec3 scale, const char* file_name, GLuint p_shaderProgramID, bool serialise, bool wireframe)
+Model::Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const char* file_name, GLuint p_shaderProgramID, bool serialise, bool wireframe)
 {
 	worldProperties.translation = position;
 	worldProperties.orientation = orientation;
@@ -84,6 +84,8 @@ bool Model::Load(const char* file_name)
 			if (mesh->HasTextureCoords (0)) 
 				texcoords.push_back(glm::vec2(mesh->mTextureCoords[0][vertIdx].x, mesh->mTextureCoords[0][vertIdx].y));
 		}
+
+		vertices = positions;
 
 		if(mesh->HasFaces())
 		{
@@ -253,7 +255,7 @@ GLuint Model::LoadTexture(const char* fileName)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 			
-	glBindTexture(GL_TEXTURE_2D, 0); //unbind try now without animation and see if there is that initial error
+	glBindTexture(GL_TEXTURE_2D, 0); 
 
 	delete image;  
 	return textureID;

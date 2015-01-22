@@ -85,12 +85,15 @@
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Inertia.h" />
+    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Line.h" />

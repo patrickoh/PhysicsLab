@@ -64,8 +64,8 @@ class Camera
 
 			mode = CameraMode::flycam;
 
-			distance = 10;
-			minDistance = 3;
+			distance = 3;
+			minDistance = 2;
 			maxDistance = 10;
 
 			scrollWheelSensivity = 0.15f;
