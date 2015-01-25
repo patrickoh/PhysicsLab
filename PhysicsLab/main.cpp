@@ -34,6 +34,7 @@
 #include <math.h>
 
 #include "RigidBody.h"
+#include "Inertia.h"
 
 using namespace std;
 
@@ -50,8 +51,10 @@ void reshape(int w, int h);
 void update();
 void draw();
 
-void BuildTweakBar();
-//void TW_CALL ResetPlaneCB(const void *value, void *clientData);
+void InitTweakBar();
+void TW_CALL ApplyImpulse(void *clientData);
+void TW_CALL ResetRB(void *clientData);
+void TW_CALL CalculateNewTesor(void *clientData);
 
 bool directionKeys[4] = {false};
 
@@ -83,13 +86,12 @@ int frames = 0;
 ShaderManager shaderManager;
 vector<Model*> objectList;
 
-Model* plane;
-
 bool printText = true;
 
 ParticleSystem particleSystem(10000);
-
+TwBar *bar;
 RigidBody* rigidBody;
+Model* impulseVisualiser;
 
 int main(int argc, char** argv)
 {
@@ -97,8 +99,11 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
 	glutInitWindowPosition (0, 0); 
-    glutCreateWindow("Particles! by Pad");
+
+    glutCreateWindow("Unconstrained Rigid Body! by Pad");
+	InitTweakBar();
 
 	//glutFullScreen();
 
@@ -117,6 +122,10 @@ int main(int argc, char** argv)
 	//glutMotionFunc (MouseMotion);
 	glutPassiveMotionFunc(passiveMouseMotion);
 	glutIdleFunc (update);
+
+	TwGLUTModifiersFunc(glutGetModifiers);
+
+	glutMotionFunc((GLUTmousemotionfun)TwEventMouseMotionGLUT);
 
 	// A call to glewInit() must be done after glut is initialized!
 	glewExperimental = GL_TRUE;
@@ -139,96 +148,99 @@ int main(int argc, char** argv)
 
 	projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
 
-	//TODO - constructor for camera
-	camera.Init(glm::vec3(0.0f, 0.0f, 0.0f), 0.0002f, 0.01f); 
+	camera.Init(glm::vec3(0.0f, 0.0f, 0.0f), 0.0002f, 0.01f); //TODO - constructor for camera
 	camera.mode = CameraMode::tp;
 
-	shaderManager.Init();
-
+	shaderManager.Init(); //TODO - constructor for shader
 	shaderManager.CreateShaderProgram("diffuse", "Shaders/diffuse.vs", "Shaders/diffuse.ps");
-
 	shaderManager.CreateShaderProgram("black", "Shaders/diffuse.vs", "Shaders/black.ps");
 	shaderManager.CreateShaderProgram("white", "Shaders/diffuse.vs", "Shaders/white.ps");
 	shaderManager.CreateShaderProgram("red", "Shaders/diffuse.vs", "Shaders/red.ps");
-
 	shaderManager.CreateShaderProgram("text", "Shaders/diffuse.vs", "Shaders/white.ps");
-
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
 
 	//plane->wireframe = true;
-	//objectList.push_back(new Model(glm::vec3(0,0,0), glm::mat4(1), glm::vec3(.1), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+
+	glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
+	cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
+	objectList.push_back(new Model(glm::vec3(0,0,5), cactuarFix, glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+
+	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
+	objectList.push_back(impulseVisualiser);
+
+	RigidBody::impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
+	RigidBody::force = glm::vec3(0,0,1);
+	RigidBody::angular = true;
+	RigidBody::linear = true;
 	
-	rigidBody = new RigidBody(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.11), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true));
-	objectList.push_back(rigidBody->model);;
+	rigidBody = new RigidBody(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.2), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true));
+	//rigidBody = new RigidBody(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.002), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse")));
+	objectList.push_back(rigidBody->model);
+
+	//ASSIGNMENT 2 - RIGID BODY UI
+	
+	TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
+	TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
+
+	TwAddSeparator(bar, "", "");
+
+	TwAddVarRW(bar, "Impulse Position", TW_TYPE_DIR3F, &impulseVisualiser->worldProperties.translation, "");
+	//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, 
+				 //" label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
+	TwAddVarRW(bar, "Impulse Force", TW_TYPE_DIR3F, &RigidBody::force, "");
+	TwAddButton(bar, "Do Impulse", ApplyImpulse, NULL, "");
+	
+	TwAddSeparator(bar, "", "");
+
+	TwAddVarRW(bar, "Angular Velocity", TW_TYPE_DIR3F, &rigidBody->angularVelocity, "");
+	TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBody->angularMomentum, "");
+
+	TwAddSeparator(bar, "", "");
+
+	TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &rigidBody->mass, "");
+	TwAddButton(bar, "Recalculate Tensor", CalculateNewTesor, NULL, "");
+
+	TwAddSeparator(bar, "", "");
+
+	TwAddVarRW(bar, "Centre of Mass", TW_TYPE_DIR3F, &rigidBody->com, "");
+
+	TwAddSeparator(bar, "", "");
+
+	TwAddButton(bar, "Reset", ResetRB, NULL, "");
+	
+	//Recalculate inertial tensor if mass changes
 
 	//particleSystem.Generate();
-
-	//BuildTweakBar();
 
 	glutMainLoop();
     
 	return 0;
 }
 
-void TW_CALL ResetPlaneCB(void *clientData)
+void InitTweakBar()
 {
-	particleSystem.normal = glm::vec3(0,1,0);
-	plane->worldProperties.orientation = glm::quat();
-}
-
-void BuildTweakBar()
-{
-	TwBar *bar; 
-
-    TwInit(TW_OPENGL, NULL);
-	TwGLUTModifiersFunc(glutGetModifiers);
-
+    TwInit(TW_OPENGL_CORE, NULL);
 	TwWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    bar = TwNewBar("TweakBar");
-    TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
+	bar = TwNewBar("TweakBar");
+    
+	TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
     TwDefine(" TweakBar size='250 700' color='125 125 125' "); // change default tweak bar size and color
+}
 
-	TwAddVarRW(bar, "EmitRate", TW_TYPE_INT32, &particleSystem.emitter.emitRate, "");
-	TwAddVarRW(bar, "Particle life", TW_TYPE_FLOAT, &particleSystem.particleLife, "min=0.0 step=0.25");
-	TwAddVarRW(bar, "StartColour", TW_TYPE_COLOR3F, &particleSystem.startColour, " group='Colours' ");
-	TwAddVarRW(bar, "EndColour", TW_TYPE_COLOR3F, &particleSystem.endColour, " group='Colours' ");
+void TW_CALL ApplyImpulse(void *clientData)
+{
+	rigidBody->ApplyImpulse(impulseVisualiser->worldProperties.translation, RigidBody::force);
+}
 
-	TwAddVarRW(bar, "VelRangeMin", TW_TYPE_DIR3F, &particleSystem.emitter.velRangeMin, " group='Initial Velocity' ");
-	TwAddVarRW(bar, "VelRangeMax", TW_TYPE_DIR3F, &particleSystem.emitter.velRangeMax, " group='Initial Velocity' ");
+void TW_CALL ResetRB(void *clientData)
+{
+	rigidBody->Reset();
+}
 
-	TwAddSeparator(bar, "", "");
-	TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &particleSystem.gravity, " label='Gravity'");
-	TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &particleSystem.env.gravity, " label='GravityStr'");
-
-	TwAddSeparator(bar, "", "");
-	TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &particleSystem.drag, " label='Drag'");
-	TwAddVarRW(bar, "Cd ", TW_TYPE_FLOAT, &particleSystem.dragCoefficient, " label='Cd' group='Drag Settings'");
-	TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &particleSystem.env.fluid.density, " label='Fluid Density' group='Drag Settings'");
-	TwAddVarRW(bar, "Wind ", TW_TYPE_BOOL8, &particleSystem.wind, " label='Wind' group='Drag Settings'");
-	TwAddVarRW(bar, "WindDir", TW_TYPE_DIR3F, &particleSystem.env.wind, 
-               " label='Wind direction' opened=false help='Change the wind direction.' group='Drag Settings' ");
-	TwAddVarRW(bar, "WindScalar ", TW_TYPE_FLOAT, &particleSystem.env.windScalar, " label='WindScalar' group='Drag Settings'");
-
-	TwAddSeparator(bar, "", "");
-	{
-		TwEnumVal integratorEV[3] = { {IntegratorMode::Euler, "Euler"}, {IntegratorMode::RK4, "RK4"}, {IntegratorMode::None, "None"} };
-        TwType integratorType = TwDefineEnum("IntegratorType", integratorEV, 3);
-		TwAddVarRW(bar, "Integrator", integratorType, &particleSystem.mode, " keyIncr='<' keyDecr='>' help='Change integrator mode.' ");
-    }
-	TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &particleSystem.simulationSpeed, 
-		 " label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
-
-	TwAddSeparator(bar, "", "");
-	TwAddVarRW(bar, "Collision Response", TW_TYPE_BOOL8, &particleSystem.bCollisions, "");
-	TwAddVarRW(bar, "Normal", TW_TYPE_DIR3F, &particleSystem.normal, 
-               " label='Plane Normal' opened=false help='Change the plane normal.' group='Plane Settings'");
-	TwAddVarRW(bar, "Kr", TW_TYPE_FLOAT, &particleSystem.coefficientOfRestitution, "help='Coefficient of Restitution.' min=0.0 max=1.0 step=0.1 group='Plane Settings'");
-	TwAddButton(bar, "Reset Plane", ResetPlaneCB, NULL, "group='Plane Settings'");
-
-	TwAddSeparator(bar, "", "");
-	TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem.liveParticles, " label='ParticleCount'");
-	TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem.mass, "min=0.1");
+void TW_CALL CalculateNewTesor(void *clientData)
+{
+	rigidBody->inertialTensor = Inertia::Compute2(rigidBody->model, rigidBody->mass);
 }
 
 // GLUT CALLBACK FUNCTIONS
@@ -249,19 +261,6 @@ void update()
 	}
 
 	camera.Update(deltaTime);
-	
-	for(int i = 0; i< objectList.size(); i++)
-	{
-		objectList[i]->Update(deltaTime);
-	}
-
-	double cosAngle = glm::dot(glm::vec3(0,1,0), particleSystem.normal);
-	if(cosAngle < 0.9999f)
-	{
-		float turnAngle = glm::degrees(glm::acos(cosAngle));
-		glm::vec3 rotAxis = glm::normalize(glm::cross(glm::vec3(0,1,0), particleSystem.normal));
-		plane->worldProperties.orientation = glm::toQuat(glm::rotate(glm::mat4(1), turnAngle, rotAxis));
-	}
 
 	//particleSystem.Update(deltaTime);
 	rigidBody->Update(deltaTime);
@@ -297,22 +296,19 @@ void draw()
 	}	
 
 	//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
-
 	//int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
 	//glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); 
-
 	//int projLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "proj"); 
 	//glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
 	//particleSystem.Render();
+
+	// Draw tweak bars
+    TwDraw();
 
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 
 	if(printText)
 		printouts();
-
-	// Draw tweak bars
-    //TwDraw();
 
 	glutSwapBuffers();
 }
@@ -320,11 +316,7 @@ void draw()
 //KEYBOARD FUCNTIONS
 void keyPressed (unsigned char key, int x, int y) 
 {  
-	if( !TwEventKeyboardGLUT(key, x, y) )  // send event to AntTweakBar
-    { // event has not been handled by AntTweakBar
-      // your code here to handle the event
-      // ...
-    }
+	TwEventKeyboardGLUT(key, x, y);
 
 	keyStates[key] = true; // Set the state of the current key to pressed  
 		
@@ -390,11 +382,7 @@ void handleSpecialKeypress(int key, int x, int y)
 //DIRECTIONAL KEYS UP
 void handleSpecialKeyReleased(int key, int x, int y) 
 {
-	if( !TwEventSpecialGLUT(key, x, y) )  // send event to AntTweakBar
-    { // event has not been handled by AntTweakBar
-      // your code here to handle the event
-      // ...
-    }
+	TwEventSpecialGLUT(key, x, y);  // send event to AntTweakBar
 
 	switch (key) 
 	{
@@ -419,11 +407,7 @@ void handleSpecialKeyReleased(int key, int x, int y)
 //MOUSE FUCNTIONS
 void passiveMouseMotion(int x, int y)  
 {
-	if( !TwEventMouseMotionGLUT(x, y) )  // send event to AntTweakBar
-    { // event has not been handled by AntTweakBar
-      // your code here to handle the event
-      // ...
-    }
+	TwEventMouseMotionGLUT(x, y); // send event to AntTweakBar
 
 	if(!freeMouse)
 	{
@@ -443,12 +427,7 @@ void passiveMouseMotion(int x, int y)
 
 void mouseButton(int button, int state, int x, int y)
 {
-
-	if( !TwEventMouseButtonGLUT(button, state, x, y) )  // send event to AntTweakBar
-    { // event has not been handled by AntTweakBar
-      // your code here to handle the event
-      // ...
-    }
+	TwEventMouseButtonGLUT(button, state, x, y);  // send event to AntTweakBar
 
 	switch(button) {
 		case GLUT_LEFT_BUTTON:
@@ -486,32 +465,29 @@ void printouts()
 	/*ss.str(std::string()); // clear
 	ss << fps << " fps ";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-40, ss.str().c_str());
-
-	
 	*/
-
 
 	ss.str(std::string()); // clear
 	glm::vec3 pos = rigidBody->model->worldProperties.translation;
 	ss << "rb.pos: (" << std::fixed << std::setprecision(PRECISION) << pos.x << ", " << pos.y << ", " << pos.z << ")";
-	drawText(20,140, ss.str().c_str());
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),140, ss.str().c_str());
 	ss.str(std::string()); // clear
 	glm::vec3 rot = rigidBody->model->GetEulerAngles();
 	ss << "rb.rot: (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
-	drawText(20,120, ss.str().c_str());
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),120, ss.str().c_str());
 
 	//PRINT CAMERA
 	ss.str(std::string()); // clear
 	ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.forward.x << ", " << camera.viewProperties.forward.y << ", " << camera.viewProperties.forward.z << ")";
-	drawText(20,80, ss.str().c_str());
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),80, ss.str().c_str());
 
 	ss.str(std::string()); // clear
 	ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.position.x << ", " << camera.viewProperties.position.y << ", " << camera.viewProperties.position.z << ")";
-	drawText(20,60, ss.str().c_str());
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),60, ss.str().c_str());
 
 	ss.str(std::string()); // clear
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
-	drawText(20,40, ss.str().c_str());
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),40, ss.str().c_str());
 }
 
 

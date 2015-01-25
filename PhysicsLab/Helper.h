@@ -22,5 +22,6 @@ void decomposeTRS(const glm::mat4& m, glm::vec3& scaling,
 glm::vec3 decomposeT(glm::mat4 m);
 double round(double d);
 double vectorSquaredDistance(glm::vec3 v1, glm::vec3 v2);
-glm::mat3 setAsCrossProductMatrix( glm::vec3 v );
 
+glm::mat4 setAsCrossProductMatrix( glm::vec3 v );
+glm::quat quatFromAngularVelocityByTimestep(glm::vec3 w);

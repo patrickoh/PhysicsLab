@@ -98,10 +98,10 @@ class Model
 		
 		void Render(GLuint shader);
 
-		void Update(double deltaTime)
+		/*void Update(double deltaTime)
 		{
 			
-		}
+		}*/
 
 		GLuint LoadTexture(const char* fileName);
 		void LoadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);

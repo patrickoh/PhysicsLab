@@ -172,9 +172,31 @@ glm::vec3 decomposeT(glm::mat4 m)
 	return translation;
 }
 
-glm::mat3 setAsCrossProductMatrix( glm::vec3 v )
+glm::mat4 setAsCrossProductMatrix( glm::vec3 w )
 {
-	return /*glm::transpose(*/glm::mat3(0, -v.z,  v.y,
-          v.z,    0, -v.x,
-         -v.y,  v.x,    0 )/*)*/;
+	return glm::transpose(glm::mat4(0, -w.z,  w.y,   0,
+					w.z,    0,  -w.x, 0,
+					-w.y,  w.x,    0, 0,
+					0 ,0 , 0,         1));
+}
+
+// w is equal to angular_velocity*time_between_frames
+glm::quat quatFromAngularVelocityByTimestep(glm::vec3 w)
+{
+    const float x = w[0];
+    const float y = w[1];
+    const float z = w[2];
+
+    const float angle = sqrt(x*x + y*y + z*z);  //module of angular velocity
+
+    if (angle > 0.0) //the formulas from the link
+    {
+		return glm::quat(x*sin(angle/2.0f)/angle,
+			y*sin(angle/2.0f)/angle,
+			z*sin(angle/2.0f)/angle,
+			cos(angle/2.0f));
+    }else    //to avoid illegal expressions
+    {
+        return glm::quat(0.0f, 0.0f, 0.0f, 1.0f);
+    }
 }

@@ -11,6 +11,8 @@
 
 #include "Model.h"
 
+#include <AntTweakBar.h>
+
 using namespace std;
 
 struct Fluid
@@ -137,6 +139,8 @@ class ParticleSystem
 		glm::vec4 endColour;
 
 		float particleLife;
+
+		Model* planeModel;
 
 		ParticleSystem(int size = 1000)
 		{
@@ -283,6 +287,15 @@ class ParticleSystem
 				
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
+
+			//Update plane
+			/*double cosAngle = glm::dot(glm::vec3(0,1,0), particleSystem.normal);
+			if(cosAngle < 0.9999f)
+			{
+				float turnAngle = glm::degrees(glm::acos(cosAngle));
+				glm::vec3 rotAxis = glm::normalize(glm::cross(glm::vec3(0,1,0), particleSystem.normal));
+				plane->worldProperties.orientation = glm::toQuat(glm::rotate(glm::mat4(1), turnAngle, rotAxis));
+			}*/
 		}
 
 		void Render()
@@ -351,4 +364,54 @@ class ParticleSystem
 				return 0.5f * env.fluid.density * surfaceArea * dragCoefficient 
 					* vel.length() * -vel;
 		}
+
+		void BuildTweakBar(TwBar* bar)
+		{
+			TwAddVarRW(bar, "EmitRate", TW_TYPE_INT32, &emitter.emitRate, "");
+			/*TwAddVarRW(bar, "Particle life", TW_TYPE_FLOAT, &particleLife, "min=0.0 step=0.25");
+			TwAddVarRW(bar, "StartColour", TW_TYPE_COLOR3F, &startColour, " group='Colours' ");
+			TwAddVarRW(bar, "EndColour", TW_TYPE_COLOR3F, &endColour, " group='Colours' ");
+
+			TwAddVarRW(bar, "VelRangeMin", TW_TYPE_DIR3F, &emitter.velRangeMin, " group='Initial Velocity' ");
+			TwAddVarRW(bar, "VelRangeMax", TW_TYPE_DIR3F, &emitter.velRangeMax, " group='Initial Velocity' ");
+
+			TwAddSeparator(bar, "", "");
+			TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &gravity, " label='Gravity'");
+			TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &env.gravity, " label='GravityStr'");
+
+			TwAddSeparator(bar, "", "");
+			TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &drag, " label='Drag'");
+			TwAddVarRW(bar, "Cd ", TW_TYPE_FLOAT, &dragCoefficient, " label='Cd' group='Drag Settings'");
+			TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &env.fluid.density, " label='Fluid Density' group='Drag Settings'");
+			TwAddVarRW(bar, "Wind ", TW_TYPE_BOOL8, &wind, " label='Wind' group='Drag Settings'");
+			TwAddVarRW(bar, "WindDir", TW_TYPE_DIR3F, &env.wind, 
+					   " label='Wind direction' opened=false help='Change the wind direction.' group='Drag Settings' ");
+			TwAddVarRW(bar, "WindScalar ", TW_TYPE_FLOAT, &env.windScalar, " label='WindScalar' group='Drag Settings'");
+
+			TwAddSeparator(bar, "", "");
+			{
+				TwEnumVal integratorEV[3] = { {IntegratorMode::Euler, "Euler"}, {IntegratorMode::RK4, "RK4"}, {IntegratorMode::None, "None"} };
+				TwType integratorType = TwDefineEnum("IntegratorType", integratorEV, 3);
+				TwAddVarRW(bar, "Integrator", integratorType, &mode, " keyIncr='<' keyDecr='>' help='Change integrator mode.' ");
+			}
+			TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, 
+				 " label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
+
+			TwAddSeparator(bar, "", "");
+			TwAddVarRW(bar, "Collision Response", TW_TYPE_BOOL8, &bCollisions, "");
+			TwAddVarRW(bar, "Normal", TW_TYPE_DIR3F, &normal, 
+					   " label='Plane Normal' opened=false help='Change the plane normal.' group='Plane Settings'");
+			TwAddVarRW(bar, "Kr", TW_TYPE_FLOAT, &coefficientOfRestitution, "help='Coefficient of Restitution.' min=0.0 max=1.0 step=0.1 group='Plane Settings'");
+			TwAddButton(bar, "Reset Plane", ResetPlaneCB, NULL, "group='Plane Settings'");
+
+			TwAddSeparator(bar, "", "");
+			TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &liveParticles, " label='ParticleCount'");
+			TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &mass, "min=0.1");*/
+		}
+
+		/*void TW_CALL ResetPlaneCB(void *clientData)
+		{
+			normal = glm::vec3(0,1,0);
+			plane->worldProperties.orientation = glm::quat();
+		}*/
 };
