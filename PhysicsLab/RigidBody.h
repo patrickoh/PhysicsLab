@@ -4,6 +4,34 @@
 #include "glm\gtx\orthonormalize.hpp"
 #include <AntTweakBar.h>
 
+struct BoundingSphere
+{
+	glm::vec3 centre; //in world space
+	float radius;
+
+	bool collisionCheck(BoundingSphere other)
+	{
+		float d = glm::distance(centre, other.centre);
+
+		if(d < (radius + other.radius))
+			return true;
+		else
+			return false;
+	}
+};
+
+struct AABB
+{
+	glm::vec3 position;
+	glm::vec3 min;
+	glm::vec3 max;
+
+	void Update(std::vector<glm::vec3> vertices)
+	{
+		//local space with rotation
+	}
+};
+
 class RigidBody
 {
 	private:
@@ -28,6 +56,8 @@ class RigidBody
 		glm::vec3 com;
 
 		Model* model;
+		BoundingSphere boundingSphere;
+		AABB aabb;
 
 		static glm::vec3 force;
 		static Model* impulseVisualiser;
@@ -73,6 +103,28 @@ class RigidBody
 
 			return com;
 		}
+
+		static void InsertionSort(std::vector<float> &m_array)
+		{
+			int i, j;
+			float tmp;
+
+			for (i = 1; i < m_array.size(); i++) 
+			{
+				j = i;
+
+				//while index is 1 or greater, and the value before the index is larger
+				//perform swap
+				while (j > 0 && m_array[j - 1] > m_array[j]) 
+				{
+						tmp = m_array[j];
+						m_array[j] = m_array[j - 1];
+						m_array[j - 1] = tmp;
+						j--; //decrement index, to continue shifting the value down
+				}
+			}
+		}
+
 
 		void Reset();
 
