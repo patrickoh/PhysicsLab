@@ -264,6 +264,9 @@ void update()
 
 	//particleSystem.Update(deltaTime);
 	rigidBody->Update(deltaTime);
+
+	//PHYSICS
+
 	
 	processContinuousInput();
 	draw();

@@ -4,6 +4,8 @@
 #include "glm\gtx\orthonormalize.hpp"
 #include <AntTweakBar.h>
 
+class RigidBody;
+
 struct BoundingSphere
 {
 	glm::vec3 centre; //in world space
@@ -20,15 +22,95 @@ struct BoundingSphere
 	}
 };
 
+enum Axis { X, Y, Z };
+enum End { min, max };
+
 struct AABB
 {
+	struct EndPoint
+	{
+		float value;
+		bool s;
+		AABB* owner;
+
+		bool operator<(const EndPoint& other)
+		{
+			return value < other.value;
+		}
+
+		bool operator>(const EndPoint& other)
+		{
+			return value > other.value;
+		}
+
+		RigidBody* rb()
+		{
+			return owner->owner;
+		}
+	};
+
 	glm::vec3 position;
+	
 	glm::vec3 min;
 	glm::vec3 max;
 
-	void Update(std::vector<glm::vec3> vertices)
+	//float width;
+	//float depth;
+	//float height;
+
+	RigidBody* owner;
+
+	void Calculate(std::vector<glm::vec3> &vertices)
 	{
 		//local space with rotation
+	}
+
+	EndPoint GetEndPoint(Axis axis, End end)
+	{
+		EndPoint ep;
+		ep.owner = this;
+
+		if(axis == Axis::X)
+		{	
+			if(end == End::min)
+			{
+				ep.value = min.x;
+				ep.s = true;	
+			}
+			else
+			{
+				ep.value = max.x;
+				ep.s = false;
+			}
+		}
+		else if(axis == Axis::Y)
+		{
+			if(end == End::min)
+			{
+				ep.value = min.y;
+				ep.s = true;
+			}
+			else
+			{
+				ep.value = max.y;
+				ep.s = false;
+			}
+		}
+		else
+		{
+			if(end == End::min)
+			{
+				ep.value = min.z;
+				ep.s = true;
+			}
+			else
+			{
+				ep.value = min.z;
+				ep.s = false;
+			}
+		}
+
+		return ep;
 	}
 };
 
@@ -70,6 +152,7 @@ class RigidBody
 		~RigidBody();
 
 		void ApplyImpulse(glm::vec3 p, glm::vec3 force);
+		void Reset();
 
 		// Calculation of the center of mass based on paul bourke's website - Thanks Gio
 		// http://paulbourke.net/geometry/polygonmesh/
@@ -103,30 +186,6 @@ class RigidBody
 
 			return com;
 		}
-
-		static void InsertionSort(std::vector<float> &m_array)
-		{
-			int i, j;
-			float tmp;
-
-			for (i = 1; i < m_array.size(); i++) 
-			{
-				j = i;
-
-				//while index is 1 or greater, and the value before the index is larger
-				//perform swap
-				while (j > 0 && m_array[j - 1] > m_array[j]) 
-				{
-						tmp = m_array[j];
-						m_array[j] = m_array[j - 1];
-						m_array[j - 1] = tmp;
-						j--; //decrement index, to continue shifting the value down
-				}
-			}
-		}
-
-
-		void Reset();
 
 		//void TW_CALL TwApplyImpulse(void *clientData)
 		//{

@@ -27,6 +27,8 @@ RigidBody::RigidBody(Model* model)
 	//3) for most objects will depend on the axis of rotation
 
 	//ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
+
+	aabb.owner = this;
 }
 
 RigidBody::~RigidBody()

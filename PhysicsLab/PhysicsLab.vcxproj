@@ -98,6 +98,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="RigidbodyManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ParticleSystem.h" />
