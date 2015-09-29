@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Physics">
       <UniqueIdentifier>{a724956f-c2cc-4b72-acca-9aa551542f5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics\Collision Detection">
+      <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -88,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="RigidBody.h">
       <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="AABB.h">
+      <Filter>Header Files\Physics\Collision Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="BoundingSphere.h">
+      <Filter>Header Files\Physics\Collision Detection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

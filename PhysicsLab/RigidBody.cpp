@@ -28,7 +28,8 @@ RigidBody::RigidBody(Model* model)
 
 	//ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
 
-	aabb.owner = this;
+	boundingSphere = new BoundingSphere(model->vertices);
+	aabb = new AABB(model->vertices);
 }
 
 RigidBody::~RigidBody()
@@ -105,4 +106,37 @@ void RigidBody::ApplyImpulse(glm::vec3 p, glm::vec3 force)
 	torqueNet += glm::cross(p - x, force);
 
 	forceNet += force;
+}
+
+// Calculation of the center of mass based on paul bourke's website
+// http://paulbourke.net/geometry/polygonmesh/
+glm::vec3 RigidBody::CalculateCentreOfMass(Model* model)
+{
+	size_t N = model->vertices.size();
+
+	glm::vec3* area = new glm::vec3[N];
+	glm::vec3* R = new glm::vec3[N];
+	glm::vec3 numerator;
+	glm::vec3 denominator;
+
+	for (int i = 0; i < N; i = i + 3) // for each facets --> numerator += R[i] * area[i], denominator += area[i] 
+	{
+		glm::vec3 v1 = model->vertices[i];
+		glm::vec3 v2 = model->vertices[i + 1];
+		glm::vec3 v3 = model->vertices[i + 2];
+		R[i] = (v1 + v2 + v3) / 3.0f;
+		area[i] = glm::abs(glm::cross(v2 - v1, v3 - v1));
+		numerator += R[i] * area[i];
+		denominator += area[i];
+	}
+
+	glm::vec3 com = numerator / denominator;
+
+	if (com != com)
+		com = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	delete[] area;
+	delete[] R;
+
+	return com;
 }
