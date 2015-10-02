@@ -1,8 +1,8 @@
 #include "Common.h"
 #include <vector>
 
-enum Axis { X, Y, Z };
-enum End { min, max };
+//enum Axis { X, Y, Z };
+//enum End { min, max };
 
 class AABB;
 
@@ -26,21 +26,24 @@ struct EndPoint
 
 class AABB
 {
+	//RigidBody* owner;
+
 	glm::vec3 position;
 
-	glm::vec3 min;
-	glm::vec3 max;
+	//glm::vec3 centre; //local space?
 
-	glm::vec3 centre; //local space?
-
-	//float width;
-	//float depth;
-	//float height;
+	float width;
+	float depth;
+	float height;
 
 public:
 
-	AABB(const std::vector<glm::vec3>& vertices)
+	EndPoint* min [3];
+	EndPoint* max [3]; 
+
+	AABB(const std::vector<glm::vec3>& vertices/*, RigidBody* p_owner*/)
 	{
+		//owner = p_owner;
 		Create(vertices);
 	}
 
@@ -48,18 +51,30 @@ public:
 	{
 		//local space with rotation
 
-		for (glm::vec3 point : vertices)
+		/*for (glm::vec3 point : vertices)
 		{
-			if (point.x < min.x) min.x = point.x;
-			if (point.x > max.x) max.x = point.x;
-			if (point.y < min.y) min.y = point.y;
-			if (point.y > max.y) max.y = point.y;
+			if (point.x < min[0]->value) min[0]->value = point.x;
+			if (point.x > max[0]->value) max[0]->value = point.x;
+			if (point.y < min[1]->value) min[1]->value = point.y;
+			if (point.y > max[1]->value) max[1]->value = point.y;
 			if (point.z < min.z) min.z = point.z;
 			if (point.z > max.z) max.z = point.z;
 		}
+
+		width = max.x - min.x;
+		height = max.y - min.y;*/
+
 	}
 
-	EndPoint GetEndPoint(Axis axis, End end)
+	bool Overlaps(AABB other)
+	{
+		return ((abs(position.x - other.position.x) * 2 < (width + other.width)) &&
+			 (abs(position.y - other.position.y) * 2 < (height + other.height)) &&
+			 (abs(position.z - other.position.z) * 2 < (depth + other.depth)));
+	}
+
+	//Just store endpoints
+	/*EndPoint GetEndPoint(Axis axis, End end)
 	{
 		EndPoint ep;
 		
@@ -91,5 +106,5 @@ public:
 		}
 				
 		return ep;
-	}
+	}*/
 };

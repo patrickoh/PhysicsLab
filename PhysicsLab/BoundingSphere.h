@@ -4,11 +4,12 @@
 
 struct BoundingSphere
 {
-	glm::vec3 centre; //in world space ... or local?
+	glm::vec3 centre; //in local space
 	float radius;
 
-	bool vis;
-	glm::vec4 colour;
+	//TODO - visualisation
+	//bool vis;
+	//glm::vec4 colour;
 
 	BoundingSphere(const std::vector<glm::vec3>& vertices)
 		: radius(0.0f)
@@ -18,7 +19,7 @@ struct BoundingSphere
 
 	bool collides(BoundingSphere* other)
 	{
-		return glm::distance(centre, other.centre) < (radius + other.radius);
+		return (glm::distance(centre, other->centre) < (radius + other->radius));
 	}
 
 	void create(const std::vector<glm::vec3>& vertices)

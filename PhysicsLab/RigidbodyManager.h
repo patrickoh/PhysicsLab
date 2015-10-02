@@ -13,19 +13,26 @@ struct CollidingPair
 class RigidbodyManager
 { 
 	private:
-
+		vector<EndPoint*> xAxis;
 
 	public:
 
 		vector<RigidBody*> rigidBodies;
+		vector<CollidingPair> activeList; //List of potentially colliding pairs / active list
 
-		vector<CollidingPair> collidingPairs; //List of potentially colliding pairs / active list
+		RigidbodyManager()
+		{
+			
+		}
 
-		//SAP
-		vector<CollidingPair> xOverlap;	
-
-		RigidbodyManager(){}
 		~RigidbodyManager(){}
+
+		/*void Add(RigidBody* rigidbody)
+		{
+			xAxis.push_back(rigidbody->aabb->min.x);
+		}*/
+
+		//TODO - remove
 
 		//Brute force check spheres
 		void SphereCollisions()
@@ -48,20 +55,21 @@ class RigidbodyManager
 			}
 		}
 
+		void Brute()
+		{
+			for (int i = 0; i < rigidBodies.size(); i++)
+			{
+				for (int j = i + 1; j < rigidBodies.size(); j++)
+				{
+					if (i == j) continue; 
+				}
+			}
+		}
+
 		void SingleAxisSAP()
 		{
-			collidingPairs.clear();	
-			xOverlap.clear();
+			activeList.clear();	
 
-			vector<EndPoint> xAxis;
-
-			for (RigidBody* rb : rigidBodies)
-			{
-				xAxis.push_back(rb->aabb->GetEndPoint(Axis::X, End::min));
-				xAxis.push_back(rb->aabb->GetEndPoint(Axis::X, End::max));
-			}
-
-			//O(n log (n) )
-			std::sort(xAxis.begin(), xAxis.end());
+			std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
 		}
 };

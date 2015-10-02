@@ -36,6 +36,8 @@
 #include "RigidBody.h"
 #include "Inertia.h"
 
+#include "RigidbodyManager.h"
+
 using namespace std;
 
 //Callbacks
@@ -92,6 +94,8 @@ ParticleSystem particleSystem(10000);
 TwBar *bar;
 RigidBody* rigidBody;
 Model* impulseVisualiser;
+
+RigidbodyManager rigidBodyManager;
 
 int main(int argc, char** argv)
 {
@@ -264,6 +268,8 @@ void update()
 
 	//particleSystem.Update(deltaTime);
 	rigidBody->Update(deltaTime);
+
+	//rigidBodyManager->Broadphase(BroadMode::BRUTE);
 
 	//PHYSICS
 
