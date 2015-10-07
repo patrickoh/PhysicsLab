@@ -86,14 +86,17 @@ int frameCounterTime = 0;
 int frames = 0;
 
 ShaderManager shaderManager;
-vector<Model*> objectList;
+vector<Model*> modelList;
 
 bool printText = true;
 
 ParticleSystem particleSystem(10000);
 TwBar *bar;
-RigidBody* rigidBody;
+
 Model* impulseVisualiser;
+
+//RigidBody* rigidBody;
+
 
 RigidbodyManager rigidBodyManager;
 
@@ -167,19 +170,20 @@ int main(int argc, char** argv)
 
 	glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
 	cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
-	objectList.push_back(new Model(glm::vec3(0,0,5), cactuarFix, glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+	modelList.push_back(new Model(glm::vec3(0, 0, 5), cactuarFix, glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
 	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
-	objectList.push_back(impulseVisualiser);
+	modelList.push_back(impulseVisualiser);
 
 	RigidBody::impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
 	RigidBody::force = glm::vec3(0,0,1);
 	RigidBody::angular = true;
 	RigidBody::linear = true;
-	
-	rigidBody = new RigidBody(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.2), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true));
-	//rigidBody = new RigidBody(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.002), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse")));
-	objectList.push_back(rigidBody->model);
+
+
+	Model* m = new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
+	rigidBodyManager.Add(new RigidBody(m));
+	modelList.push_back(m);
 
 	//ASSIGNMENT 2 - RIGID BODY UI
 	
@@ -196,17 +200,17 @@ int main(int argc, char** argv)
 	
 	TwAddSeparator(bar, "", "");
 
-	TwAddVarRW(bar, "Angular Velocity", TW_TYPE_DIR3F, &rigidBody->angularVelocity, "");
-	TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBody->angularMomentum, "");
+	TwAddVarRW(bar, "Angular Velocity", TW_TYPE_DIR3F, &rigidBodyManager[0]->angularVelocity, "");
+	TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[0]->angularMomentum, "");
 
 	TwAddSeparator(bar, "", "");
 
-	TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &rigidBody->mass, "");
+	TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &rigidBodyManager[0]->mass, "");
 	TwAddButton(bar, "Recalculate Tensor", CalculateNewTesor, NULL, "");
 
 	TwAddSeparator(bar, "", "");
 
-	TwAddVarRW(bar, "Centre of Mass", TW_TYPE_DIR3F, &rigidBody->com, "");
+	TwAddVarRW(bar, "Centre of Mass", TW_TYPE_DIR3F, &rigidBodyManager[0]->com, "");
 
 	TwAddSeparator(bar, "", "");
 
@@ -234,17 +238,17 @@ void InitTweakBar()
 
 void TW_CALL ApplyImpulse(void *clientData)
 {
-	rigidBody->ApplyImpulse(impulseVisualiser->worldProperties.translation, RigidBody::force);
+	rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, RigidBody::force);
 }
 
 void TW_CALL ResetRB(void *clientData)
 {
-	rigidBody->Reset();
+	rigidBodyManager[0]->Reset();
 }
 
 void TW_CALL CalculateNewTesor(void *clientData)
 {
-	rigidBody->inertialTensor = Inertia::Compute2(rigidBody->model, rigidBody->mass);
+	rigidBodyManager[0]->inertialTensor = Inertia::Compute2(rigidBodyManager[0]->model, rigidBodyManager[0]->mass);
 }
 
 // GLUT CALLBACK FUNCTIONS
@@ -267,7 +271,9 @@ void update()
 	camera.Update(deltaTime);
 
 	//particleSystem.Update(deltaTime);
-	rigidBody->Update(deltaTime);
+
+	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
+		rigidBodyManager[i]->Update(deltaTime);
 
 	//rigidBodyManager->Broadphase(BroadMode::BRUTE);
 
@@ -287,22 +293,36 @@ void draw()
 
 	glm::mat4 viewMatrix = camera.GetViewMatrix();
 
-	for(int i = 0; i < objectList.size(); i++)
+	for (int i = 0; i < modelList.size(); i++)
 	{
-		if(objectList[i]->drawMe)
+		if (modelList[i]->drawMe)
 		{
 			//Set shader
-			shaderManager.SetShaderProgram(objectList[i]->GetShaderProgramID());
+			shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
 
 			//Set MVP matrix
-			glm::mat4 MVP = projectionMatrix * viewMatrix * objectList.at(i)->GetModelMatrix();
-			int mvpMatrixLocation = glGetUniformLocation(objectList[i]->GetShaderProgramID(), "mvpMatrix"); // Get the location of mvp matrix in the shader
+			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
+			int mvpMatrixLocation = glGetUniformLocation(modelList[i]->GetShaderProgramID(), "mvpMatrix"); // Get the location of mvp matrix in the shader
 			glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
 
 			//Render
-			objectList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
+
+	GLuint bounding = shaderManager.GetShaderProgramID("red");
+
+	shaderManager.SetShaderProgram(bounding);
+	glPolygonMode(GL_FRONT, GL_LINE);
+
+	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
+	{
+		glm::mat4 MVP = projectionMatrix * viewMatrix * rigidBodyManager[i]->model->GetModelMatrix();
+		int mvpMatrixLocation = glGetUniformLocation(bounding, "mvpMatrix"); // Get the location of mvp matrix in the shader
+		glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
+
+		rigidBodyManager[i]->boundingSphere->draw();
+	}
 
 	//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
 	//int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
@@ -315,6 +335,8 @@ void draw()
     TwDraw();
 
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
+
+	glPolygonMode(GL_FRONT, GL_FILL);
 
 	if(printText)
 		printouts();
@@ -477,11 +499,11 @@ void printouts()
 	*/
 
 	ss.str(std::string()); // clear
-	glm::vec3 pos = rigidBody->model->worldProperties.translation;
+	glm::vec3 pos = rigidBodyManager[0]->model->worldProperties.translation;
 	ss << "rb.pos: (" << std::fixed << std::setprecision(PRECISION) << pos.x << ", " << pos.y << ", " << pos.z << ")";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),140, ss.str().c_str());
 	ss.str(std::string()); // clear
-	glm::vec3 rot = rigidBody->model->GetEulerAngles();
+	glm::vec3 rot = rigidBodyManager[0]->model->GetEulerAngles();
 	ss << "rb.rot: (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),120, ss.str().c_str());
 

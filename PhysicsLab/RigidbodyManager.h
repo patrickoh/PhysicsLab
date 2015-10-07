@@ -32,7 +32,15 @@ class RigidbodyManager
 			xAxis.push_back(rigidbody->aabb->min.x);
 		}*/
 
+		RigidBody* operator [](int i) const    { return rigidBodies[i]; }
+		RigidBody* & operator [](int i) { return rigidBodies[i]; }
+
 		//TODO - remove
+
+		void Add(RigidBody* rb)
+		{
+			rigidBodies.push_back(rb);
+		}
 
 		//Brute force check spheres
 		void SphereCollisions()
