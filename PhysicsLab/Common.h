@@ -8,6 +8,8 @@
 
 #define BOX "Models/cubeTri.obj"
 
+#define PI 3.1415926535897932384626433832795f;
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> 
 #include <glm/gtc/type_ptr.hpp>

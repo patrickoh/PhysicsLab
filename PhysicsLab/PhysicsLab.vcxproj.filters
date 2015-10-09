@@ -34,6 +34,9 @@
     <Filter Include="Header Files\Physics\Collision Detection">
       <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{ab498c38-9065-481c-a50e-e4e7fc1d9dcb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
