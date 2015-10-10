@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 	RigidBody::linear = true;
 
 
-	Model* m = new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(1), "Models/crate.dae", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m = new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
 	rigidBodyManager.Add(new RigidBody(m));
 	modelList.push_back(m);
 
@@ -317,7 +317,7 @@ void draw()
 
 	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
 	{
-		glm::mat4 MVP = projectionMatrix * viewMatrix * rigidBodyManager[i]->model->GetModelMatrix();
+		glm::mat4 MVP = projectionMatrix * viewMatrix * rigidBodyManager[i]->model->GetModelMatrix() * glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
 		int mvpMatrixLocation = glGetUniformLocation(bounding, "mvpMatrix"); // Get the location of mvp matrix in the shader
 		glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
 

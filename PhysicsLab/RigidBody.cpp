@@ -102,7 +102,7 @@ void RigidBody::Update(double deltaTime)
 //the point on the object relative to the center of mass of the object
 void RigidBody::ApplyImpulse(glm::vec3 p, glm::vec3 force) 
 { 
-	glm::vec3 x = model->worldProperties.translation + com;
+	glm::vec3 x = model->worldProperties.translation + (com * model->worldProperties.scale);
 	torqueNet += glm::cross(p - x, force);
 
 	forceNet += force;

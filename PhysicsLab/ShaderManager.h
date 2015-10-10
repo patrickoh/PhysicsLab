@@ -34,7 +34,7 @@ class ShaderManager
 		
 		GLuint GetCurrentShaderProgramID() { return currentShaderProgramID; }
 
-		static void SetUniform3fv(GLuint id, std::string name, glm::vec3 value)
+		/*static void SetUniform3fv(GLuint id, std::string name, glm::vec3 value)
 		{
 			glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, glm::value_ptr(value));
 		}
@@ -52,7 +52,7 @@ class ShaderManager
 		static void SetUniform1f(GLuint id, std::string name, GLfloat value)
 		{
 			glUniform1f(glGetUniformLocation(id, name.c_str()), value);
-		}
+		}*/
 };
 
 #endif
