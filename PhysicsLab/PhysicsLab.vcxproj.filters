@@ -124,5 +124,8 @@
     <None Include="Shaders\white.ps">
       <Filter>Resource Files\Pixel Shaders</Filter>
     </None>
+    <None Include="Shaders\bounding.ps">
+      <Filter>Resource Files\Pixel Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

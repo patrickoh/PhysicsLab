@@ -34,25 +34,30 @@ class ShaderManager
 		
 		GLuint GetCurrentShaderProgramID() { return currentShaderProgramID; }
 
-		/*static void SetUniform3fv(GLuint id, std::string name, glm::vec3 value)
+		static void SetUniform(GLuint id, std::string name, glm::vec3 value)
 		{
 			glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, glm::value_ptr(value));
 		}
 
-		static void SetUniformMatrix3fv(GLuint id, std::string name, glm::mat3 value)
+		static void SetUniform(GLuint id, std::string name, glm::vec4 value)
+		{
+			glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, glm::value_ptr(value));
+		}
+
+		static void SetUniform(GLuint id, std::string name, glm::mat3 value)
 		{
 			glUniformMatrix3fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 		}
 
-		static void SetUniformMatrix4fv(GLuint id, std::string name, glm::mat4 value)
+		static void SetUniform(GLuint id, std::string name, glm::mat4 value)
 		{
 			glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 		}
 
-		static void SetUniform1f(GLuint id, std::string name, GLfloat value)
+		static void SetUniform(GLuint id, std::string name, GLfloat value)
 		{
 			glUniform1f(glGetUniformLocation(id, name.c_str()), value);
-		}*/
+		}
 };
 
 #endif

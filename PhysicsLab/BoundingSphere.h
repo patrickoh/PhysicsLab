@@ -9,14 +9,67 @@ struct BoundingSphere
 
 	//TODO - visualisation
 	//bool vis;
-	//glm::vec4 colour;
+	
+	glm::vec4 colour;
 
 	//std::vector<glm::vec3> vertices;
 
 	BoundingSphere(const std::vector<glm::vec3>& v)
 	{
-		//Ritter's algorithm 
+		calculate3(v);
 
+		#pragma region DRAW OWN SPHERE
+		//float X1,Y1,X2,Y2,Z1,Z2;
+		//float inc1,inc2,inc3,inc4,inc5,Radius1,Radius2;
+		//int i = 0;
+
+		//int resolution = 50;
+		//vertices.resize(resolution * resolution * 6);
+
+		//for(int w = 0; w < resolution; w++) 
+		//{
+		//	for(int h = (-resolution/2); h < (resolution/2); h++)
+		//	{
+
+
+		//		inc1 = (w/(float)resolution)*2*PI;
+		//		inc2 = ((w+1)/(float)resolution)*2*PI;
+
+		//		inc3 = (h/(float)resolution)*PI;
+		//		inc4 = ((h+1)/(float)resolution)*PI;
+
+
+		//		X1 = sin(inc1);
+		//		Y1 = cos(inc1);
+		//		X2 = sin(inc2);
+		//		Y2 = cos(inc2);
+
+		//		// store the upper and lower radius, remember everything is going to be drawn as triangles
+		//		Radius1 = radius*cos(inc3);
+		//		Radius2 = radius*cos(inc4);
+
+		//		Z1 = radius*sin(inc3); 
+		//		Z2 = radius*sin(inc4);
+
+		//		// insert the triangle coordinates
+		//		vertices[i++] = glm::vec3(Radius1*X1,Z1,Radius1*Y1); //+ center;
+		//		vertices[i++] = glm::vec3(Radius1*X2,Z1,Radius1*Y2); //+ center;
+		//		vertices[i++] = glm::vec3(Radius2*X2,Z2,Radius2*Y2); //+ center;
+
+		//		vertices[i++] = glm::vec3(Radius1*X1,Z1,Radius1*Y1);
+		//		vertices[i++] = glm::vec3(Radius2*X2,Z2,Radius2*Y2);
+		//		vertices[i++] = glm::vec3(Radius2*X1,Z2,Radius2*Y1);
+
+
+		//		//indexVBO(v, t, n, indices, indexed_vertices, indexed_uvs, indexed_normals);	 
+		//	}
+		//}
+		#pragma endregion
+	}
+
+	//Ritter's (Sarah)
+	void calculate1(const std::vector<glm::vec3>& v)
+	{
 		glm::vec3 vmin, vmax;
 
 		vmin = vmax = v[0];
@@ -81,8 +134,12 @@ struct BoundingSphere
 	
 		centre = c;
 		radius = r;
+	}
 
-		/*glm::vec3 xmin, xmax, ymin, ymax, zmin, zmax;
+	//Ritter's Unity Forums
+	void calculate2(const std::vector<glm::vec3>& v)
+	{
+		glm::vec3 xmin, xmax, ymin, ymax, zmin, zmax;
 
         for (glm::vec3 p : v)
         {
@@ -125,96 +182,71 @@ struct BoundingSphere
                 float offset = r - radius;
                 centre = (radius * centre + offset * p) / r;
             }
-		}*/
+		}
+	}
 
-		//glm::vec3 min, max;
+	//Really naive approach that doesn't even work!
+	void calculate3(const std::vector<glm::vec3>& v)
+	{
+		glm::vec3 p1, p2;
+		float diameter = 0.0f;
 
-		//for (glm::vec3 point : v)
-		//{
-		//	if (point.x < min.x) min.x = point.x;
-		//	if (point.x > max.x) max.x = point.x;
-		//	if (point.y < min.y) min.y = point.y;
-		//	if (point.y > max.y) max.y = point.y;
-		//	if (point.z < min.z) min.z = point.z;
-		//	if (point.z > max.z) max.z = point.z;
-		//}
+		for(int i = 0; i < v.size(); i++)
+		{
+			for(int j = 0; j < v.size(); j++)
+			{
+				if(glm::distance(v[i], v[j]) > diameter)
+				{
+					diameter = glm::distance(v[i], v[j]);
+					p1 = v[i];
+					p2 = v[j];
+				}
+			}
+		}
 
-		//float xSpan = max.x - min.x;
-		//float ySpan = max.y - min.y;
-		//float zSpan = max.z - min.y;
+		centre = (p1 + p2) * 0.5f;
+		radius = diameter * 0.5f;
+	}
 
-		//float maxSpan = xSpan;
+	//Bouncing Bubble Algorithm
+	void calculate4(const std::vector<glm::vec3>& vertices)
+	{
+		centre = vertices[0];
+		radius = 0.0001f;
 
-		//if (ySpan > maxSpan)
-		//	maxSpan = ySpan;
+		glm::vec3 pos, diff;
+		float len, alpha, alphaSq;
 
-		//if (zSpan > maxSpan)
-		//	maxSpan = zSpan;
+		for (int i = 0; i < 2; i++)
+		{
+			for (int i = 0; i < vertices.size(); i++)
+			{
+				pos = vertices[i];
+				diff = pos - centre;
+				len = diff.length();
+				
+				if (len > radius)
+				{
+					alpha = len / radius;
+					alphaSq = alpha * alpha;
+					radius = 0.5f * (alpha + 1 / alpha) * radius;
+					centre = 0.5f * ((1 + 1 / alphaSq) * centre + (1 - 1 / alphaSq) * pos);
+				}
+			}
+		}
 
-		//centre = (min+max) * 0.5f;
-		//radius = maxSpan / 2;
-
-		//for  (glm::vec3 point : v)
-		//{
-		//	//float distance = (point - centre).length;
-		//	glm::vec3 direction = point - centre;
-
-		//	if(direction.length() > radius)
-		//	{
-		//		float difference = direction.length() - radius;
-		//		radius = (radius + direction.length()) / 2;
-		//		centre += difference * glm::normalize(direction);
-		//	}
-		//}
-
-		#pragma region DRAW OWN SPHERE
-		//float X1,Y1,X2,Y2,Z1,Z2;
-		//float inc1,inc2,inc3,inc4,inc5,Radius1,Radius2;
-		//int i = 0;
-
-		//int resolution = 50;
-		//vertices.resize(resolution * resolution * 6);
-
-		//for(int w = 0; w < resolution; w++) 
-		//{
-		//	for(int h = (-resolution/2); h < (resolution/2); h++)
-		//	{
-
-
-		//		inc1 = (w/(float)resolution)*2*PI;
-		//		inc2 = ((w+1)/(float)resolution)*2*PI;
-
-		//		inc3 = (h/(float)resolution)*PI;
-		//		inc4 = ((h+1)/(float)resolution)*PI;
-
-
-		//		X1 = sin(inc1);
-		//		Y1 = cos(inc1);
-		//		X2 = sin(inc2);
-		//		Y2 = cos(inc2);
-
-		//		// store the upper and lower radius, remember everything is going to be drawn as triangles
-		//		Radius1 = radius*cos(inc3);
-		//		Radius2 = radius*cos(inc4);
-
-		//		Z1 = radius*sin(inc3); 
-		//		Z2 = radius*sin(inc4);
-
-		//		// insert the triangle coordinates
-		//		vertices[i++] = glm::vec3(Radius1*X1,Z1,Radius1*Y1); //+ center;
-		//		vertices[i++] = glm::vec3(Radius1*X2,Z1,Radius1*Y2); //+ center;
-		//		vertices[i++] = glm::vec3(Radius2*X2,Z2,Radius2*Y2); //+ center;
-
-		//		vertices[i++] = glm::vec3(Radius1*X1,Z1,Radius1*Y1);
-		//		vertices[i++] = glm::vec3(Radius2*X2,Z2,Radius2*Y2);
-		//		vertices[i++] = glm::vec3(Radius2*X1,Z2,Radius2*Y1);
-
-
-		//		//indexVBO(v, t, n, indices, indexed_vertices, indexed_uvs, indexed_normals);	 
-		//	}
-		//}
-		#pragma endregion
-
+		for (int i = 0; i < vertices.size(); i++)
+		{
+			pos = vertices[i];
+			diff = pos - centre;
+			len = diff.length();
+			
+			if (len > radius)
+			{
+				radius = (radius + len) / 2.0f;
+				centre = centre + ((len - radius) / len * diff);
+			}
+		}
 	}
 
 	bool collides(BoundingSphere* other)

@@ -165,6 +165,7 @@ int main(int argc, char** argv)
 	shaderManager.CreateShaderProgram("red", "Shaders/diffuse.vs", "Shaders/red.ps");
 	shaderManager.CreateShaderProgram("text", "Shaders/diffuse.vs", "Shaders/white.ps");
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
+	shaderManager.CreateShaderProgram("bounding", "Shaders/diffuse.vs", "Shaders/bounding.ps");
 
 	//plane->wireframe = true;
 
@@ -181,7 +182,7 @@ int main(int argc, char** argv)
 	RigidBody::linear = true;
 
 
-	Model* m = new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m = new Model(glm::vec3(0, 1, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
 	rigidBodyManager.Add(new RigidBody(m));
 	modelList.push_back(m);
 
@@ -297,15 +298,12 @@ void draw()
 	{
 		if (modelList[i]->drawMe)
 		{
-			//Set shader
 			shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
 
-			//Set MVP matrix
 			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
-			int mvpMatrixLocation = glGetUniformLocation(modelList[i]->GetShaderProgramID(), "mvpMatrix"); // Get the location of mvp matrix in the shader
-			glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
+			
+			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
 
-			//Render
 			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
@@ -318,8 +316,14 @@ void draw()
 	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
 	{
 		glm::mat4 MVP = projectionMatrix * viewMatrix * rigidBodyManager[i]->model->GetModelMatrix() * glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
-		int mvpMatrixLocation = glGetUniformLocation(bounding, "mvpMatrix"); // Get the location of mvp matrix in the shader
-		glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
+		
+		ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
+
+		//ShaderManager::SetUniform(bounding, "colour", glm::vec4(1,1,0,1));
+
+		//glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
+		//int mvpMatrixLocation = glGetUniformLocation(modelList[i]->GetShaderProgramID(), "mvpMatrix"); // Get the location of mvp matrix in the shader
+		//glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
 
 		rigidBodyManager[i]->boundingSphere->draw();
 	}
