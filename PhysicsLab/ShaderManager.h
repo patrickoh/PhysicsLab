@@ -11,6 +11,8 @@
 
 #include <map>
 
+#include "Common.h"
+
 class ShaderManager
 {
 	private:
@@ -41,7 +43,7 @@ class ShaderManager
 
 		static void SetUniform(GLuint id, std::string name, glm::vec4 value)
 		{
-			glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, glm::value_ptr(value));
+			glUniform4fv(glGetUniformLocation(id, name.c_str()), 1, glm::value_ptr(value));
 		}
 
 		static void SetUniform(GLuint id, std::string name, glm::mat3 value)

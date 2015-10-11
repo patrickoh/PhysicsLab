@@ -14,9 +14,16 @@ struct BoundingSphere
 
 	//std::vector<glm::vec3> vertices;
 
+	glm::vec3 position;
+	float scale;
+
 	BoundingSphere(const std::vector<glm::vec3>& v)
 	{
 		calculate3(v);
+		colour = glm::vec4(0,0,1,1);
+
+		scale = 1;
+		position = glm::vec3(0);
 
 		#pragma region DRAW OWN SPHERE
 		//float X1,Y1,X2,Y2,Z1,Z2;
@@ -251,7 +258,7 @@ struct BoundingSphere
 
 	bool collides(BoundingSphere* other)
 	{
-		return (glm::distance(centre, other->centre) < (radius + other->radius));
+		return (glm::distance(centre + position, other->centre + other->position) < ((radius * scale) + (other->radius * other->scale)) );
 	}
 
 	void draw()

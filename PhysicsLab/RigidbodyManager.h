@@ -4,6 +4,8 @@
 #include <vector>
 #include <glm\glm.hpp>
 
+#include <algorithm> 
+
 struct CollidingPair
 {
 	RigidBody* rb1;
@@ -42,6 +44,22 @@ class RigidbodyManager
 			rigidBodies.push_back(rb);
 		}
 
+		void Broadphase()
+		{
+			SphereCollisions();
+		}
+
+		void Update(double deltaTime)
+		{
+			for (int i = 0; i < rigidBodies.size(); i++)
+			{
+				rigidBodies[i]->Update(deltaTime);
+
+				rigidBodies[i]->boundingSphere->scale = rigidBodies[i]->model->worldProperties.scale.x;
+				rigidBodies[i]->boundingSphere->position = rigidBodies[i]->model->worldProperties.translation;
+			}
+		}
+
 		//Brute force check spheres
 		void SphereCollisions()
 		{
@@ -55,10 +73,9 @@ class RigidbodyManager
 					BoundingSphere* sphere2 = rigidBodies[j]->boundingSphere;
 
 					if(sphere1->collides(sphere2))
-					{ 
-						//sphere2->Change_Color(d_colliding_color);
-						//sphere1->Change_Color(d_colliding_color);
-					}
+						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);
+					else
+						sphere1->colour = sphere2->colour = glm::vec4(0,1,0,1);
 				}
 			}
 		}

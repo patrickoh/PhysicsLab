@@ -186,6 +186,10 @@ int main(int argc, char** argv)
 	rigidBodyManager.Add(new RigidBody(m));
 	modelList.push_back(m);
 
+	Model* m2 = new Model(glm::vec3(0, 1, 5), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
+	rigidBodyManager.Add(new RigidBody(m2));
+	modelList.push_back(m2);
+
 	//ASSIGNMENT 2 - RIGID BODY UI
 	
 	TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
@@ -273,10 +277,9 @@ void update()
 
 	//particleSystem.Update(deltaTime);
 
-	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
-		rigidBodyManager[i]->Update(deltaTime);
+	rigidBodyManager.Update(deltaTime);
 
-	//rigidBodyManager->Broadphase(BroadMode::BRUTE);
+	rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
 
 	//PHYSICS
 
@@ -299,31 +302,25 @@ void draw()
 		if (modelList[i]->drawMe)
 		{
 			shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
-
 			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
-			
 			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
-
 			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
 
-	GLuint bounding = shaderManager.GetShaderProgramID("red");
+	GLuint bounding = shaderManager.GetShaderProgramID("bounding");
 
 	shaderManager.SetShaderProgram(bounding);
-	glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_FRONT, GL_LINE);
 
 	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
 	{
 		glm::mat4 MVP = projectionMatrix * viewMatrix * rigidBodyManager[i]->model->GetModelMatrix() * glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
 		
 		ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
+		ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->boundingSphere->colour);
 
-		//ShaderManager::SetUniform(bounding, "colour", glm::vec4(1,1,0,1));
-
-		//glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
-		//int mvpMatrixLocation = glGetUniformLocation(modelList[i]->GetShaderProgramID(), "mvpMatrix"); // Get the location of mvp matrix in the shader
-		//glUniformMatrix4fv(mvpMatrixLocation, 1, GL_FALSE, glm::value_ptr(MVP)); // Send updated mvp matrix 
+		//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
 
 		rigidBodyManager[i]->boundingSphere->draw();
 	}
@@ -340,7 +337,7 @@ void draw()
 
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 
-	glPolygonMode(GL_FRONT, GL_FILL);
+	//glPolygonMode(GL_FRONT, GL_FILL);
 
 	if(printText)
 		printouts();
