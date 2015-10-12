@@ -53,6 +53,10 @@ void reshape(int w, int h);
 void update();
 void draw();
 
+void DrawModels(glm::mat4);
+void DrawBoundings(glm::mat4);
+void DrawParticles(glm::mat4);
+
 void InitTweakBar();
 void TW_CALL ApplyImpulse(void *clientData);
 void TW_CALL ResetRB(void *clientData);
@@ -182,11 +186,11 @@ int main(int argc, char** argv)
 	RigidBody::linear = true;
 
 
-	Model* m = new Model(glm::vec3(0, 1, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m = new Model(glm::vec3(0, 1, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
 	rigidBodyManager.Add(new RigidBody(m));
 	modelList.push_back(m);
 
-	Model* m2 = new Model(glm::vec3(0, 1, 5), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m2 = new Model(glm::vec3(0, 1, 5), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
 	rigidBodyManager.Add(new RigidBody(m2));
 	modelList.push_back(m2);
 
@@ -293,21 +297,39 @@ void update()
 void draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	glm::mat4 viewMatrix = camera.GetViewMatrix();
 
+	DrawModels(viewMatrix);
+	DrawBoundings(viewMatrix);
+	DrawParticles(viewMatrix);
+
+    TwDraw(); // Draw tweak bars
+
+	if(printText)
+		printouts();
+
+	glutSwapBuffers();
+}
+
+void DrawModels(glm::mat4 viewMatrix)
+{
 	for (int i = 0; i < modelList.size(); i++)
 	{
 		if (modelList[i]->drawMe)
 		{
 			shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
+			
 			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
 			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
+			
 			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
+}
 
+void DrawBoundings(glm::mat4 viewMatrix)
+{
 	GLuint bounding = shaderManager.GetShaderProgramID("bounding");
 
 	shaderManager.SetShaderProgram(bounding);
@@ -315,34 +337,45 @@ void draw()
 
 	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
 	{
-		glm::mat4 MVP = projectionMatrix * viewMatrix * rigidBodyManager[i]->model->GetModelMatrix() * glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
+		glm::mat4 MVP = projectionMatrix * viewMatrix *  
+			glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
+				* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale)
+				* rigidBodyManager[i]->model->globalInverseTransform
+				* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
 		
 		ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
 		ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->boundingSphere->colour);
 
 		//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
 
-		rigidBodyManager[i]->boundingSphere->draw();
+		//rigidBodyManager[i]->boundingSphere->draw();
 	}
 
+	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
+	{
+		glm::mat4 MVP = projectionMatrix * viewMatrix * 
+			glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
+				* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale) 
+				* rigidBodyManager[i]->model->globalInverseTransform 
+				* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->aabb->centre)
+				* glm::scale(glm::mat4(), glm::vec3(rigidBodyManager[i]->aabb->width, rigidBodyManager[i]->aabb->height, 
+													rigidBodyManager[i]->aabb->depth)); 
+		
+		ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
+		ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->aabb->colour);
+
+		rigidBodyManager[i]->aabb->Draw();
+	}
+}
+
+void DrawParticles(glm::mat4 viewMatrix)
+{
 	//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
 	//int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
 	//glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); 
 	//int projLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "proj"); 
 	//glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	//particleSystem.Render();
-
-	// Draw tweak bars
-    TwDraw();
-
-	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
-
-	//glPolygonMode(GL_FRONT, GL_FILL);
-
-	if(printText)
-		printouts();
-
-	glutSwapBuffers();
 }
 
 //KEYBOARD FUCNTIONS
@@ -482,6 +515,8 @@ void mouseWheel(int button, int dir, int x, int y)
 
 void printouts()
 {
+	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
+
 	std::stringstream ss;
 
 	//Bottom left is 0,0
@@ -507,6 +542,18 @@ void printouts()
 	glm::vec3 rot = rigidBodyManager[0]->model->GetEulerAngles();
 	ss << "rb.rot: (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),120, ss.str().c_str());
+
+	///////////////
+
+	ss.str(std::string()); // clear
+	pos = rigidBodyManager[0]->aabb->centre;
+	ss << "aabb.centre: (" << std::fixed << std::setprecision(PRECISION) << pos.x << ", " << pos.y << ", " << pos.z << ")";
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),180, ss.str().c_str());
+	ss.str(std::string()); // clear
+	AABB* aabb = rigidBodyManager[0]->aabb;
+	rot = glm::vec3(aabb->width, aabb->height, aabb->depth); 
+	ss << "aabb (w h d): (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),160, ss.str().c_str());
 
 	//PRINT CAMERA
 	ss.str(std::string()); // clear

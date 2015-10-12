@@ -47,4 +47,10 @@ class RigidBody
 		void Reset();
 
 		static glm::vec3 CalculateCentreOfMass(Model* model);
+
+		static void transformBatch(std::vector<glm::vec3>* verts, glm::quat orientation)
+		{
+			for(int i = 0; i < verts->size(); i++)
+				verts->at(i) = verts->at(i) * glm::toMat3(orientation);
+		}
 };

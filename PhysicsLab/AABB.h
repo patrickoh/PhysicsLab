@@ -1,7 +1,7 @@
 #include "Common.h"
 #include <vector>
 
-//enum Axis { X, Y, Z };
+enum Axis { X = 0, Y, Z };
 //enum End { min, max };
 
 class AABB;
@@ -11,7 +11,17 @@ struct EndPoint
 	float value;
 	bool isMin;
 
-	AABB* owner;
+	//AABB* owner;
+
+	EndPoint() 
+	{
+	}
+
+	EndPoint(float p_value, bool p_isMin) 
+	{
+		value = p_value;
+		isMin = p_isMin;
+	}
 
 	bool operator<(const EndPoint& other)
 	{
@@ -26,44 +36,72 @@ struct EndPoint
 
 class AABB
 {
-	//RigidBody* owner;
-
 	glm::vec3 position;
+	 //local space?
 
-	//glm::vec3 centre; //local space?
+public:
+
+	glm::vec3 centre;
+	glm::vec4 colour;
 
 	float width;
 	float depth;
 	float height;
 
-public:
+	std::vector<glm::vec3> restBBverts;
 
-	EndPoint* min [3];
-	EndPoint* max [3]; 
+	EndPoint min [3];
+	EndPoint max [3]; 
 
 	AABB(const std::vector<glm::vec3>& vertices/*, RigidBody* p_owner*/)
 	{
 		//owner = p_owner;
+
+		colour = glm::vec4(0,0,1,1);
+
+		min[0] = EndPoint(std::numeric_limits<float>::max(), true);
+		min[1] = EndPoint(std::numeric_limits<float>::max(), true);
+		min[2] = EndPoint(std::numeric_limits<float>::max(), true);
+
+		max[0] = EndPoint(std::numeric_limits<float>::min(), true);
+		max[1] = EndPoint(std::numeric_limits<float>::min(), true);
+		max[2] = EndPoint(std::numeric_limits<float>::min(), true);
+
 		Create(vertices);
 	}
 
 	void Create(const std::vector<glm::vec3> &vertices)
 	{
-		//local space with rotation
+		Calculate(vertices);
 
-		/*for (glm::vec3 point : vertices)
+		restBBverts.push_back(glm::vec3(width*0.5, height*0.5, depth*0.5));
+		restBBverts.push_back(glm::vec3(width*0.5, height*0.5, -depth*0.5));
+		restBBverts.push_back(glm::vec3(width*0.5, -height*0.5, depth*0.5));
+		restBBverts.push_back(glm::vec3(width*0.5, -height*0.5, -depth*0.5));
+		restBBverts.push_back(glm::vec3(-width*0.5, height*0.5, depth*0.5));
+		restBBverts.push_back(glm::vec3(-width*0.5, height*0.5, -depth*0.5));
+		restBBverts.push_back(glm::vec3(-width*0.5, -height*0.5, depth*0.5));
+		restBBverts.push_back(glm::vec3(-width*0.5, -height*0.5, -depth*0.5));
+	}
+
+	void Calculate(const std::vector<glm::vec3> &vertices)
+	{
+		for (glm::vec3 point : vertices)
 		{
-			if (point.x < min[0]->value) min[0]->value = point.x;
-			if (point.x > max[0]->value) max[0]->value = point.x;
-			if (point.y < min[1]->value) min[1]->value = point.y;
-			if (point.y > max[1]->value) max[1]->value = point.y;
-			if (point.z < min.z) min.z = point.z;
-			if (point.z > max.z) max.z = point.z;
+			if (point.x < min[Axis::X].value) min[Axis::X].value = point.x;
+			if (point.x > max[Axis::X].value) max[Axis::X].value = point.x;
+			if (point.y < min[Axis::Y].value) min[Axis::Y].value = point.y;
+			if (point.y > max[Axis::Y].value) max[Axis::Y].value = point.y;
+			if (point.z < min[Axis::Z].value) min[Axis::Z].value = point.z;
+			if (point.z > max[Axis::Z].value) max[Axis::Z].value = point.z;
 		}
 
-		width = max.x - min.x;
-		height = max.y - min.y;*/
+		width = max[Axis::X].value - min[Axis::X].value;
+		height = max[Axis::Y].value - min[Axis::Y].value;
+		depth = max[Axis::Z].value - min[Axis::Z].value;
 
+		centre = (glm::vec3(min[Axis::X].value, min[Axis::Y].value, min[Axis::Z].value) +
+			glm::vec3(max[Axis::X].value, max[Axis::Y].value, max[Axis::Z].value)) * 0.5f;
 	}
 
 	bool Overlaps(AABB other)
@@ -71,6 +109,11 @@ public:
 		return ((abs(position.x - other.position.x) * 2 < (width + other.width)) &&
 			 (abs(position.y - other.position.y) * 2 < (height + other.height)) &&
 			 (abs(position.z - other.position.z) * 2 < (depth + other.depth)));
+	}
+
+	void Draw()
+	{
+		glutWireCube(1);
 	}
 
 	//Just store endpoints

@@ -55,8 +55,10 @@ class RigidbodyManager
 			{
 				rigidBodies[i]->Update(deltaTime);
 
-				rigidBodies[i]->boundingSphere->scale = rigidBodies[i]->model->worldProperties.scale.x;
-				rigidBodies[i]->boundingSphere->position = rigidBodies[i]->model->worldProperties.translation;
+				glm::vec3 scale = rigidBodies[i]->model->worldProperties.scale;
+
+				rigidBodies[i]->boundingSphere->scale = max(max(scale.x, scale.y), scale.z);
+				rigidBodies[i]->boundingSphere->translation = rigidBodies[i]->model->worldProperties.translation;
 			}
 		}
 

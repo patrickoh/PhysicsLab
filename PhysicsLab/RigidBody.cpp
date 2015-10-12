@@ -84,6 +84,13 @@ void RigidBody::Update(double deltaTime)
 		model->worldProperties.orientation += 
 			timestep * model->worldProperties.orientation * glm::quat(setAsCrossProductMatrix(angularVelocity));
 		//model->worldProperties.orientation *= glm::angleAxis(1.0f, glm::vec3(0,0,1.0f));
+
+		//if(angularVelocity.x != 0 || angularVelocity.y != 0 || angularVelocity.z != 0)
+		//{
+			std::vector<glm::vec3> extents = aabb->restBBverts;
+			RigidBody::transformBatch(&extents, model->worldProperties.orientation);
+			aabb->Calculate(extents);
+		//}
 	
 		angularMomentum += torqueNet * timestep;
 		
