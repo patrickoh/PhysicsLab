@@ -36,10 +36,11 @@ struct EndPoint
 
 class AABB
 {
-	glm::vec3 position;
-	 //local space?
 
 public:
+
+	glm::vec3 translation;
+	float scale;
 
 	glm::vec3 centre;
 	glm::vec4 colour;
@@ -58,14 +59,6 @@ public:
 		//owner = p_owner;
 
 		colour = glm::vec4(0,0,1,1);
-
-		min[0] = EndPoint(std::numeric_limits<float>::max(), true);
-		min[1] = EndPoint(std::numeric_limits<float>::max(), true);
-		min[2] = EndPoint(std::numeric_limits<float>::max(), true);
-
-		max[0] = EndPoint(std::numeric_limits<float>::min(), true);
-		max[1] = EndPoint(std::numeric_limits<float>::min(), true);
-		max[2] = EndPoint(std::numeric_limits<float>::min(), true);
 
 		Create(vertices);
 	}
@@ -86,6 +79,14 @@ public:
 
 	void Calculate(const std::vector<glm::vec3> &vertices)
 	{
+		min[Axis::X] = EndPoint(std::numeric_limits<float>::max(), true);
+		min[Axis::Y] = EndPoint(std::numeric_limits<float>::max(), true);
+		min[Axis::Z] = EndPoint(std::numeric_limits<float>::max(), true);
+
+		max[Axis::X] = EndPoint(std::numeric_limits<float>::min(), true);
+		max[Axis::Y] = EndPoint(std::numeric_limits<float>::min(), true);
+		max[Axis::Z] = EndPoint(std::numeric_limits<float>::min(), true);
+
 		for (glm::vec3 point : vertices)
 		{
 			if (point.x < min[Axis::X].value) min[Axis::X].value = point.x;
@@ -104,11 +105,11 @@ public:
 			glm::vec3(max[Axis::X].value, max[Axis::Y].value, max[Axis::Z].value)) * 0.5f;
 	}
 
-	bool Overlaps(AABB other)
+	bool collides(AABB* other)
 	{
-		return ((abs(position.x - other.position.x) * 2 < (width + other.width)) &&
-			 (abs(position.y - other.position.y) * 2 < (height + other.height)) &&
-			 (abs(position.z - other.position.z) * 2 < (depth + other.depth)));
+		return ((abs((centre.x + translation.x) - (other->centre.x + other->translation.x)) * 2 < (width + other->width) * scale) && 	
+				(abs((centre.y + translation.y) - (other->centre.y + other->translation.y)) * 2 < (height + other->height) * scale) &&
+				(abs((centre.z + translation.z) - (other->centre.z + other->translation.z)) * 2 < (depth + other->depth) * scale ));
 	}
 
 	void Draw()

@@ -101,6 +101,8 @@ Model* impulseVisualiser;
 
 //RigidBody* rigidBody;
 
+bool drawBoundingSpheres = false;
+bool drawBoundingBoxes = true;
 
 RigidbodyManager rigidBodyManager;
 
@@ -322,8 +324,10 @@ void DrawModels(glm::mat4 viewMatrix)
 			
 			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
 			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
+
+			//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
 			
-			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+			//modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
 }
@@ -331,29 +335,29 @@ void DrawModels(glm::mat4 viewMatrix)
 void DrawBoundings(glm::mat4 viewMatrix)
 {
 	GLuint bounding = shaderManager.GetShaderProgramID("bounding");
-
 	shaderManager.SetShaderProgram(bounding);
-	//glPolygonMode(GL_FRONT, GL_LINE);
 
 	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
 	{
-		glm::mat4 MVP = projectionMatrix * viewMatrix *  
-			glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
-				* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale)
-				* rigidBodyManager[i]->model->globalInverseTransform
-				* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
+		glm::mat4 MVP;
+
+		if(drawBoundingSpheres)
+		{
+			MVP = projectionMatrix * viewMatrix *  
+				glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
+					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale)
+					* rigidBodyManager[i]->model->globalInverseTransform
+					* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
 		
-		ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
-		ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->boundingSphere->colour);
+			ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
+			ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->boundingSphere->colour);
 
-		//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
+			rigidBodyManager[i]->boundingSphere->draw();
+		}
 
-		//rigidBodyManager[i]->boundingSphere->draw();
-	}
-
-	for (int i = 0; i < rigidBodyManager.rigidBodies.size(); i++)
-	{
-		glm::mat4 MVP = projectionMatrix * viewMatrix * 
+		if(drawBoundingBoxes)
+		{
+			MVP = projectionMatrix * viewMatrix * 
 			glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
 				* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale) 
 				* rigidBodyManager[i]->model->globalInverseTransform 
@@ -361,10 +365,11 @@ void DrawBoundings(glm::mat4 viewMatrix)
 				* glm::scale(glm::mat4(), glm::vec3(rigidBodyManager[i]->aabb->width, rigidBodyManager[i]->aabb->height, 
 													rigidBodyManager[i]->aabb->depth)); 
 		
-		ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
-		ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->aabb->colour);
+			ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
+			ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->aabb->colour);
 
-		rigidBodyManager[i]->aabb->Draw();
+			rigidBodyManager[i]->aabb->Draw();
+		}
 	}
 }
 

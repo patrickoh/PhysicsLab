@@ -47,6 +47,8 @@ class RigidbodyManager
 		void Broadphase()
 		{
 			SphereCollisions();
+
+			Brute();
 		}
 
 		void Update(double deltaTime)
@@ -55,10 +57,12 @@ class RigidbodyManager
 			{
 				rigidBodies[i]->Update(deltaTime);
 
-				glm::vec3 scale = rigidBodies[i]->model->worldProperties.scale;
-
-				rigidBodies[i]->boundingSphere->scale = max(max(scale.x, scale.y), scale.z);
 				rigidBodies[i]->boundingSphere->translation = rigidBodies[i]->model->worldProperties.translation;
+				rigidBodies[i]->aabb->translation = rigidBodies[i]->model->worldProperties.translation;
+
+				glm::vec3 scale = rigidBodies[i]->model->worldProperties.scale;
+				rigidBodies[i]->boundingSphere->scale = max(max(scale.x, scale.y), scale.z);
+				rigidBodies[i]->aabb->scale = max(max(scale.x, scale.y), scale.z);
 			}
 		}
 
@@ -89,6 +93,14 @@ class RigidbodyManager
 				for (int j = i + 1; j < rigidBodies.size(); j++)
 				{
 					if (i == j) continue; 
+
+					AABB* aabb1 = rigidBodies[i]->aabb;
+					AABB* aabb2 = rigidBodies[j]->aabb;
+
+					if(aabb1->collides(aabb2))
+						aabb1->colour = aabb2->colour = glm::vec4(1,0,0,1);
+					else
+						aabb1->colour = aabb2->colour = glm::vec4(0,1,0,1);
 				}
 			}
 		}
@@ -98,5 +110,7 @@ class RigidbodyManager
 			activeList.clear();	
 
 			std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
+
+
 		}
 };
