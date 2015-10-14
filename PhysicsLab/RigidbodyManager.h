@@ -10,6 +10,12 @@ struct CollidingPair
 {
 	RigidBody* rb1;
 	RigidBody* rb2;
+
+	CollidingPair(RigidBody* r1, RigidBody* r2)
+	{
+		rb1 = r1;
+		rb2 = r2;
+	}
 };
 
 class RigidbodyManager
@@ -20,7 +26,8 @@ class RigidbodyManager
 	public:
 
 		vector<RigidBody*> rigidBodies;
-		vector<CollidingPair> activeList; //List of potentially colliding pairs / active list
+		vector<EndPoint*> activeList; //List of potentially colliding pairs / active list
+		vector<CollidingPair> collidingPairs;
 
 		RigidbodyManager()
 		{
@@ -42,6 +49,8 @@ class RigidbodyManager
 		void Add(RigidBody* rb)
 		{
 			rigidBodies.push_back(rb);
+
+			xAxis.push_back(rb->aabb->min[0]);
 		}
 
 		void Broadphase()
@@ -111,6 +120,15 @@ class RigidbodyManager
 
 			std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
 
+			for (EndPoint* ep : xAxis)
+			{
+				if(ep->isMin)
+				{
+					for(EndPoint* ep2 : activeList)
+						collidingPairs.push_back(CollidingPair(ep, ep2));
 
+					activeList.push_back(ep);
+				}
+			}
 		}
 };

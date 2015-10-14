@@ -11,7 +11,7 @@ struct EndPoint
 	float value;
 	bool isMin;
 
-	//AABB* owner;
+	AABB* owner;
 
 	EndPoint() 
 	{
@@ -60,6 +60,12 @@ public:
 
 		colour = glm::vec4(0,0,1,1);
 
+		for(int i = 0; i < 3; i++)
+		{
+			min[i].owner = this;
+			max[i].owner = this;
+		}
+
 		Create(vertices);
 	}
 
@@ -76,6 +82,8 @@ public:
 		restBBverts.push_back(glm::vec3(-width*0.5, -height*0.5, depth*0.5));
 		restBBverts.push_back(glm::vec3(-width*0.5, -height*0.5, -depth*0.5));
 	}
+
+	////MIN AND MAX ARE IN LOCAL!! 
 
 	void Calculate(const std::vector<glm::vec3> &vertices)
 	{
