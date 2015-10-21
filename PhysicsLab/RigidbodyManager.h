@@ -8,25 +8,25 @@
 
 struct CollidingPair
 {
-	RigidBody* rb1;
-	RigidBody* rb2;
+	AABB* aabb1;
+	AABB* aabb2;
 
-	CollidingPair(RigidBody* r1, RigidBody* r2)
+	CollidingPair(AABB* p_aabb1, AABB* p_aabb2)
 	{
-		rb1 = r1;
-		rb2 = r2;
+		aabb1 = p_aabb1;
+		aabb2 = p_aabb2;
 	}
 };
 
 class RigidbodyManager
 { 
 	private:
-		vector<EndPoint*> xAxis;
+		vector<AABB::EndPoint*> xAxis;
 
 	public:
 
 		vector<RigidBody*> rigidBodies;
-		vector<EndPoint*> activeList; //List of potentially colliding pairs / active list
+		vector<AABB::EndPoint*> activeList; //List of potentially colliding pairs / active list
 		vector<CollidingPair> collidingPairs;
 
 		RigidbodyManager()
@@ -50,14 +50,16 @@ class RigidbodyManager
 		{
 			rigidBodies.push_back(rb);
 
-			xAxis.push_back(rb->aabb->min[0]);
+			xAxis.push_back(rb->aabb->min[Axis::X]);
+			xAxis.push_back(rb->aabb->max[Axis::X]);
 		}
 
 		void Broadphase()
 		{
 			SphereCollisions();
 
-			Brute();
+			//Brute();
+			SingleAxisSAP();
 		}
 
 		void Update(double deltaTime)
@@ -72,6 +74,13 @@ class RigidbodyManager
 				glm::vec3 scale = rigidBodies[i]->model->worldProperties.scale;
 				rigidBodies[i]->boundingSphere->scale = max(max(scale.x, scale.y), scale.z);
 				rigidBodies[i]->aabb->scale = max(max(scale.x, scale.y), scale.z);
+
+				rigidBodies[i]->aabb->min[0]->Update();
+				rigidBodies[i]->aabb->max[0]->Update();
+				rigidBodies[i]->aabb->min[1]->Update();
+				rigidBodies[i]->aabb->max[1]->Update();
+				rigidBodies[i]->aabb->min[2]->Update();
+				rigidBodies[i]->aabb->max[2]->Update();
 			}
 		}
 
@@ -114,21 +123,64 @@ class RigidbodyManager
 			}
 		}
 
+		//TODO - fix scale issue
 		void SingleAxisSAP()
 		{
 			activeList.clear();	
 
-			std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
+			//std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
+			//insertionSort(xAxis);
+			std::sort(xAxis.begin(), xAxis.end(), AABB::EndPoint::my_cmp); 
 
-			for (EndPoint* ep : xAxis)
+			for (AABB::EndPoint* ep : xAxis)
 			{
 				if(ep->isMin)
 				{
-					for(EndPoint* ep2 : activeList)
-						collidingPairs.push_back(CollidingPair(ep, ep2));
+					for(AABB::EndPoint* ep2 : activeList)
+						collidingPairs.push_back(CollidingPair(ep->owner, ep2->owner));
 
 					activeList.push_back(ep);
 				}
+				else
+				{
+					activeList.erase(std::remove(activeList.begin(), activeList.end(), ep), activeList.end());
+					activeList.erase(activeList.begin());
+				}
+			}
+
+			//temp
+			for(RigidBody* rb : rigidBodies)
+			{
+				rb->aabb->colour = glm::vec4(0,1,0,1);
+			}
+
+			for(CollidingPair cp : collidingPairs)
+			{
+				cp.aabb1->colour = glm::vec4(1,0,0,1);
+				cp.aabb2->colour = glm::vec4(1,0,0,1);
+			}
+
+			collidingPairs.clear();
+		}
+
+		void insertionSort (vector<AABB::EndPoint*> &data) 
+		{
+			int i, j;
+			AABB::EndPoint* tmp;
+
+			for (i = 1; i < data.size(); i++)
+			{
+				j = i;
+
+				tmp = data[i];
+
+				while (j > 0 && tmp->GetGlobalValue() < data[j-1]->GetGlobalValue())
+				{
+					data[j] = data[j-1];
+					j--;
+				}
+
+				data[j] = tmp;
 			}
 		}
 };
