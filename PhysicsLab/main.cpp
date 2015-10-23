@@ -106,6 +106,9 @@ bool drawBoundingBoxes = true;
 
 RigidbodyManager rigidBodyManager;
 
+long long int QueryPerformance::ts = 0;
+long long int QueryPerformance::tf = 0;
+
 int main(int argc, char** argv)
 {
 	// Set up the window
@@ -543,7 +546,7 @@ void printouts()
 
 	ss.str(std::string()); // clear
 	//glm::vec3 pos = rigidBodyManager[0]->model->worldProperties.translation;
-	ss << "rb.pos: (" << std::fixed << std::setprecision(PRECISION) << rigidBodyManager[0]->aabb->min[Axis::X]->GetGlobalValue() << ", " << pos.y << ", " << pos.z << ")";
+	ss << "rb.pos: (" << std::fixed << std::setprecision(PRECISION) << rigidBodyManager[0]->aabb->min[Axis::X]->global << ", " << pos.y << ", " << pos.z << ")";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),140, ss.str().c_str());
 	ss.str(std::string()); // clear
 	glm::vec3 rot = rigidBodyManager[0]->model->GetEulerAngles();

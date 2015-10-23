@@ -53,4 +53,10 @@ struct BoundingSphere
 	{
 		glutWireSphere(radius, 25, 25);
 	}
+
+	void Update(glm::vec3 p_translation, float uniformScale)
+	{
+		translation = p_translation;
+		scale = uniformScale;
+	}
 };

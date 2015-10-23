@@ -6,6 +6,8 @@
 
 #include <algorithm> 
 
+#include "QueryPerformance.h"
+
 struct CollidingPair
 {
 	AABB* aabb1;
@@ -58,29 +60,20 @@ class RigidbodyManager
 		{
 			SphereCollisions();
 
-			//Brute();
-			SingleAxisSAP();
+			QueryPerformance::Start();
+			//BruteForceCheckAABBs();
+			SAP1D();
+			QueryPerformance::Finish();
+
+			std::cout << QueryPerformance::Result() << std::endl;
 		}
 
 		void Update(double deltaTime)
 		{
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
-				rigidBodies[i]->Update(deltaTime);
-
-				rigidBodies[i]->boundingSphere->translation = rigidBodies[i]->model->worldProperties.translation;
-				rigidBodies[i]->aabb->translation = rigidBodies[i]->model->worldProperties.translation;
-
-				glm::vec3 scale = rigidBodies[i]->model->worldProperties.scale;
-				rigidBodies[i]->boundingSphere->scale = max(max(scale.x, scale.y), scale.z);
-				rigidBodies[i]->aabb->scale = max(max(scale.x, scale.y), scale.z);
-
-				rigidBodies[i]->aabb->min[0]->Update();
-				rigidBodies[i]->aabb->max[0]->Update();
-				rigidBodies[i]->aabb->min[1]->Update();
-				rigidBodies[i]->aabb->max[1]->Update();
-				rigidBodies[i]->aabb->min[2]->Update();
-				rigidBodies[i]->aabb->max[2]->Update();
+				rigidBodies[i]->StepPhysics(deltaTime);
+				rigidBodies[i]->Update();
 			}
 		}
 
@@ -104,7 +97,7 @@ class RigidbodyManager
 			}
 		}
 
-		void Brute()
+		void BruteForceCheckAABBs()
 		{
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
@@ -123,44 +116,37 @@ class RigidbodyManager
 			}
 		}
 
-		//TODO - fix scale issue
-		void SingleAxisSAP()
+		void SAP1D()
 		{
 			activeList.clear();	
 
 			//std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
-			//insertionSort(xAxis);
-			std::sort(xAxis.begin(), xAxis.end(), AABB::EndPoint::my_cmp); 
+			insertionSort(xAxis);//Insertionsort is O(n) on nearly sorted lists
+			//std::sort(xAxis.begin(), xAxis.end(), AABB::EndPoint::my_cmp); 
+
+			for(RigidBody* rb : rigidBodies)
+				rb->aabb->colour = glm::vec4(0,1,0,1);
 
 			for (AABB::EndPoint* ep : xAxis)
 			{
 				if(ep->isMin)
 				{
 					for(AABB::EndPoint* ep2 : activeList)
-						collidingPairs.push_back(CollidingPair(ep->owner, ep2->owner));
+						if(ep->owner->collides(ep2->owner))
+							ep->owner->colour = ep2->owner->colour = glm::vec4(1,0,0,1);
 
 					activeList.push_back(ep);
 				}
 				else
 				{
-					activeList.erase(std::remove(activeList.begin(), activeList.end(), ep), activeList.end());
-					activeList.erase(activeList.begin());
+					activeList.erase(std::remove(activeList.begin(), activeList.end(), ep->partner), activeList.end());
 				}
 			}
+		}
 
-			//temp
-			for(RigidBody* rb : rigidBodies)
-			{
-				rb->aabb->colour = glm::vec4(0,1,0,1);
-			}
+		void SAP3D()
+		{
 
-			for(CollidingPair cp : collidingPairs)
-			{
-				cp.aabb1->colour = glm::vec4(1,0,0,1);
-				cp.aabb2->colour = glm::vec4(1,0,0,1);
-			}
-
-			collidingPairs.clear();
 		}
 
 		void insertionSort (vector<AABB::EndPoint*> &data) 
@@ -174,7 +160,7 @@ class RigidbodyManager
 
 				tmp = data[i];
 
-				while (j > 0 && tmp->GetGlobalValue() < data[j-1]->GetGlobalValue())
+				while (j > 0 && tmp->global < data[j-1]->global)
 				{
 					data[j] = data[j-1];
 					j--;

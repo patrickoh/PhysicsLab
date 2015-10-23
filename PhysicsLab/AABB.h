@@ -14,8 +14,6 @@ private:
 
 public:
 
-	glm::vec3 translation;
-
 	struct EndPoint
 	{
 		float value; //ooor update the value
@@ -25,38 +23,24 @@ public:
 		Axis axis;
 
 		AABB* owner;
+		EndPoint* partner;
 
 		EndPoint() {}
 		EndPoint(float p_value, bool p_isMin, Axis axis, AABB* p_owner);
 
-		float GetGlobalValue()
-		{
-			if(axis == Axis::X)
-				return value + owner->translation.x; 
-			else if(axis == Axis::Y)
-				return value + owner->translation.y;
-			else
-				return value + owner->translation.z;
-		}
-
 		void Update()
 		{
 			if(axis == Axis::X)
-				global = value + owner->translation.x; 
+				global = value * owner->scale + owner->translation.x; 
 			else if(axis == Axis::Y)
-				global = value + owner->translation.y;
+				global = value * owner->scale + owner->translation.y;
 			else
-				global = value + owner->translation.z;
+				global = value * owner->scale + owner->translation.z;
 		}
 
 		static bool my_cmp(const EndPoint* a, const EndPoint* b)
 		{
-			if(a->axis == Axis::X)
-				return (a->value + a->owner->translation.x) < (b->value + b->owner->translation.x); 
-			else if(a->axis == Axis::Y)
-				return (a->value + a->owner->translation.y) < (b->value + b->owner->translation.y);
-			else
-				return (a->value + a->owner->translation.z) < (b->value + b->owner->translation.z);
+			return a->global < b->global;
 		}
 
 		/*bool operator>(const EndPoint& other) const
@@ -70,6 +54,7 @@ public:
 		}*/
 	};
 
+	glm::vec3 translation;
 	float scale; //assumes a uniform scale
 
 	glm::vec3 centre;
@@ -94,6 +79,18 @@ public:
 	bool collides(AABB* other);
 	void Draw();
 
+	void Update(glm::vec3 p_translation, float uniformScale)
+	{
+		translation = p_translation;
+		scale = uniformScale;
+
+		min[0]->Update();
+		max[0]->Update();
+		min[1]->Update();
+		max[1]->Update();
+		min[2]->Update();
+		max[2]->Update();
+	}
 	
 };
 

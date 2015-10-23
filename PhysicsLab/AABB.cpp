@@ -24,6 +24,14 @@ AABB::AABB(const std::vector<glm::vec3>& vertices/*, RigidBody* p_owner*/)
 	max[Axis::Y] = new EndPoint(std::numeric_limits<float>::min(), false, Axis::Y, this);
 	max[Axis::Z] = new EndPoint(std::numeric_limits<float>::min(), false, Axis::Z, this);
 
+	min[Axis::X]->partner = max[Axis::X];
+	min[Axis::Y]->partner = max[Axis::Y];
+	min[Axis::Z]->partner = max[Axis::Z];
+
+	max[Axis::X]->partner = min[Axis::X];
+	max[Axis::Y]->partner = min[Axis::Y];
+	max[Axis::Z]->partner = min[Axis::Z];
+
 	Create(vertices);
 }
 

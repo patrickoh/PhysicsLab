@@ -38,7 +38,8 @@ class RigidBody
 		static bool angular;
 		static bool linear;
 
-		void Update(double deltaTime);
+		void StepPhysics(double deltaTime);
+		void Update();
 
 		RigidBody(Model* model);
 		~RigidBody();

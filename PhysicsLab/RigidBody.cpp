@@ -48,7 +48,7 @@ void RigidBody::Reset()
 	angularVelocity = glm::vec3(0,0,0);
 }
 
-void RigidBody::Update(double deltaTime)
+void RigidBody::StepPhysics(double deltaTime)
 {
 	float timestep = deltaTime / 1000;
 
@@ -100,6 +100,15 @@ void RigidBody::Update(double deltaTime)
 
 	forceNet = glm::vec3(0);
 	torqueNet = glm::vec3(0);
+}
+
+void RigidBody::Update()
+{
+	glm::vec3 scale = model->worldProperties.scale;
+	float scaleUniform = max(max(scale.x, scale.y), scale.z);
+	
+	boundingSphere->Update(model->worldProperties.translation, scaleUniform);
+	aabb->Update(model->worldProperties.translation, scaleUniform);
 }
 
 //Torque = (pt - com) x force

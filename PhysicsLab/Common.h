@@ -17,6 +17,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
+#define NOMINMAX
+#include <Windows.h> //QueryPerformanceCounter
+
 enum DKEY
 {
 	Right = 0, Left, Up, Down,
