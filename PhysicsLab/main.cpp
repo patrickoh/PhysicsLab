@@ -109,6 +109,8 @@ RigidbodyManager rigidBodyManager;
 long long int QueryPerformance::ts = 0;
 long long int QueryPerformance::tf = 0;
 
+bool pausedSim = false;
+
 int main(int argc, char** argv)
 {
 	// Set up the window
@@ -286,12 +288,11 @@ void update()
 
 	//particleSystem.Update(deltaTime);
 
-	rigidBodyManager.Update(deltaTime);
-
-	rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
-
-	//PHYSICS
-
+	if(!pausedSim)
+	{
+		rigidBodyManager.Update(deltaTime);
+		rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
+	}
 	
 	processContinuousInput();
 	draw();
@@ -410,6 +411,11 @@ void keyPressed (unsigned char key, int x, int y)
 			freeMouse = false;
 			glutSetCursor(GLUT_CURSOR_NONE);
 		}
+	}
+
+	if(key == KEY::KEY_0)
+	{
+		pausedSim = !pausedSim;
 	}
 }  
   
