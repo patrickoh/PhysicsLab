@@ -2,7 +2,7 @@
 
 #include "Common.h"
 
-class Input //TODO - finish
+class Input 
 {
 
 private:
@@ -12,13 +12,23 @@ public:
 	static bool directionKeys[4]; 
 	static bool keyStates[256];
 
+	static bool wasKeyPressed;
+	static unsigned char keyPress;
+
 	//static int mouseWheelDir;
+
+	static bool mouseMoved;
+	static int mouseX;
+	static int mouseY;
 
 	static void keyPressed (unsigned char key, int x, int y) 
 	{  
 		TwEventKeyboardGLUT(key, x, y);
 
 		keyStates[key] = true; // Set the state of the current key to pressed  
+
+		wasKeyPressed = true;
+		keyPress = key;
 	}  
   
 	static void keyUp (unsigned char key, int x, int y) 
@@ -78,6 +88,10 @@ public:
 	static void passiveMouseMotion(int x, int y)  
 	{
 		TwEventMouseMotionGLUT(x, y); // send event to AntTweakBar
+
+		mouseMoved = true;
+		mouseX = x;
+		mouseY = y;
 	}
 
 	static void mouseButton(int button, int state, int x, int y)
@@ -85,11 +99,11 @@ public:
 		TwEventMouseButtonGLUT(button, state, x, y);  // send event to AntTweakBar
 	}
 
-	/*void mouseWheel(int button, int dir, int x, int y)
+	static void mouseWheel(int button, int dir, int x, int y)
 	{
-		if (dir > 0)
-			camera.Zoom(-deltaTime);
-		else
-			camera.Zoom(deltaTime);
-	}*/
+		//if (dir > 0)
+			//camera.Zoom(-deltaTime);
+		//else
+			//camera.Zoom(deltaTime);
+	}
 };

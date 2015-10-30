@@ -168,7 +168,7 @@ class Camera
 			}
 		}
 
-		void ProcessKeyboardOnce(unsigned char key, int x, int y)
+		void ProcessKeyboardOnce(unsigned char key)
 		{
 			if (key == KEY::KEY_C || key == KEY::KEY_c)
 			{

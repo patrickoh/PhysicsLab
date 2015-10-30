@@ -40,14 +40,6 @@
 using namespace std;
 
 //Callbacks
-void keyPressed (unsigned char key, int x, int y); 
-void keyUp (unsigned char key, int x, int y); 
-void passiveMouseMotion(int x, int y);
-void mouseButton(int button, int state, int x, int y);
-void handleSpecialKeypress(int key, int x, int y);
-void handleSpecialKeyReleased(int key, int x, int y);
-void mouseWheel(int, int, int, int);
-
 void reshape(int w, int h);
 void update();
 void draw();
@@ -63,9 +55,8 @@ void TW_CALL CalculateNewTesor(void *clientData);
 
 void SetUpUI();
 
-bool directionKeys[4] = {false};
-
-bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
+//bool directionKeys[4] = {false};
+//bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
 
 void processContinuousInput();
 void printouts();
@@ -118,6 +109,13 @@ bool Input::directionKeys[4] = { false };
 bool Input::keyStates[256] = { false };
 //int Input::mouseWheelDir = 0;
 
+bool Input::mouseMoved = false;
+int Input::mouseX = 0;
+int Input::mouseY = 0;
+
+unsigned char Input::keyPress = KEY::KEY_F12;
+bool Input::wasKeyPressed = false;
+
 int main(int argc, char** argv)
 {
 	// Set up the window
@@ -133,17 +131,18 @@ int main(int argc, char** argv)
 	glutSetCursor(GLUT_CURSOR_NONE);
 	
 	// REGISTER GLUT CALLBACKS
+	glutKeyboardFunc(Input::keyPressed); // Tell GLUT to use the method "keyPressed" for key presses  
+	glutKeyboardUpFunc(Input::keyUp); // Tell GLUT to use the method "keyUp" for key up events  
+	glutSpecialFunc(Input::handleSpecialKeypress);
+	glutSpecialUpFunc(Input::handleSpecialKeyReleased);
+	glutMouseFunc (Input::mouseButton);
+	glutMouseWheelFunc(Input::mouseWheel);
+	glutPassiveMotionFunc(Input::passiveMouseMotion);
+	//glutMotionFunc (MouseMotion);
+	
+	glutIdleFunc (update);
 	//glutDisplayFunc(draw);
 	//glutReshapeFunc (reshape);
-	glutKeyboardFunc(Input::keyPressed); // Tell GLUT to use the method "keyPressed" for key presses  
-	glutKeyboardUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events  
-	glutSpecialFunc(handleSpecialKeypress);
-	glutSpecialUpFunc(handleSpecialKeyReleased);
-	glutMouseFunc (mouseButton);
-	glutMouseWheelFunc(mouseWheel);
-	//glutMotionFunc (MouseMotion);
-	glutPassiveMotionFunc(passiveMouseMotion);
-	glutIdleFunc (update);
 
 	TwGLUTModifiersFunc(glutGetModifiers);
 
@@ -285,6 +284,17 @@ void update()
 		frames = frameCounterTime = 0;
 	}
 
+	if(!freeMouse)
+	{
+		if(Input::mouseMoved)
+		{
+			camera.MouseRotate(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime); 
+			Input::mouseMoved = false;
+		}
+
+		glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+	}
+
 	camera.Update(deltaTime);
 
 	//particleSystem.Update(deltaTime);
@@ -294,8 +304,38 @@ void update()
 		rigidBodyManager.Update(deltaTime);
 		rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
 	}
+
+	if(Input::wasKeyPressed)
+	{
+		camera.ProcessKeyboardOnce(Input::keyPress); 
+
+		if(Input::keyPress == KEY::KEY_h || Input::keyPress == KEY::KEY_H) 
+			printText = !printText;
+
+		if(Input::keyPress == KEY::KEY_SPACE || Input::keyPress == KEY::KEY_ESCAPE) 
+		{
+			if(!freeMouse)
+			{
+				freeMouse = true;
+				glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+			}
+			else
+			{
+				freeMouse = false;
+				glutSetCursor(GLUT_CURSOR_NONE);
+			}
+		}
+
+		if(Input::keyPress == KEY::KEY_0)
+		{
+			pausedSim = !pausedSim;
+		}
+
+		Input::wasKeyPressed = false;
+	}
 	
-	processContinuousInput();
+	camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
+	
 	draw();
 }
 
@@ -306,6 +346,11 @@ void draw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	glm::mat4 viewMatrix = camera.GetViewMatrix();
+
+	shaderManager.SetShaderProgram("red");
+	glm::mat4 MVP = projectionMatrix * viewMatrix; //TODO - move these calculations to the graphics card?
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+	glutWireCube(10);
 
 	DrawModels(viewMatrix);
 	DrawBoundings(viewMatrix);
@@ -387,146 +432,6 @@ void DrawParticles(glm::mat4 viewMatrix)
 	//glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	//particleSystem.Render();
 }
-
-//KEYBOARD FUCNTIONS
-void keyPressed (unsigned char key, int x, int y) 
-{  
-	TwEventKeyboardGLUT(key, x, y);
-
-	keyStates[key] = true; // Set the state of the current key to pressed  
-		
-	camera.ProcessKeyboardOnce(key, x, y);
-
-	if(key == KEY::KEY_h || key == KEY::KEY_H)
-		printText = !printText;
-
-	if(key == KEY::KEY_SPACE || key == KEY::KEY_ESCAPE)
-	{
-		if(!freeMouse)
-		{
-			freeMouse = true;
-			glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
-		}
-		else
-		{
-			freeMouse = false;
-			glutSetCursor(GLUT_CURSOR_NONE);
-		}
-	}
-
-	if(key == KEY::KEY_0)
-	{
-		pausedSim = !pausedSim;
-	}
-}  
-  
-void keyUp (unsigned char key, int x, int y) 
-{  
-	keyStates[key] = false; // Set the state of the current key to not pressed  
-}  
-
-//Process keystates
-void processContinuousInput()
-{
-	//exit(0);
-
-	camera.ProcessKeyboardContinuous(keyStates, deltaTime);
-}
-
-//DIRECTIONAL KEYS DOWN
-void handleSpecialKeypress(int key, int x, int y)
-{
-	switch (key) 
-	{
-		case GLUT_KEY_LEFT:
-			directionKeys[DKEY::Left] = true;
-			break;
-
-		case GLUT_KEY_RIGHT:
-			directionKeys[DKEY::Right] = true;	
-			break;
-
-		case GLUT_KEY_UP:
-			directionKeys[DKEY::Up] = true;
-			break;
-
-		case GLUT_KEY_DOWN:
-			directionKeys[DKEY::Down] = true;
-			break;
-	}
-
-	//if(editMode == levelEdit)
-		//levelEditor->ProcessKeyboardOnce(key, x, y);
-}
-
-//DIRECTIONAL KEYS UP
-void handleSpecialKeyReleased(int key, int x, int y) 
-{
-	TwEventSpecialGLUT(key, x, y);  // send event to AntTweakBar
-
-	switch (key) 
-	{
-		case GLUT_KEY_LEFT:
-			directionKeys[DKEY::Left] = false;
-			break;
-
-		case GLUT_KEY_RIGHT:
-			directionKeys[DKEY::Right] = false;	
-			break;
-
-		case GLUT_KEY_UP:
-			directionKeys[DKEY::Up] = false;
-			break;
-
-		case GLUT_KEY_DOWN:
-			directionKeys[DKEY::Down] = false;
-			break;
-	}
-}
-
-//MOUSE FUCNTIONS
-void passiveMouseMotion(int x, int y)  
-{
-	TwEventMouseMotionGLUT(x, y); // send event to AntTweakBar
-
-	if(!freeMouse)
-	{
-		//As glutWarpPoint triggers an event callback to Mouse() we need to return to ensure it doesn't recursively call
-		static bool just_warped = false;
-		if(just_warped) {
-			just_warped = false;
-			return;
-		}
-
-		camera.MouseRotate(x, y, WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime); 
-
-		glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
-		just_warped = true;
-	}
-}
-
-void mouseButton(int button, int state, int x, int y)
-{
-	TwEventMouseButtonGLUT(button, state, x, y);  // send event to AntTweakBar
-
-	switch(button) {
-		case GLUT_LEFT_BUTTON:
-			break;
-    }
-
-	//if(!freeMouse)
-		//player->ProcessMouseButton(button, state, x, y);
-}
-
-void mouseWheel(int button, int dir, int x, int y)
-{
-	if (dir > 0)
-		camera.Zoom(-deltaTime);
-    else
-		camera.Zoom(deltaTime);
-}
-
-// OTHER FUNCTIONS
 
 void printouts()
 {
