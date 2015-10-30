@@ -17,6 +17,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
+#include <GL/freeglut.h>
+#include <AntTweakBar.h>
+
 #define NOMINMAX
 #include <Windows.h> //QueryPerformanceCounter
 

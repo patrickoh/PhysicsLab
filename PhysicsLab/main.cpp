@@ -1,5 +1,4 @@
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/cimport.h> // C importer
@@ -27,8 +26,6 @@
 
 #include "ParticleSystem.h"
 
-#include <AntTweakBar.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -37,6 +34,8 @@
 #include "Inertia.h"
 
 #include "RigidbodyManager.h"
+
+#include "Input.h"
 
 using namespace std;
 
@@ -61,6 +60,8 @@ void InitTweakBar();
 void TW_CALL ApplyImpulse(void *clientData);
 void TW_CALL ResetRB(void *clientData);
 void TW_CALL CalculateNewTesor(void *clientData);
+
+void SetUpUI();
 
 bool directionKeys[4] = {false};
 
@@ -111,27 +112,30 @@ long long int QueryPerformance::tf = 0;
 
 bool pausedSim = false;
 
+Input input;
+
+bool Input::directionKeys[4] = { false }; 
+bool Input::keyStates[256] = { false };
+//int Input::mouseWheelDir = 0;
+
 int main(int argc, char** argv)
 {
 	// Set up the window
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
 	glutInitWindowPosition (0, 0); 
-
     glutCreateWindow("Unconstrained Rigid Body! by Pad");
+	
 	InitTweakBar();
 
 	//glutFullScreen();
-
 	glutSetCursor(GLUT_CURSOR_NONE);
 	
 	// REGISTER GLUT CALLBACKS
-
 	//glutDisplayFunc(draw);
 	//glutReshapeFunc (reshape);
-	glutKeyboardFunc(keyPressed); // Tell GLUT to use the method "keyPressed" for key presses  
+	glutKeyboardFunc(Input::keyPressed); // Tell GLUT to use the method "keyPressed" for key presses  
 	glutKeyboardUpFunc(keyUp); // Tell GLUT to use the method "keyUp" for key up events  
 	glutSpecialFunc(handleSpecialKeypress);
 	glutSpecialUpFunc(handleSpecialKeyReleased);
@@ -178,8 +182,6 @@ int main(int argc, char** argv)
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
 	shaderManager.CreateShaderProgram("bounding", "Shaders/diffuse.vs", "Shaders/bounding.ps");
 
-	//plane->wireframe = true;
-
 	glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
 	cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
 	modelList.push_back(new Model(glm::vec3(0, 0, 5), cactuarFix, glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
@@ -192,49 +194,16 @@ int main(int argc, char** argv)
 	RigidBody::angular = true;
 	RigidBody::linear = true;
 
+	for(int i = 0; i < 20; i++)
+	{
+		Model* m = new Model(glm::vec3(0, i, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
+		rigidBodyManager.Add(new RigidBody(m));
+		modelList.push_back(m);
+	}
 
-	Model* m = new Model(glm::vec3(0, 1, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
-	rigidBodyManager.Add(new RigidBody(m));
-	modelList.push_back(m);
-
-	Model* m2 = new Model(glm::vec3(0, 1, 5), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
-	rigidBodyManager.Add(new RigidBody(m2));
-	modelList.push_back(m2);
-
-	//ASSIGNMENT 2 - RIGID BODY UI
+	SetUpUI();
 	
-	TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
-	TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
-
-	TwAddSeparator(bar, "", "");
-
-	TwAddVarRW(bar, "Impulse Position", TW_TYPE_DIR3F, &impulseVisualiser->worldProperties.translation, "");
-	//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, 
-				 //" label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
-	TwAddVarRW(bar, "Impulse Force", TW_TYPE_DIR3F, &RigidBody::force, "");
-	TwAddButton(bar, "Do Impulse", ApplyImpulse, NULL, "");
-	
-	TwAddSeparator(bar, "", "");
-
-	TwAddVarRW(bar, "Angular Velocity", TW_TYPE_DIR3F, &rigidBodyManager[0]->angularVelocity, "");
-	TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[0]->angularMomentum, "");
-
-	TwAddSeparator(bar, "", "");
-
-	TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &rigidBodyManager[0]->mass, "");
-	TwAddButton(bar, "Recalculate Tensor", CalculateNewTesor, NULL, "");
-
-	TwAddSeparator(bar, "", "");
-
-	TwAddVarRW(bar, "Centre of Mass", TW_TYPE_DIR3F, &rigidBodyManager[0]->com, "");
-
-	TwAddSeparator(bar, "", "");
-
-	TwAddButton(bar, "Reset", ResetRB, NULL, "");
-	
-	//Recalculate inertial tensor if mass changes
-
-	//particleSystem.Generate();
+	//TODO? - Recalculate inertial tensor if mass changes
 
 	glutMainLoop();
     
@@ -265,6 +234,38 @@ void TW_CALL ResetRB(void *clientData)
 void TW_CALL CalculateNewTesor(void *clientData)
 {
 	rigidBodyManager[0]->inertialTensor = Inertia::Compute2(rigidBodyManager[0]->model, rigidBodyManager[0]->mass);
+}
+
+void SetUpUI()
+{
+	TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
+	TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Impulse Position", TW_TYPE_DIR3F, &impulseVisualiser->worldProperties.translation, "");
+	//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, 
+				 //" label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
+	TwAddVarRW(bar, "Impulse Force", TW_TYPE_DIR3F, &RigidBody::force, "");
+	TwAddButton(bar, "Do Impulse", ApplyImpulse, NULL, "");
+	
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Angular Velocity", TW_TYPE_DIR3F, &rigidBodyManager[0]->angularVelocity, "");
+	TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[0]->angularMomentum, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &rigidBodyManager[0]->mass, "");
+	TwAddButton(bar, "Recalculate Tensor", CalculateNewTesor, NULL, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Centre of Mass", TW_TYPE_DIR3F, &rigidBodyManager[0]->com, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddButton(bar, "Reset", ResetRB, NULL, "");
 }
 
 // GLUT CALLBACK FUNCTIONS
