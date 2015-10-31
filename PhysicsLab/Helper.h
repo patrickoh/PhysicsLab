@@ -8,6 +8,7 @@
 
 #include <glm\glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 glm::mat4 convertAssimpMatrix (aiMatrix4x4 m);
 glm::quat formQuaternion(double x, double y, double z, double angle);
@@ -25,3 +26,5 @@ double vectorSquaredDistance(glm::vec3 v1, glm::vec3 v2);
 
 glm::mat4 setAsCrossProductMatrix( glm::vec3 v );
 glm::quat quatFromAngularVelocityByTimestep(glm::vec3 w);
+
+//glm::vec3 GetOGLPos(int x, int y);

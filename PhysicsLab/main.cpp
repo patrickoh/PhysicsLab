@@ -44,16 +44,21 @@ void reshape(int w, int h);
 void update();
 void draw();
 
+void HandleInput();
+
 void DrawModels(glm::mat4);
 void DrawBoundings(glm::mat4);
 void DrawParticles(glm::mat4);
 
 void InitTweakBar();
+void InitTweakBar2();
 void TW_CALL ApplyImpulse(void *clientData);
 void TW_CALL ResetRB(void *clientData);
 void TW_CALL CalculateNewTesor(void *clientData);
 
-void SetUpUI();
+void SetUpMainTweakBar();
+
+glm::vec3 GetOGLPos(int x, int y);
 
 //bool directionKeys[4] = {false};
 //bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
@@ -65,14 +70,8 @@ Camera camera;
 glm::mat4 projectionMatrix; // Store the projection matrix
 bool freeMouse = false;
 
-//int WINDOW_WIDTH = 1920;
-//int WINDOW_HEIGHT = 1080;
-
 int WINDOW_WIDTH = 1280;
 int WINDOW_HEIGHT = 720;
-
-//int WINDOW_WIDTH = 1680;
-//int WINDOW_HEIGHT = 1050;
 
 int oldTimeSinceStart;
 double deltaTime;
@@ -87,7 +86,8 @@ vector<Model*> modelList;
 bool printText = true;
 
 ParticleSystem particleSystem(10000);
-TwBar *bar;
+
+std::map<std::string, TwBar*> tweakBars;
 
 Model* impulseVisualiser;
 
@@ -116,6 +116,8 @@ int Input::mouseY = 0;
 unsigned char Input::keyPress = KEY::KEY_F12;
 bool Input::wasKeyPressed = false;
 
+bool Input::leftClick = false;
+
 int main(int argc, char** argv)
 {
 	// Set up the window
@@ -124,8 +126,11 @@ int main(int argc, char** argv)
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInitWindowPosition (0, 0); 
     glutCreateWindow("Unconstrained Rigid Body! by Pad");
-	
-	InitTweakBar();
+
+	//AntTweakBar
+	TwInit(TW_OPENGL_CORE, NULL);
+	TwWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
 
 	//glutFullScreen();
 	glutSetCursor(GLUT_CURSOR_NONE);
@@ -189,18 +194,28 @@ int main(int argc, char** argv)
 	modelList.push_back(impulseVisualiser);
 
 	RigidBody::impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
-	RigidBody::force = glm::vec3(0,0,1);
+	RigidBody::forcePush = 1.0f;
 	RigidBody::angular = true;
 	RigidBody::linear = true;
 
-	for(int i = 0; i < 20; i++)
+	for(int i = 0; i < 1; i++)
 	{
 		Model* m = new Model(glm::vec3(0, i, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
 		rigidBodyManager.Add(new RigidBody(m));
 		modelList.push_back(m);
 	}
 
-	SetUpUI();
+	Model* m = new Model(glm::vec3(5, 5, 5), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
+	rigidBodyManager.Add(new RigidBody(m));
+	modelList.push_back(m);
+
+	tweakBars["main"] = TwNewBar("Main");
+	TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
+	SetUpMainTweakBar();
+
+	tweakBars["main2"] = TwNewBar("TweakBar2");
+	TwDefine(" TweakBar2 size='250 700' color='125 125 125' "); // change default tweak bar size and color
+	TwAddVarRW(tweakBars["main2"], "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
 	
 	//TODO? - Recalculate inertial tensor if mass changes
 
@@ -209,20 +224,9 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-void InitTweakBar()
-{
-    TwInit(TW_OPENGL_CORE, NULL);
-	TwWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	bar = TwNewBar("TweakBar");
-    
-	TwDefine(" GLOBAL help='AntTweakBar.' "); // Message added to the help bar.
-    TwDefine(" TweakBar size='250 700' color='125 125 125' "); // change default tweak bar size and color
-}
-
 void TW_CALL ApplyImpulse(void *clientData)
 {
-	rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, RigidBody::force);
+	rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
 }
 
 void TW_CALL ResetRB(void *clientData)
@@ -235,17 +239,23 @@ void TW_CALL CalculateNewTesor(void *clientData)
 	rigidBodyManager[0]->inertialTensor = Inertia::Compute2(rigidBodyManager[0]->model, rigidBodyManager[0]->mass);
 }
 
-void SetUpUI()
+void SetUpMainTweakBar()
 {
+	TwBar* bar = tweakBars["main"];
+
 	TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
 	TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Pause simulation", TW_TYPE_BOOL8, &pausedSim, "");
 
 	TwAddSeparator(bar, "", ""); //=======================================================
 
 	TwAddVarRW(bar, "Impulse Position", TW_TYPE_DIR3F, &impulseVisualiser->worldProperties.translation, "");
 	//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, 
 				 //" label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
-	TwAddVarRW(bar, "Impulse Force", TW_TYPE_DIR3F, &RigidBody::force, "");
+	TwAddVarRW(bar, "Impulse Force", TW_TYPE_FLOAT, &RigidBody::forcePush, "");
 	TwAddButton(bar, "Do Impulse", ApplyImpulse, NULL, "");
 	
 	TwAddSeparator(bar, "", ""); //=======================================================
@@ -284,6 +294,23 @@ void update()
 		frames = frameCounterTime = 0;
 	}
 
+	HandleInput();
+	
+	camera.Update(deltaTime);
+
+	//particleSystem.Update(deltaTime);
+
+	if(!pausedSim)
+	{
+		rigidBodyManager.Update(deltaTime);
+		rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
+	}
+	
+	draw();
+}
+
+void HandleInput()
+{
 	if(!freeMouse)
 	{
 		if(Input::mouseMoved)
@@ -293,16 +320,6 @@ void update()
 		}
 
 		glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
-	}
-
-	camera.Update(deltaTime);
-
-	//particleSystem.Update(deltaTime);
-
-	if(!pausedSim)
-	{
-		rigidBodyManager.Update(deltaTime);
-		rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
 	}
 
 	if(Input::wasKeyPressed)
@@ -326,17 +343,18 @@ void update()
 			}
 		}
 
-		if(Input::keyPress == KEY::KEY_0)
+		if(Input::keyPress == KEY::KEY_P || Input::keyPress == KEY::KEY_p)
 		{
 			pausedSim = !pausedSim;
 		}
 
 		Input::wasKeyPressed = false;
 	}
+
+	if(Input::leftClick)
+		rigidBodyManager[0]->ApplyImpulse(GetOGLPos(Input::mouseX, Input::mouseY), camera.viewProperties.forward * RigidBody::forcePush);
 	
 	camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
-	
-	draw();
 }
 
 //Draw loops through each 3d object, and switches to the correct shader for that object, and fill the uniform matrices with the up-to-date values,
@@ -348,7 +366,7 @@ void draw()
 	glm::mat4 viewMatrix = camera.GetViewMatrix();
 
 	shaderManager.SetShaderProgram("red");
-	glm::mat4 MVP = projectionMatrix * viewMatrix; //TODO - move these calculations to the graphics card?
+	glm::mat4 MVP = projectionMatrix * viewMatrix;
 	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 	glutWireCube(10);
 
@@ -374,14 +392,13 @@ void DrawModels(glm::mat4 viewMatrix)
 			
 			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
 			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
-
-			//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
 			
-			//modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 		}
 	}	
 }
 
+//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
 void DrawBoundings(glm::mat4 viewMatrix)
 {
 	GLuint bounding = shaderManager.GetShaderProgramID("bounding");
@@ -435,6 +452,8 @@ void DrawParticles(glm::mat4 viewMatrix)
 
 void printouts()
 {
+	glm::vec3 ws = GetOGLPos(Input::mouseX, Input::mouseY);
+
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 
 	std::stringstream ss;
@@ -448,6 +467,14 @@ void printouts()
 	ss.str(std::string()); // clear
 	ss << " Press 'c' to switch camera modes";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-60, ss.str().c_str());
+
+	ss.str(std::string()); // clear
+	ss << " sim paused: " << pausedSim;
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-80, ss.str().c_str());
+
+	ss.str(std::string()); // clear
+	ss << " x: " << ws.x << " y: " << ws.y << "z: " << ws.z;
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-100, ss.str().c_str());
 
 	/*ss.str(std::string()); // clear
 	ss << fps << " fps ";
@@ -490,6 +517,25 @@ void printouts()
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),40, ss.str().c_str());
 }
+
+//TODO - fix this
+glm::vec3 GetOGLPos(int x, int y)
+{
+    GLint viewport[4];
+
+	glm::vec3 win;
+	win.x = (float)x;
+	win.y = (float)y;
+    glReadPixels( x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &win.z ); //read depth buffer at screen space (x,y)
+
+	glGetIntegerv( GL_VIEWPORT, viewport );
+
+	glm::vec4 vp = glm::vec4(viewport[0], viewport[1], viewport[2], viewport[3]);
+
+	return glm::unProject(win, glm::mat4(1), projectionMatrix, vp);
+}
+
+
 
 
 

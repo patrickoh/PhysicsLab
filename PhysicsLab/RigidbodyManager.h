@@ -72,6 +72,23 @@ class RigidbodyManager
 		{
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
+				//if bouncy enclosure
+
+				glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
+				glm::vec3 plane[] = { glm::vec3(0,-5,0), glm::vec3(0,5,0), glm::vec3(-5,0,0), glm::vec3(5,0,0), glm::vec3(0,0,5), glm::vec3(0,0,-5) };
+
+				for(int j = 0; j < 6; j++)
+				{
+					if(glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) < 0.01f
+							&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
+					{
+						rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
+						rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+
+						//velocity.y = -velocity.y;
+					}
+				}
+
 				rigidBodies[i]->StepPhysics(deltaTime);
 				rigidBodies[i]->Update();
 			}

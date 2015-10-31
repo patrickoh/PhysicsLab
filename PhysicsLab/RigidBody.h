@@ -33,8 +33,9 @@ class RigidBody
 		BoundingSphere* boundingSphere;
 		AABB* aabb;
 
-		static glm::vec3 force;
+		static float forcePush;
 		static Model* impulseVisualiser;
+		
 		static bool angular;
 		static bool linear;
 

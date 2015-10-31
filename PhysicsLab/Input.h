@@ -21,6 +21,8 @@ public:
 	static int mouseX;
 	static int mouseY;
 
+	static bool leftClick;
+
 	static void keyPressed (unsigned char key, int x, int y) 
 	{  
 		TwEventKeyboardGLUT(key, x, y);
@@ -97,6 +99,18 @@ public:
 	static void mouseButton(int button, int state, int x, int y)
 	{
 		TwEventMouseButtonGLUT(button, state, x, y);  // send event to AntTweakBar
+
+		if(button == GLUT_LEFT_BUTTON)
+		{
+			if (state == GLUT_DOWN)
+			{
+				leftClick = true;
+			}
+			else if (state == GLUT_UP)
+			{
+				leftClick = false;
+			}
+		}
 	}
 
 	static void mouseWheel(int button, int dir, int x, int y)

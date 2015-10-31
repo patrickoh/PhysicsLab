@@ -1,7 +1,7 @@
 #include "RigidBody.h"
 #include "Inertia.h"
 
-glm::vec3 RigidBody::force;
+float RigidBody::forcePush;
 Model* RigidBody::impulseVisualiser;
 bool RigidBody::angular; 
 bool RigidBody::linear; 
@@ -59,13 +59,13 @@ void RigidBody::StepPhysics(double deltaTime)
 		//v = P/m
 
 		//Momentum method
-		model->worldProperties.translation += velocity * timestep;
-		velocity = momentum / mass;
-		momentum += forceNet * timestep;
+		//model->worldProperties.translation += velocity * timestep;
+		//velocity = momentum / mass; //equals is bad :P
+		//momentum += forceNet * timestep;
 		
 		//Acceleration method
-		//model->worldProperties.translation += velocity * timestep;
-		//velocity += (mass * glm::vec3(0,-9.81,0))/mass * timestep;
+		model->worldProperties.translation += velocity * timestep;
+		velocity += (mass * forceNet)/mass * timestep;
 	}
 
 	if(RigidBody::angular)
