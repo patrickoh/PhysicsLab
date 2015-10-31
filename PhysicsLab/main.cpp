@@ -46,9 +46,9 @@ void draw();
 
 void HandleInput();
 
-void DrawModels(glm::mat4);
-void DrawBoundings(glm::mat4);
-void DrawParticles(glm::mat4);
+void DrawModels();
+void DrawBoundings();
+void DrawParticles();
 
 void InitTweakBar();
 void InitTweakBar2();
@@ -69,6 +69,8 @@ void printouts();
 Camera camera;
 glm::mat4 projectionMatrix; // Store the projection matrix
 bool freeMouse = false;
+
+glm::mat4 viewMatrix;
 
 int WINDOW_WIDTH = 1280;
 int WINDOW_HEIGHT = 720;
@@ -191,9 +193,9 @@ int main(int argc, char** argv)
 	modelList.push_back(new Model(glm::vec3(0, 0, 5), cactuarFix, glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
 	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
-	modelList.push_back(impulseVisualiser);
+	//modelList.push_back(impulseVisualiser);
 
-	RigidBody::impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
+	RigidBody::impulseVisualiser = impulseVisualiser;
 	RigidBody::forcePush = 1.0f;
 	RigidBody::angular = true;
 	RigidBody::linear = true;
@@ -363,26 +365,36 @@ void draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	glm::mat4 viewMatrix = camera.GetViewMatrix();
+	viewMatrix = camera.GetViewMatrix();
 
 	shaderManager.SetShaderProgram("red");
 	glm::mat4 MVP = projectionMatrix * viewMatrix;
 	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 	glutWireCube(10);
 
-	DrawModels(viewMatrix);
-	DrawBoundings(viewMatrix);
-	DrawParticles(viewMatrix);
+	DrawModels();
+	DrawBoundings();
+	DrawParticles();
 
     TwDraw(); // Draw tweak bars
 
 	if(printText)
 		printouts();
 
+	glm::vec3 cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY);
+	RigidBody::impulseVisualiser->worldProperties.translation = cursorWorldSpace;
+
+	shaderManager.SetShaderProgram(RigidBody::impulseVisualiser->GetShaderProgramID());
+			
+	MVP = projectionMatrix * viewMatrix * RigidBody::impulseVisualiser->GetModelMatrix(); //TODO - move these calculations to the graphics card?
+	ShaderManager::SetUniform(RigidBody::impulseVisualiser->GetShaderProgramID(), "mvpMatrix", MVP);
+			
+	RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
+
 	glutSwapBuffers();
 }
 
-void DrawModels(glm::mat4 viewMatrix)
+void DrawModels()
 {
 	for (int i = 0; i < modelList.size(); i++)
 	{
@@ -399,7 +411,7 @@ void DrawModels(glm::mat4 viewMatrix)
 }
 
 //GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
-void DrawBoundings(glm::mat4 viewMatrix)
+void DrawBoundings()
 {
 	GLuint bounding = shaderManager.GetShaderProgramID("bounding");
 	shaderManager.SetShaderProgram(bounding);
@@ -440,7 +452,7 @@ void DrawBoundings(glm::mat4 viewMatrix)
 	}
 }
 
-void DrawParticles(glm::mat4 viewMatrix)
+void DrawParticles()
 {
 	//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
 	//int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
@@ -518,21 +530,15 @@ void printouts()
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),40, ss.str().c_str());
 }
 
-//TODO - fix this
 glm::vec3 GetOGLPos(int x, int y)
 {
-    GLint viewport[4];
+	glm::vec4 viewport = glm::vec4(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
+	float fixY = WINDOW_HEIGHT - y; //0,0 in OpenGL is bottom left
 
-	glm::vec3 win;
-	win.x = (float)x;
-	win.y = (float)y;
-    glReadPixels( x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &win.z ); //read depth buffer at screen space (x,y)
-
-	glGetIntegerv( GL_VIEWPORT, viewport );
-
-	glm::vec4 vp = glm::vec4(viewport[0], viewport[1], viewport[2], viewport[3]);
-
-	return glm::unProject(win, glm::mat4(1), projectionMatrix, vp);
+	GLfloat z; 
+	glReadPixels( x, fixY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z ); //get z position in depth buffer
+	
+	return glm::unProject(glm::vec3(x, fixY, z), viewMatrix, projectionMatrix, viewport);
 }
 
 
