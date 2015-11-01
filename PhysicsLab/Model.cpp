@@ -177,11 +177,11 @@ bool Model::Load(const char* file_name)
 	return true;
 }
 
-void Model::Render(GLuint shader)
+void Model::Render(GLuint shader, bool bWireframe)
 {
 	glBindVertexArray(vao);
 		
-	if(wireframe)
+	if(bWireframe)
 		glPolygonMode(GL_FRONT, GL_LINE); 
 
 	if(meshEntries.size() > 1)
@@ -214,7 +214,7 @@ void Model::Render(GLuint shader)
 		glDrawArrays(GL_TRIANGLES, 0, vertexCount);	
 	}
 
-	if(wireframe)
+	if(bWireframe)
 		glPolygonMode(GL_FRONT, GL_FILL); 
 
 	// Make sure the VAO is not changed from the outside    

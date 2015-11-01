@@ -20,6 +20,8 @@ struct CollidingPair
 	}
 };
 
+enum BroadphaseMode { Sphere, BruteAABB, SAP1D };
+
 class RigidbodyManager
 { 
 	private:
@@ -56,16 +58,18 @@ class RigidbodyManager
 			xAxis.push_back(rb->aabb->max[Axis::X]);
 		}
 
-		void Broadphase()
+		void Broadphase(BroadphaseMode mode)
 		{
-			SphereCollisions();
-
 			QueryPerformance::Start();
-			//BruteForceCheckAABBs();
-			SAP1D();
-			QueryPerformance::Finish();
-
-			std::cout << QueryPerformance::Result() << std::endl;
+			
+			if(mode == BroadphaseMode::BruteAABB)
+				BruteForceCheckAABBs();
+			else if (mode == BroadphaseMode::Sphere)
+				SphereCollisions();
+			else if (mode == BroadphaseMode::SAP1D)
+				SAP1D();
+			
+			QueryPerformance::Finish("Broadphase");
 		}
 
 		void Update(double deltaTime)
@@ -97,6 +101,9 @@ class RigidbodyManager
 		//Brute force check spheres
 		void SphereCollisions()
 		{
+			for(RigidBody* rb : rigidBodies)
+				rb->boundingSphere->colour = glm::vec4(0,0,1,1);
+
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
 				for (int j = i + 1; j < rigidBodies.size(); j++)
@@ -107,15 +114,16 @@ class RigidbodyManager
 					BoundingSphere* sphere2 = rigidBodies[j]->boundingSphere;
 
 					if(sphere1->collides(sphere2))
-						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);
-					else
-						sphere1->colour = sphere2->colour = glm::vec4(0,1,0,1);
+						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);						
 				}
 			}
 		}
 
 		void BruteForceCheckAABBs()
 		{
+			for(RigidBody* rb : rigidBodies)
+				rb->aabb->colour = glm::vec4(0,1,0,1);
+
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
 				for (int j = i + 1; j < rigidBodies.size(); j++)
@@ -127,8 +135,6 @@ class RigidbodyManager
 
 					if(aabb1->collides(aabb2))
 						aabb1->colour = aabb2->colour = glm::vec4(1,0,0,1);
-					else
-						aabb1->colour = aabb2->colour = glm::vec4(0,1,0,1);
 				}
 			}
 		}

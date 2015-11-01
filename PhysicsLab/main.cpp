@@ -6,6 +6,9 @@
 #include <assimp/postprocess.h> // various extra operations
 #include <assert.h>
 
+#include <glm/gtx/random.hpp>
+#include <glm\common.hpp>
+
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
@@ -55,6 +58,7 @@ void InitTweakBar2();
 void TW_CALL ApplyImpulse(void *clientData);
 void TW_CALL ResetRB(void *clientData);
 void TW_CALL CalculateNewTesor(void *clientData);
+void TW_CALL ResetPerformanceCounter(void *clientData);
 
 void SetUpMainTweakBar();
 
@@ -65,6 +69,8 @@ glm::vec3 GetOGLPos(int x, int y);
 
 void processContinuousInput();
 void printouts();
+
+void AddADude();
 
 Camera camera;
 glm::mat4 projectionMatrix; // Store the projection matrix
@@ -95,13 +101,18 @@ Model* impulseVisualiser;
 
 //RigidBody* rigidBody;
 
-bool drawBoundingSpheres = false;
+bool drawBoundingSpheres = true;
 bool drawBoundingBoxes = true;
 
 RigidbodyManager rigidBodyManager;
 
 long long int QueryPerformance::ts = 0;
 long long int QueryPerformance::tf = 0;
+
+std::map<std::string, sint64> QueryPerformance::results;
+
+int broadphaseResultCounter = 0;
+sint64 broadphaseResults = 0;
 
 bool pausedSim = false;
 
@@ -119,6 +130,10 @@ unsigned char Input::keyPress = KEY::KEY_F12;
 bool Input::wasKeyPressed = false;
 
 bool Input::leftClick = false;
+
+glm::vec3 cursorWorldSpace;
+
+BroadphaseMode broadphaseMode = BroadphaseMode::SAP1D;
 
 int main(int argc, char** argv)
 {
@@ -177,7 +192,7 @@ int main(int argc, char** argv)
 	projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
 
 	camera.Init(glm::vec3(0.0f, 0.0f, 0.0f), 0.0002f, 0.01f); //TODO - constructor for camera
-	camera.mode = CameraMode::tp;
+	camera.mode = CameraMode::flycam;
 
 	shaderManager.Init(); //TODO - constructor for shader
 	shaderManager.CreateShaderProgram("diffuse", "Shaders/diffuse.vs", "Shaders/diffuse.ps");
@@ -200,11 +215,9 @@ int main(int argc, char** argv)
 	RigidBody::angular = true;
 	RigidBody::linear = true;
 
-	for(int i = 0; i < 1; i++)
+	for(int i = 0; i < 80; i++)
 	{
-		Model* m = new Model(glm::vec3(0, i, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
-		rigidBodyManager.Add(new RigidBody(m));
-		modelList.push_back(m);
+		AddADude();
 	}
 
 	Model* m = new Model(glm::vec3(5, 5, 5), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
@@ -226,9 +239,21 @@ int main(int argc, char** argv)
 	return 0;
 }
 
+void AddADude()
+{
+	Model* m = new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
+	RigidBody* rb = new RigidBody(m);
+		
+	rb->velocity = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
+	rb->angularMomentum = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
+
+	rigidBodyManager.Add(rb);
+	modelList.push_back(m);
+}
+
 void TW_CALL ApplyImpulse(void *clientData)
 {
-	rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
+	//rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
 }
 
 void TW_CALL ResetRB(void *clientData)
@@ -236,9 +261,20 @@ void TW_CALL ResetRB(void *clientData)
 	rigidBodyManager[0]->Reset();
 }
 
+void TW_CALL ResetPerformanceCounter(void *clientData)
+{
+	broadphaseResults = 0;
+	broadphaseResultCounter = 0;
+}
+
 void TW_CALL CalculateNewTesor(void *clientData)
 {
 	rigidBodyManager[0]->inertialTensor = Inertia::Compute2(rigidBodyManager[0]->model, rigidBodyManager[0]->mass);
+}
+
+void TW_CALL AddDudeButton(void *clientData)
+{
+	AddADude();
 }
 
 void SetUpMainTweakBar()
@@ -277,6 +313,17 @@ void SetUpMainTweakBar()
 	TwAddSeparator(bar, "", ""); //=======================================================
 
 	TwAddButton(bar, "Reset", ResetRB, NULL, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	{
+		TwEnumVal broadphaseModeEV[3] = { {BroadphaseMode::SAP1D, "SAP1D"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"} };
+        TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 3);
+		TwAddVarRW(bar, "BroadphaseMode", broadphaseType, &broadphaseMode, " keyIncr='<' keyDecr='>' help='Change broadphase mode.' ");
+    }
+
+	TwAddButton(bar, "Reset2", ResetPerformanceCounter, NULL, "");
+	TwAddButton(bar, "Add Dude", AddDudeButton, NULL, "");
 }
 
 // GLUT CALLBACK FUNCTIONS
@@ -305,7 +352,7 @@ void update()
 	if(!pausedSim)
 	{
 		rigidBodyManager.Update(deltaTime);
-		rigidBodyManager.Broadphase(/*BroadMode::BRUTE*/);
+		rigidBodyManager.Broadphase(broadphaseMode);
 	}
 	
 	draw();
@@ -353,8 +400,9 @@ void HandleInput()
 		Input::wasKeyPressed = false;
 	}
 
-	if(Input::leftClick)
-		rigidBodyManager[0]->ApplyImpulse(GetOGLPos(Input::mouseX, Input::mouseY), camera.viewProperties.forward * RigidBody::forcePush);
+	////TODO - actually check which object it is hitting
+	//if(Input::leftClick)
+		//rigidBodyManager[0]->ApplyImpulse(cursorWorldSpace, camera.viewProperties.forward * RigidBody::forcePush);
 	
 	camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
 }
@@ -367,12 +415,32 @@ void draw()
 
 	viewMatrix = camera.GetViewMatrix();
 
-	shaderManager.SetShaderProgram("red");
-	glm::mat4 MVP = projectionMatrix * viewMatrix;
-	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-	glutWireCube(10);
-
 	DrawModels();
+
+	glm::mat4 MVP;
+
+	cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY);
+
+	//ImpulseVisualiser
+	{
+		RigidBody::impulseVisualiser->worldProperties.translation = cursorWorldSpace;
+
+		shaderManager.SetShaderProgram(RigidBody::impulseVisualiser->GetShaderProgramID());
+			
+		MVP = projectionMatrix * viewMatrix * RigidBody::impulseVisualiser->GetModelMatrix(); //TODO - move these calculations to the graphics card?
+		ShaderManager::SetUniform(RigidBody::impulseVisualiser->GetShaderProgramID(), "mvpMatrix", MVP);
+			
+		RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
+	}
+
+	//Enclosure
+	{
+		shaderManager.SetShaderProgram("red");
+		MVP = projectionMatrix * viewMatrix;
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+		glutWireCube(10);
+	}
+
 	DrawBoundings();
 	DrawParticles();
 
@@ -380,16 +448,6 @@ void draw()
 
 	if(printText)
 		printouts();
-
-	glm::vec3 cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY);
-	RigidBody::impulseVisualiser->worldProperties.translation = cursorWorldSpace;
-
-	shaderManager.SetShaderProgram(RigidBody::impulseVisualiser->GetShaderProgramID());
-			
-	MVP = projectionMatrix * viewMatrix * RigidBody::impulseVisualiser->GetModelMatrix(); //TODO - move these calculations to the graphics card?
-	ShaderManager::SetUniform(RigidBody::impulseVisualiser->GetShaderProgramID(), "mvpMatrix", MVP);
-			
-	RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
 
 	glutSwapBuffers();
 }
@@ -406,6 +464,11 @@ void DrawModels()
 			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
 			
 			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+
+			//TODO - dedicated shader
+			shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("black"));
+			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
+			modelList.at(i)->Render(shaderManager.GetShaderProgramID("black"), true);
 		}
 	}	
 }
@@ -487,6 +550,17 @@ void printouts()
 	ss.str(std::string()); // clear
 	ss << " x: " << ws.x << " y: " << ws.y << "z: " << ws.z;
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-100, ss.str().c_str());
+
+	ss.str(std::string()); // clear
+	ss << " fps: " << fps;
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-120, ss.str().c_str());
+
+	ss.str(std::string()); // clear
+
+	sint64 broadphaseResult = QueryPerformance::results["Broadphase"];
+	broadphaseResults += broadphaseResult;
+	ss << " Query Performance - Broadphase (Avg.): " << broadphaseResults / ++broadphaseResultCounter;
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-140, ss.str().c_str());
 
 	/*ss.str(std::string()); // clear
 	ss << fps << " fps ";

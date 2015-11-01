@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include <string>
+#include <map>
 
 typedef long long int sint64;
 
@@ -11,20 +12,16 @@ static class QueryPerformance
 
 		static sint64 ts,tf;
 
+		static std::map<std::string, sint64> results;
+
 		static void Start()
 		{
 			QueryPerformanceCounter((LARGE_INTEGER*)(&ts));
 		}
 
-		static void Finish()
+		static void Finish(std::string resultName)
 		{
 			QueryPerformanceCounter((LARGE_INTEGER*)(&tf));
-		}
-
-		static std::string Result()
-		{
-			std::stringstream ss;
-			ss << (tf - ts);
-			return ss.str();
+			results[resultName] = tf - ts;
 		}
 };

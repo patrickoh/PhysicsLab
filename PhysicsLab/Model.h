@@ -96,7 +96,7 @@ class Model
 
 		bool Load(const char* file_name);
 		
-		void Render(GLuint shader);
+		void Render(GLuint shader, bool bWireframe = false);
 
 		/*void Update(double deltaTime)
 		{
