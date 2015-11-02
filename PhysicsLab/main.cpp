@@ -67,8 +67,9 @@ glm::vec3 GetOGLPos(int x, int y);
 //bool directionKeys[4] = {false};
 //bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
 
-void processContinuousInput();
 void printouts();
+void printStream();
+std::stringstream ss;
 
 void AddADude();
 
@@ -134,6 +135,8 @@ bool Input::leftClick = false;
 glm::vec3 cursorWorldSpace;
 
 BroadphaseMode broadphaseMode = BroadphaseMode::SAP1D;
+
+int currentLine = 0;
 
 int main(int argc, char** argv)
 {
@@ -277,6 +280,9 @@ void SetUpMainTweakBar()
 
 	TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
 	TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
+
+	TwAddVarRW(bar, "Draw Bounding Spheres", TW_TYPE_BOOL8, &drawBoundingSpheres, "");
+	TwAddVarRW(bar, "Draw AABBs", TW_TYPE_BOOL8, &drawBoundingBoxes, "");
 
 	TwAddSeparator(bar, "", ""); //=======================================================
 
@@ -521,81 +527,47 @@ void DrawParticles()
 
 void printouts()
 {
-	glm::vec3 ws = GetOGLPos(Input::mouseX, Input::mouseY);
-
 	shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 
-	std::stringstream ss;
-
-	//Bottom left is 0,0
-
-	ss.str(std::string()); // clear
 	ss << " Press 'spacebar' or 'esc' to toggle camera/cursor";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-40, ss.str().c_str());
+	printStream();
 
-	ss.str(std::string()); // clear
 	ss << " Press 'c' to switch camera modes";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-60, ss.str().c_str());
+	printStream();
 
-	ss.str(std::string()); // clear
 	ss << " sim paused: " << pausedSim;
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-80, ss.str().c_str());
+	printStream();
 
-	ss.str(std::string()); // clear
-	ss << " x: " << ws.x << " y: " << ws.y << "z: " << ws.z;
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-100, ss.str().c_str());
+	printStream();
 
-	ss.str(std::string()); // clear
+	ss << " x: " << cursorWorldSpace.x << " y: " << cursorWorldSpace.y << "z: " << cursorWorldSpace.z;
+	printStream();
+
 	ss << " fps: " << fps;
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-120, ss.str().c_str());
-
-	ss.str(std::string()); // clear
+	printStream();
 
 	sint64 broadphaseResult = QueryPerformance::results["Broadphase"];
 	broadphaseResults += broadphaseResult;
 	ss << " Query Performance - Broadphase (Avg.): " << broadphaseResults / ++broadphaseResultCounter;
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-140, ss.str().c_str());
+	printStream();
 
-	/*ss.str(std::string()); // clear
-	ss << fps << " fps ";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-40, ss.str().c_str());
-	*/
-
-	glm::vec3 pos = rigidBodyManager[0]->aabb->translation;
-
-	ss.str(std::string()); // clear
-	//glm::vec3 pos = rigidBodyManager[0]->model->worldProperties.translation;
-	ss << "rb.pos: (" << std::fixed << std::setprecision(PRECISION) << rigidBodyManager[0]->aabb->min[Axis::X]->global << ", " << pos.y << ", " << pos.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),140, ss.str().c_str());
-	ss.str(std::string()); // clear
-	glm::vec3 rot = rigidBodyManager[0]->model->GetEulerAngles();
-	ss << "rb.rot: (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),120, ss.str().c_str());
-
-	///////////////
-
-	ss.str(std::string()); // clear
-	pos = rigidBodyManager[0]->aabb->centre;
-	ss << "aabb.centre: (" << std::fixed << std::setprecision(PRECISION) << pos.x << ", " << pos.y << ", " << pos.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),180, ss.str().c_str());
-	ss.str(std::string()); // clear
-	AABB* aabb = rigidBodyManager[0]->aabb;
-	rot = glm::vec3(aabb->width, aabb->height, aabb->depth); 
-	ss << "aabb (w h d): (" << std::fixed << std::setprecision(PRECISION) << rot.x << ", " << rot.y << ", " << rot.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),160, ss.str().c_str());
-
-	//PRINT CAMERA
-	ss.str(std::string()); // clear
 	ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.forward.x << ", " << camera.viewProperties.forward.y << ", " << camera.viewProperties.forward.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),80, ss.str().c_str());
+	printStream();
 
-	ss.str(std::string()); // clear
 	ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.position.x << ", " << camera.viewProperties.position.y << ", " << camera.viewProperties.position.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),60, ss.str().c_str());
+	printStream();
 
-	ss.str(std::string()); // clear
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
-	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),40, ss.str().c_str());
+	printStream();
+
+	currentLine = 0;
+}
+
+void printStream()
+{
+	currentLine += 20;
+	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-currentLine, ss.str().c_str()); //Bottom left is 0,0
+	ss.str(std::string()); //reset
 }
 
 glm::vec3 GetOGLPos(int x, int y)
