@@ -3,6 +3,7 @@
 #include "RigidBody.h"
 #include <vector>
 #include <glm\glm.hpp>
+#include <map>
 
 #include <algorithm> 
 
@@ -20,12 +21,13 @@ struct CollidingPair
 	}
 };
 
-enum BroadphaseMode { Sphere, BruteAABB, SAP1D };
+enum BroadphaseMode { Sphere, BruteAABB, SAP1D};
 
 class RigidbodyManager
 { 
 	private:
-		vector<AABB::EndPoint*> xAxis;
+		vector<AABB::EndPoint*> Axes[3];
+		std::vector<Axis> axes;
 
 	public:
 
@@ -33,9 +35,13 @@ class RigidbodyManager
 		vector<AABB::EndPoint*> activeList; //List of potentially colliding pairs / active list
 		vector<CollidingPair> collidingPairs;
 
+		std::vector<std::vector<int>> pairs;
+
 		RigidbodyManager()
 		{
-			
+			axes.push_back(Axis::X);
+			axes.push_back(Axis::Y);
+			axes.push_back(Axis::Z);
 		}
 
 		~RigidbodyManager(){}
@@ -52,10 +58,21 @@ class RigidbodyManager
 
 		void Add(RigidBody* rb)
 		{
+			rb->id = rigidBodies.size();
 			rigidBodies.push_back(rb);
 
-			xAxis.push_back(rb->aabb->min[Axis::X]);
-			xAxis.push_back(rb->aabb->max[Axis::X]);
+			Axes[Axis::X].push_back(rb->aabb->min[Axis::X]);
+			Axes[Axis::X].push_back(rb->aabb->max[Axis::X]);
+
+			Axes[Axis::Y].push_back(rb->aabb->min[Axis::Y]);
+			Axes[Axis::Y].push_back(rb->aabb->max[Axis::Y]);
+
+			Axes[Axis::Z].push_back(rb->aabb->min[Axis::Z]);
+			Axes[Axis::Z].push_back(rb->aabb->max[Axis::Z]);
+
+			pairs.resize(rigidBodies.size());
+			for(int i=0; i<rigidBodies.size(); i++)
+				pairs[i].resize(rigidBodies.size());
 		}
 
 		void Broadphase(BroadphaseMode mode)
@@ -67,8 +84,11 @@ class RigidbodyManager
 			else if (mode == BroadphaseMode::Sphere)
 				SphereCollisions();
 			else if (mode == BroadphaseMode::SAP1D)
-				SAP1D();
-			
+			{
+				SAP1D(Axis::X);
+				//SAP(axes);
+			}
+	
 			QueryPerformance::Finish("Broadphase");
 		}
 
@@ -139,18 +159,18 @@ class RigidbodyManager
 			}
 		}
 
-		void SAP1D()
+		void SAP1D(Axis a)
 		{
 			activeList.clear();	
-
-			//std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
-			insertionSort(xAxis);//Insertionsort is O(n) on nearly sorted lists
-			//std::sort(xAxis.begin(), xAxis.end(), AABB::EndPoint::my_cmp); 
 
 			for(RigidBody* rb : rigidBodies)
 				rb->aabb->colour = glm::vec4(0,1,0,1);
 
-			for (AABB::EndPoint* ep : xAxis)
+			//std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
+			insertionSort(Axes[a]);//Insertionsort is O(n) on nearly sorted lists
+			//std::sort(xAxis.begin(), xAxis.end(), AABB::EndPoint::my_cmp); 
+
+			for (AABB::EndPoint* ep : Axes[a])
 			{
 				if(ep->isMin)
 				{
@@ -167,9 +187,54 @@ class RigidbodyManager
 			}
 		}
 
-		void SAP3D()
+		void SAP(vector<Axis> a)
 		{
+			activeList.clear();	
 
+			for(RigidBody* rb : rigidBodies)
+				rb->aabb->colour = glm::vec4(0,1,0,1);
+
+			for(Axis axis : a)
+			{
+				//std::sort(xAxis.begin(), xAxis.end()); //O(n log (n) )
+				insertionSort(Axes[axis]);//Insertionsort is O(n) on nearly sorted lists
+				//std::sort(xAxis.begin(), xAxis.end(), AABB::EndPoint::my_cmp); 
+
+				for (AABB::EndPoint* ep : Axes[axis])
+				{
+					if(ep->isMin)
+					{
+						for(AABB::EndPoint* ep2 : activeList)
+						{
+							int id1 = ep->owner->owner->id;
+							int id2 = ep2->owner->owner->id;
+							pairs[id1][id2]++;
+							pairs[id2][id1]++;
+						}
+
+						activeList.push_back(ep);
+					}
+					else
+					{
+						activeList.erase(std::remove(activeList.begin(), activeList.end(), ep->partner), activeList.end());
+					}
+				}
+			}
+
+			for(int i = 0; i < rigidBodies.size(); i++)
+			{
+				for (int j = i + 1; j < rigidBodies.size(); j++)
+				{
+					if (i == j) continue; 
+
+					if(pairs[i][j] == 3)
+						rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
+				}
+			}
+
+			for(int i = 0; i < rigidBodies.size(); i++)
+				for (int j = 0; j < rigidBodies.size(); j++)
+					pairs[i][j] = 0;
 		}
 
 		void insertionSort (vector<AABB::EndPoint*> &data) 

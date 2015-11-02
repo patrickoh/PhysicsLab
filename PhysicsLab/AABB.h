@@ -7,6 +7,8 @@
 enum Axis { X = 0, Y, Z };
 //enum End { min, max };
 
+class RigidBody;
+
 class AABB
 {
 
@@ -69,7 +71,9 @@ public:
 	EndPoint* min [3];
 	EndPoint* max [3]; 
 
-	AABB(const std::vector<glm::vec3>& vertices/*, RigidBody* p_owner*/);
+	RigidBody* owner;
+
+	AABB(const std::vector<glm::vec3>& vertices, RigidBody* p_owner);
 
 	//glm::vec3 getTranslation() { return translation; }
 	//void setTranslation(glm::vec3 set) { translation = set; }

@@ -29,7 +29,7 @@ RigidBody::RigidBody(Model* model)
 	//ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
 
 	boundingSphere = new BoundingSphere(model->vertices);
-	aabb = new AABB(model->vertices);
+	aabb = new AABB(model->vertices, this);
 }
 
 RigidBody::~RigidBody()

@@ -10,6 +10,8 @@
 
 #define PI 3.1415926535897932384626433832795f;
 
+#include <GL/glew.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> 
 #include <glm/gtc/type_ptr.hpp>

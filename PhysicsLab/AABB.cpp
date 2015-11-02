@@ -1,4 +1,5 @@
 #include "AABB.h"
+#include "RigidBody.h"
 
 AABB::EndPoint::EndPoint(float p_value, bool p_isMin, Axis p_axis, AABB* p_owner) 
 {
@@ -10,9 +11,9 @@ AABB::EndPoint::EndPoint(float p_value, bool p_isMin, Axis p_axis, AABB* p_owner
 	owner = p_owner;
 }
 
-AABB::AABB(const std::vector<glm::vec3>& vertices/*, RigidBody* p_owner*/)
+AABB::AABB(const std::vector<glm::vec3>& vertices, RigidBody* p_owner)
 {
-	//owner = p_owner;
+	owner = p_owner;
 
 	colour = glm::vec4(0,0,1,1);
 

@@ -203,9 +203,9 @@ int main(int argc, char** argv)
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
 	shaderManager.CreateShaderProgram("bounding", "Shaders/diffuse.vs", "Shaders/bounding.ps");
 
-	glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
-	cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
-	modelList.push_back(new Model(glm::vec3(0, 0, 5), cactuarFix, glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+	//glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
+	//cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
+	modelList.push_back(new Model(glm::vec3(0, 0, 5), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
 	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
 	//modelList.push_back(impulseVisualiser);
@@ -216,13 +216,7 @@ int main(int argc, char** argv)
 	RigidBody::linear = true;
 
 	for(int i = 0; i < 80; i++)
-	{
 		AddADude();
-	}
-
-	Model* m = new Model(glm::vec3(5, 5, 5), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
-	rigidBodyManager.Add(new RigidBody(m));
-	modelList.push_back(m);
 
 	tweakBars["main"] = TwNewBar("Main");
 	TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color

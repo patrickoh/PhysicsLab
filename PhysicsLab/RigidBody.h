@@ -33,6 +33,8 @@ class RigidBody
 		BoundingSphere* boundingSphere;
 		AABB* aabb;
 
+		int id;
+
 		static float forcePush;
 		static Model* impulseVisualiser;
 		
