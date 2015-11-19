@@ -32,7 +32,7 @@ bool Model::Load(const char* file_name)
 		return false;
 	}
 
-	globalInverseTransform = convertAssimpMatrix(scene->mRootNode->mTransformation);
+	globalInverseTransform = glm::mat4(1);//convertAssimpMatrix(scene->mRootNode->mTransformation);
 	//glm::mat4 fix = GetModelMatrix() * globalInverseTransform;
 	//decomposeTRS(fix, worldProperties.translation, worldProperties.orientation, worldProperties.scale);
 	
