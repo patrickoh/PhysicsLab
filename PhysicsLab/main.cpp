@@ -71,7 +71,7 @@ void printouts();
 void printStream();
 std::stringstream ss;
 
-void AddADude();
+void AddADude(glm::vec3 position, bool moving = true);
 
 Camera camera;
 glm::mat4 projectionMatrix; // Store the projection matrix
@@ -106,6 +106,8 @@ bool drawBoundingSpheres = true;
 bool drawBoundingBoxes = true;
 
 RigidbodyManager rigidBodyManager;
+RigidBody* selectedRigidbody;
+int selectedRigidbodyIndex;
 
 long long int QueryPerformance::ts = 0;
 long long int QueryPerformance::tf = 0;
@@ -137,6 +139,9 @@ glm::vec3 cursorWorldSpace;
 BroadphaseMode broadphaseMode = BroadphaseMode::SAP1D;
 
 int currentLine = 0;
+
+int RigidbodyManager::shaderID1;
+int RigidbodyManager::shaderID2;
 
 int main(int argc, char** argv)
 {
@@ -213,13 +218,18 @@ int main(int argc, char** argv)
 	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
 	//modelList.push_back(impulseVisualiser);
 
+	modelList.push_back(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white")));
+
 	RigidBody::impulseVisualiser = impulseVisualiser;
 	RigidBody::forcePush = 1.0f;
 	RigidBody::angular = true;
 	RigidBody::linear = true;
 
-	for(int i = 0; i < 80; i++)
-		AddADude();
+	RigidbodyManager::shaderID1 = shaderManager.GetShaderProgramID("red");
+	RigidbodyManager::shaderID2 = shaderManager.GetShaderProgramID("white");
+
+	for(int i = 1; i <= 2; i++)
+		AddADude(glm::vec3(i, 0, 0), false);
 
 	tweakBars["main"] = TwNewBar("Main");
 	TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
@@ -227,7 +237,14 @@ int main(int argc, char** argv)
 
 	tweakBars["main2"] = TwNewBar("TweakBar2");
 	TwDefine(" TweakBar2 size='250 700' color='125 125 125' "); // change default tweak bar size and color
-	TwAddVarRW(tweakBars["main2"], "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
+
+	selectedRigidbody = rigidBodyManager.rigidBodies[0];
+	
+	TwAddVarRW(tweakBars["main2"], "SelectedRB", TW_TYPE_DIR3F, &selectedRigidbody->model->worldProperties.translation, "");
+	TwAddVarRW(tweakBars["main2"], "SelectedRB", TW_TYPE_INT32, &selectedRigidbodyIndex, "");
+
+	TwAddVarRW(tweakBars["main2"], "Angular Velocity", TW_TYPE_DIR3F, &rigidBodyManager[1]->angularVelocity, "");
+	TwAddVarRW(tweakBars["main2"], "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[1]->angularMomentum, "");
 	
 	//TODO? - Recalculate inertial tensor if mass changes
 
@@ -236,13 +253,16 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-void AddADude()
+void AddADude(glm::vec3 position, bool moving)
 {
-	Model* m = new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m = new Model(position, glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
 	RigidBody* rb = new RigidBody(m);
-		
-	rb->velocity = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
-	rb->angularMomentum = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
+	
+	if(moving)
+	{
+		rb->velocity = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
+		rb->angularMomentum = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
+	}
 
 	rigidBodyManager.Add(rb);
 	modelList.push_back(m);
@@ -271,7 +291,7 @@ void TW_CALL CalculateNewTesor(void *clientData)
 
 void TW_CALL AddDudeButton(void *clientData)
 {
-	AddADude();
+	//AddADude();
 }
 
 void SetUpMainTweakBar()
@@ -329,6 +349,9 @@ void SetUpMainTweakBar()
 // GLUT CALLBACK FUNCTIONS
 void update()
 {
+	//TODO - make a function for this
+	selectedRigidbody = rigidBodyManager.rigidBodies[0];
+
 	//Calculate deltaTime
 	int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
     deltaTime = timeSinceStart - oldTimeSinceStart;
@@ -352,7 +375,8 @@ void update()
 	if(!pausedSim)
 	{
 		rigidBodyManager.Update(deltaTime);
-		rigidBodyManager.Broadphase(broadphaseMode);
+		//rigidBodyManager.Broadphase(broadphaseMode);
+		rigidBodyManager.Narrowphase();
 	}
 	
 	draw();

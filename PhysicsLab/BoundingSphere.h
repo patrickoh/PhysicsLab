@@ -1,27 +1,27 @@
 #pragma once
 
 #include "Common.h"
+#include <vector>
 
-struct BoundingSphere
+class RigidBody;
+
+class BoundingSphere
 {
+
+public:
 	glm::vec3 centre;
 	float radius;
+
+	RigidBody* owner;
 	
 	glm::vec4 colour;
 
 	glm::vec3 translation; 
 	float scale;
 
-	BoundingSphere(const std::vector<glm::vec3>& v)
-	{
-		calculate(v);
-		colour = glm::vec4(1,0,0,1);
+	BoundingSphere(const std::vector<glm::vec3>& v, RigidBody* p_owner);
 
-		scale = 1;
-		translation = glm::vec3(0);
-	}
-
-	//Really naive approach that doesn't even work!
+	//TODO - Fix this naive approach that doesn't even work!
 	void calculate(const std::vector<glm::vec3>& v)
 	{
 		glm::vec3 p1, p2;
@@ -59,4 +59,7 @@ struct BoundingSphere
 		translation = p_translation;
 		scale = uniformScale;
 	}
+
+private:
+
 };

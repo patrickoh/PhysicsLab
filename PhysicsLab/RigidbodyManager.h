@@ -8,16 +8,17 @@
 #include <algorithm> 
 
 #include "QueryPerformance.h"
+#include "GJK.h"
 
-struct CollidingPair
+struct RbPair
 {
-	AABB* aabb1;
-	AABB* aabb2;
+	RigidBody* rb1;
+	RigidBody* rb2;
 
-	CollidingPair(AABB* p_aabb1, AABB* p_aabb2)
+	RbPair(RigidBody* p_rb1, RigidBody* p_rb2)
 	{
-		aabb1 = p_aabb1;
-		aabb2 = p_aabb2;
+		rb1 = p_rb1;
+		rb2 = p_rb2;
 	}
 };
 
@@ -29,11 +30,17 @@ class RigidbodyManager
 		vector<AABB::EndPoint*> Axes[3];
 		std::vector<Axis> axes;
 
+		GJK gjk;
+
 	public:
+
+		//temp
+		static int shaderID1;
+		static int shaderID2;
 
 		vector<RigidBody*> rigidBodies;
 		vector<AABB::EndPoint*> activeList; //List of potentially colliding pairs / active list
-		vector<CollidingPair> collidingPairs;
+		vector<RbPair> broadphasePairs;
 
 		std::vector<std::vector<int>> pairs;
 
@@ -42,6 +49,8 @@ class RigidbodyManager
 			axes.push_back(Axis::X);
 			axes.push_back(Axis::Y);
 			axes.push_back(Axis::Z);
+
+			gjk = GJK();
 		}
 
 		~RigidbodyManager(){}
@@ -92,10 +101,37 @@ class RigidbodyManager
 			QueryPerformance::Finish("Broadphase");
 		}
 
+		void Narrowphase()
+		{
+			//for(int i = 0; i < broadphasePairs.size(); i++)
+			//{
+			//	if(gjk.Intersects(broadphasePairs[i].rb1->model->GetTransformedVertices(), 
+			//		broadphasePairs[i].rb2->model->GetTransformedVertices()))
+			//	{
+			//		//broadphasePairs[i].rb1->aabb->colour =
+			//			//broadphasePairs[i].rb2->aabb->colour = glm::vec4(1,0,0,1);
+
+			//		broadphasePairs[i].rb1->model->SetShaderProgramID(shaderID2);//temp
+			//		broadphasePairs[i].rb2->model->SetShaderProgramID(shaderID2);//
+			//	}
+			//}
+
+			//broadphasePairs.clear();
+
+			if(gjk.Intersects(rigidBodies[0]->model, rigidBodies[1]->model))
+			{
+				rigidBodies[0]->model->SetShaderProgramID(shaderID2);//temp
+				rigidBodies[1]->model->SetShaderProgramID(shaderID2);//
+			}
+		}
+
 		void Update(double deltaTime)
 		{
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
+				//temp change color to white
+				rigidBodies[i]->model->SetShaderProgramID(shaderID1);//temp
+
 				//if bouncy enclosure
 
 				glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
@@ -134,7 +170,10 @@ class RigidbodyManager
 					BoundingSphere* sphere2 = rigidBodies[j]->boundingSphere;
 
 					if(sphere1->collides(sphere2))
-						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);						
+					{
+						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);		
+						broadphasePairs.push_back(RbPair(sphere1->owner, sphere2->owner));
+					}
 				}
 			}
 		}
@@ -154,7 +193,10 @@ class RigidbodyManager
 					AABB* aabb2 = rigidBodies[j]->aabb;
 
 					if(aabb1->collides(aabb2))
+					{
 						aabb1->colour = aabb2->colour = glm::vec4(1,0,0,1);
+						broadphasePairs.push_back(RbPair(aabb1->owner, aabb2->owner));
+					}
 				}
 			}
 		}
@@ -175,8 +217,13 @@ class RigidbodyManager
 				if(ep->isMin)
 				{
 					for(AABB::EndPoint* ep2 : activeList)
+					{
 						if(ep->owner->collides(ep2->owner))
+						{
 							ep->owner->colour = ep2->owner->colour = glm::vec4(1,0,0,1);
+							broadphasePairs.push_back(RbPair(ep->owner->owner, ep2->owner->owner));
+						}
+					}
 
 					activeList.push_back(ep);
 				}
@@ -228,7 +275,10 @@ class RigidbodyManager
 					if (i == j) continue; 
 
 					if(pairs[i][j] == 3)
+					{
 						rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
+						broadphasePairs.push_back(RbPair(rigidBodies[i], rigidBodies[j]));
+					}
 				}
 			}
 

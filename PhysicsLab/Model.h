@@ -138,6 +138,40 @@ class Model
 
 			for(int i = 0; i < vertices.size(); i++)
 				transformedVertices.push_back(glm::vec3(glm::vec4(vertices[i], 1) * modelMat));
+
+			return transformedVertices;
+		}
+
+		glm::vec3 GetFurthestPointInDirection(glm::vec3 dir)
+		{
+			glm::vec3 returnVector;
+
+			//convert in world coordinates
+			glm::vec4  m = GetModelMatrix() * glm::vec4(vertices[0].x, vertices[0].y, vertices[0].z, 1);
+			glm::vec3 worldVertex = glm::vec3(m.x, m.y, m.z);
+
+			float maxDot = glm::dot(worldVertex, dir);
+			returnVector = worldVertex;
+
+			for (int i = 1; i < vertices.size(); i++)
+			{
+				//convert in world coordinates
+				m = GetModelMatrix() * glm::vec4(vertices[i].x, vertices[i].y, vertices[i].z, 1);
+				worldVertex = glm::vec3(m.x, m.y, m.z);
+
+				float dot = glm::dot(worldVertex, dir);
+
+				//find biggest dot product
+				if (dot > maxDot)
+				{
+					maxDot = dot;
+					returnVector = worldVertex;
+
+				}
+
+			}
+
+			return returnVector;
 		}
 
 		//Setters
