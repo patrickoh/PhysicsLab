@@ -119,6 +119,12 @@
     <ClInclude Include="GJK.h">
       <Filter>Header Files\Physics\CD - Narrowphase</Filter>
     </ClInclude>
+    <ClInclude Include="Support.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="EPA.h">
+      <Filter>Header Files\Physics\Collision Response</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\black.ps">

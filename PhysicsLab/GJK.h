@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include <vector>
+#include "Support.h"
 
 //Gilbert Johnson Keerthi algorithm for determining whether or 
 //not two convex solids intersect
@@ -23,6 +24,14 @@ class GJK
 		{
 
 		}
+
+		void Reset()
+		{
+			nrPointsSimplex = 0;
+			a = b = c = d = glm::vec3(0);
+		}
+
+		#pragma region firsttry
 		//bool Intersects(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2)
 		//{
 			//std::vector<glm::vec3> simplex; //a simplex is simply a list of points that form an n-dimensional construct
@@ -45,89 +54,53 @@ class GJK
 			//}
 
 			//return false;
-
-
 		//}
+		#pragma endregion
 
-		glm::vec3 Support(glm::vec3 direction, std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2)
+		bool Intersects(Model* model1, Model* model2, std::vector<glm::vec3> &simplex)
 		{
-			glm::vec3 p1 = Support(direction, shape1);
-			glm::vec3 p2 = Support(-direction, shape2);
+			Reset();
 
-			return p1 - p2; //= max Dt ABij (furtest point along direction in minkowski difference)
-		}
-
-		glm::vec3 Support(glm::vec3 direction, Model* shape1, Model* shape2)
-		{
-			glm::vec3 p1 = shape1->GetFurthestPointInDirection(direction);
-			glm::vec3 p2 = shape2->GetFurthestPointInDirection(-direction);
-
-			return p1 - p2; //= max Dt ABij (furtest point along direction in minkowski difference)
-		}
-
-		//Support - furthest along in that direction 
-		glm::vec3 Support(glm::vec3 direction, std::vector<glm::vec3> shape)
-		{
-			//direction = glm::normalize(direction); // just in case //Doesn't have to be normalised
-
-			float maxDot = glm::dot(shape[0], direction);
-			glm::vec3 furthest = shape[0];
-			//The dot product tells you what amount of one vector goes in the direction of another, in other words,
-			//what is the furtest point in said direction.
-
-			float dot;
-
-			for(int i = 0; i < shape.size(); i++)
-			{
-				dot = glm::dot(shape[i], direction);
-
-				if(dot > maxDot)
-				{
-					maxDot = dot;
-					furthest = shape[i];
-				}
-			}
-
-			return furthest;
-		}
-
-		bool Intersects(Model* model1, Model* model2/*std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2*/)
-		{
-			 glm::vec3 dir = glm::vec3(1, 1, 1);
+			glm::vec3 dir = glm::vec3(1, 1, 1);
 		
-			 c = Support(dir, model1, model2);
+			c = Support(dir, model1, model2);
 		 	
-			 dir = -c;//negative direction
+			dir = -c;//negative direction
 
-			 b = Support(dir, model1, model2);
+			b = Support(dir, model1, model2);
 
-			 if (glm::dot(b, dir) < 0)
-			 {
-				 return false;
-			 }
-			 dir = doubleCross(c - b, -b);
+			if (glm::dot(b, dir) < 0)
+			{
+				return false;
+			}
+			dir = doubleCross(c - b, -b);
 	 
-			 nrPointsSimplex = 2; //begin with 2 points in simplex
+			nrPointsSimplex = 2; //begin with 2 points in simplex
 	
-			 int steps = 0;//avoid infinite loop
-			 while (steps<50)
-			 {
-				 a = Support(dir, model1, model2);
-				 if (glm::dot(a, dir) < 0)
-				 {
-					 return false;
-				 }
-				 else
-				 {
+			int steps = 0;//avoid infinite loop
+			while (steps<50)
+			{
+				a = Support(dir, model1, model2);
+				if (glm::dot(a, dir) < 0)
+				{
+					return false;
+				}
+				else
+				{
 			 
-					 if (ContainsOrigin(dir))
-					 {
-						 return true;
-					 }
-				 }
-				 steps++;
+					if (ContainsOrigin(dir))
+					{
+						simplex.push_back(a);
+						simplex.push_back(b);
+						simplex.push_back(c);
+						simplex.push_back(d);
 
-			 }
+						return true;
+					}
+				}
+				steps++;
+
+			}
 	
 			 return false;
 		}
@@ -338,11 +311,6 @@ class GJK
 			nrPointsSimplex = 3;
 
 			return false;
-		}
-
-		glm::vec3 doubleCross(const glm::vec3& v1, const glm::vec3& v2)
-		{
-			return glm::cross(glm::cross(v1, v2), v1);
 		}
 };
 

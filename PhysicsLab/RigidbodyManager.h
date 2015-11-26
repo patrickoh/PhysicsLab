@@ -9,6 +9,7 @@
 
 #include "QueryPerformance.h"
 #include "GJK.h"
+#include "EPA.h"
 
 struct RbPair
 {
@@ -28,9 +29,9 @@ class RigidbodyManager
 { 
 	private:
 		vector<AABB::EndPoint*> Axes[3];
-		std::vector<Axis> axes;
 
 		GJK gjk;
+		EPA epa;
 
 	public:
 
@@ -39,18 +40,16 @@ class RigidbodyManager
 		static int shaderID2;
 
 		vector<RigidBody*> rigidBodies;
-		vector<AABB::EndPoint*> activeList; //List of potentially colliding pairs / active list
-		vector<RbPair> broadphasePairs;
 
-		std::vector<std::vector<int>> pairs;
+		vector<AABB::EndPoint*> activeList; //List of potentially colliding pairs / active list
+		std::vector<std::vector<int>> pairs; //2d container for tracking no. of axis collisions between aabbs (max 3)
+
+		vector<RbPair> broadphasePairs; //Handed on to narrowphase stage
 
 		RigidbodyManager()
 		{
-			axes.push_back(Axis::X);
-			axes.push_back(Axis::Y);
-			axes.push_back(Axis::Z);
-
 			gjk = GJK();
+			epa = EPA();
 		}
 
 		~RigidbodyManager(){}
@@ -63,7 +62,7 @@ class RigidbodyManager
 		RigidBody* operator [](int i) const    { return rigidBodies[i]; }
 		RigidBody* & operator [](int i) { return rigidBodies[i]; }
 
-		//TODO - remove
+		//TODO - remove rigidbody
 
 		void Add(RigidBody* rb)
 		{
@@ -103,26 +102,21 @@ class RigidbodyManager
 
 		void Narrowphase()
 		{
-			//for(int i = 0; i < broadphasePairs.size(); i++)
-			//{
-			//	if(gjk.Intersects(broadphasePairs[i].rb1->model->GetTransformedVertices(), 
-			//		broadphasePairs[i].rb2->model->GetTransformedVertices()))
-			//	{
-			//		//broadphasePairs[i].rb1->aabb->colour =
-			//			//broadphasePairs[i].rb2->aabb->colour = glm::vec4(1,0,0,1);
-
-			//		broadphasePairs[i].rb1->model->SetShaderProgramID(shaderID2);//temp
-			//		broadphasePairs[i].rb2->model->SetShaderProgramID(shaderID2);//
-			//	}
-			//}
-
-			//broadphasePairs.clear();
-
-			if(gjk.Intersects(rigidBodies[0]->model, rigidBodies[1]->model))
+			for(int i = 0; i < broadphasePairs.size(); i++)
 			{
-				rigidBodies[0]->model->SetShaderProgramID(shaderID2);//temp
-				rigidBodies[1]->model->SetShaderProgramID(shaderID2);//
+				std::vector<glm::vec3> simplex;
+
+				if(gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex))
+				{
+					broadphasePairs[i].rb1->model->SetShaderProgramID(shaderID2);//temp
+					broadphasePairs[i].rb2->model->SetShaderProgramID(shaderID2);//
+
+					epa.getContactInfo(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex);
+
+				}
 			}
+
+			broadphasePairs.clear();
 		}
 
 		void Update(double deltaTime)
@@ -133,24 +127,25 @@ class RigidbodyManager
 				rigidBodies[i]->model->SetShaderProgramID(shaderID1);//temp
 
 				//if bouncy enclosure
-
-				glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
-				glm::vec3 plane[] = { glm::vec3(0,-5,0), glm::vec3(0,5,0), glm::vec3(-5,0,0), glm::vec3(5,0,0), glm::vec3(0,0,5), glm::vec3(0,0,-5) };
-
-				for(int j = 0; j < 6; j++)
 				{
-					if(glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) < 0.01f
-							&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
-					{
-						rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
-						rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+					glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
+					glm::vec3 plane[] = { glm::vec3(0,-50,0), glm::vec3(0,50,0), glm::vec3(-50,0,0), glm::vec3(50,0,0), glm::vec3(0,0,50), glm::vec3(0,0,-50) };
 
-						//velocity.y = -velocity.y;
+					for(int j = 0; j < 6; j++)
+					{
+						if(glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) < 0.01f
+								&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
+						{
+							rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
+							rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+
+							//velocity.y = -velocity.y;
+						}
 					}
 				}
 
-				rigidBodies[i]->StepPhysics(deltaTime);
-				rigidBodies[i]->Update();
+				rigidBodies[i]->StepPhysics(deltaTime); //physics update
+				rigidBodies[i]->Update(); //bookkeeping
 			}
 		}
 

@@ -52,20 +52,6 @@ void drawText(int x, int y, const char *st)
 	}
 }
 
-void dialogue(int x, int y, const char *st)
-{
-	int l,i;
-
-	l=strlen(st); // see how many characters are in text string.
-
-	glWindowPos2i(x, y); // location to start printing text
-	
-	for(i=0; i < l; i++) // loop until i is greater then l
-	{
-		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, st[i]);
-	}
-}
-
 glm::mat4 convertAssimpMatrix(aiMatrix4x4 from)
 {
 	 glm::mat4 to;
@@ -199,4 +185,26 @@ glm::quat quatFromAngularVelocityByTimestep(glm::vec3 w)
     {
         return glm::quat(0.0f, 0.0f, 0.0f, 1.0f);
     }
+}
+
+glm::vec3 GetOGLPos(int x, int y, int WINDOW_WIDTH, int WINDOW_HEIGHT, glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
+{
+	glm::vec4 viewport = glm::vec4(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
+	float fixY = WINDOW_HEIGHT - y; //0,0 in OpenGL is bottom left
+
+	GLfloat z; 
+	glReadPixels( x, fixY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z ); //get z position in depth buffer
+	
+	return glm::unProject(glm::vec3(x, fixY, z), viewMatrix, projectionMatrix, viewport);
+}
+
+glm::vec3 doubleCross(const glm::vec3& v1, const glm::vec3& v2)
+{
+	return glm::cross(glm::cross(v1, v2), v1);
+}
+
+//Assuming convex poly
+bool isCCW(glm::vec3 adjEdge1, glm::vec3 adjEdge2)
+{
+	return glm::dot(glm::cross(adjEdge1, adjEdge2), glm::vec3(0,0,1)) > 0;
 }

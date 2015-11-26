@@ -99,6 +99,7 @@
     <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="Inertia.h" />
     <ClInclude Include="Input.h" />
@@ -112,6 +113,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="Support.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\black.ps" />

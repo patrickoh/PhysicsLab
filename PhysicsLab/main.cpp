@@ -62,8 +62,6 @@ void TW_CALL ResetPerformanceCounter(void *clientData);
 
 void SetUpMainTweakBar();
 
-glm::vec3 GetOGLPos(int x, int y);
-
 //bool directionKeys[4] = {false};
 //bool keyStates[256] = {false}; // Create an array of boolean values of length 256 (0-255)
 
@@ -255,7 +253,7 @@ int main(int argc, char** argv)
 
 void AddADude(glm::vec3 position, bool moving)
 {
-	Model* m = new Model(position, glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m = new Model(position, glm::quat(), glm::vec3(0.1f), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
 	RigidBody* rb = new RigidBody(m);
 	
 	if(moving)
@@ -375,7 +373,8 @@ void update()
 	if(!pausedSim)
 	{
 		rigidBodyManager.Update(deltaTime);
-		//rigidBodyManager.Broadphase(broadphaseMode);
+		
+		rigidBodyManager.Broadphase(broadphaseMode);
 		rigidBodyManager.Narrowphase();
 	}
 	
@@ -443,7 +442,7 @@ void draw()
 
 	glm::mat4 MVP;
 
-	cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY);
+	cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
 
 	//ImpulseVisualiser
 	{
@@ -462,7 +461,7 @@ void draw()
 		shaderManager.SetShaderProgram("red");
 		MVP = projectionMatrix * viewMatrix;
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-		glutWireCube(10);
+		glutWireCube(50);
 	}
 
 	DrawBoundings();
@@ -592,17 +591,6 @@ void printStream()
 	currentLine += 20;
 	drawText(WINDOW_WIDTH-(strlen(ss.str().c_str())*LETTER_WIDTH),WINDOW_HEIGHT-currentLine, ss.str().c_str()); //Bottom left is 0,0
 	ss.str(std::string()); //reset
-}
-
-glm::vec3 GetOGLPos(int x, int y)
-{
-	glm::vec4 viewport = glm::vec4(0,0,WINDOW_WIDTH, WINDOW_HEIGHT);
-	float fixY = WINDOW_HEIGHT - y; //0,0 in OpenGL is bottom left
-
-	GLfloat z; 
-	glReadPixels( x, fixY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z ); //get z position in depth buffer
-	
-	return glm::unProject(glm::vec3(x, fixY, z), viewMatrix, projectionMatrix, viewport);
 }
 
 
