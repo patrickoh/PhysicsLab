@@ -26,21 +26,21 @@ struct ContactInfo
 //A face comprises three vertices and a surface normal
 struct Triangle
 {
-	glm::vec3 v1, v2, v3;
+	SupportPoint v1, v2, v3;
 	glm::vec3 n;
 
-	Triangle(glm::vec3 p_v1, glm::vec3 p_v2, glm::vec3 p_v3) : v1(p_v1), v2(p_v2), v3(p_v3)
+	Triangle(SupportPoint p_v1, SupportPoint p_v2, SupportPoint p_v3) : v1(p_v1), v2(p_v2), v3(p_v3)
 	{
 		//Winding needs to be CCW
 		//EPA retains winding of the simplex, so this is just to make sure the initial simplex is CCW
-		if(!isCCW(v1, v2))
+		if(!isCCW(v1.AB, v2.AB))
 		{
-			glm::vec3 tmp = v1;
+			SupportPoint tmp = v1;
 			v1 = v3;
 			v3 = tmp;
 		}
 
-		n = glm::cross(v2-v1, v3-v1); //CCW winding assumed
+		n = glm::cross(v2.AB-v1.AB, v3.AB-v1.AB); //CCW winding assumed
 		n = glm::normalize(n);
 	}
 
@@ -49,9 +49,9 @@ struct Triangle
 	std::vector<glm::vec3> getPoints()
 	{
 		std::vector<glm::vec3> points;
-		points.push_back(v1);
-		points.push_back(v2);
-		points.push_back(v3);
+		points.push_back(v1.AB);
+		points.push_back(v2.AB);
+		points.push_back(v3.AB);
 		return points;
 	}
 
@@ -64,9 +64,9 @@ struct Triangle
 //TODO - perhaps give them a unique id?
 bool operator==(const Triangle& left, const Triangle& right)
 {
-	return left.v1 == right.v1 
-		&& left.v2 == right.v2 
-		&& left.v3 == right.v3
+	return left.v1.AB == right.v1.AB 
+		&& left.v2.AB == right.v2.AB 
+		&& left.v3.AB == right.v3.AB
 		&& left.n == right.n;
 }
 
@@ -98,7 +98,7 @@ class EPA
 
 		}
 
-		ContactInfo getContactInfo(Model* shape1, Model* shape2, std::vector<glm::vec3> simplex) 
+		ContactInfo getContactInfo(Model* shape1, Model* shape2, std::vector<SupportPoint> simplex) 
 		{
 			Reset();
 
@@ -116,42 +116,37 @@ class EPA
 				// (1) Pick closest face of polytope to origin
 				closest = findClosestFace();
 
-				// (2) Remove closest face
-				polytope.erase(std::remove(polytope.begin(), polytope.end(), closest), polytope.end());
-
-				// (3) Search for support point in direction of normal
-				glm::vec3 minkowskiPoint = Support(closest.n, shape1, shape2);
-
+				// (3) Check if the new closest 
 				float d = closest.getDistance(glm::vec3(0));
-
-				if(d - previousClosest.getDistance(glm::vec3(0)) < EPA_TOLERANCE)
+				if(i != 0 && d - previousClosest.getDistance(glm::vec3(0)) < EPA_TOLERANCE)
 				{
 					//calculatue barycentric coords of the closest tri with respect to proj of the origin onto the face
-					glm::vec3 bary = barycentric(glm::vec3(0), closest.v1, closest.v2, closest.v3);
+					glm::vec3 bary = barycentric(glm::vec3(0), closest.v1.AB, closest.v2.AB, closest.v3.AB);
 
 					cInfo.depth = d; //the penetration depth is the distance between the closest minkowski facet and the origin
 					cInfo.normal = closest.n; // the normal of the contact is the normal of the closest minkowski facet
 
-					//glm::vec3 p1 = Support(direction, shape1); 
-					//glm::vec3 p2 = Support(-direction, shape2);
+					cInfo.c1 = bary.x/*u*/ * closest.v1.A
+						+ bary.y/*v*/ * closest.v2.A
+						+ bary.z/*w*/ * closest.v3.A;
 
-					//SupportA(closest.n, shape1, shape2);
-					//SupportB(closest.n, shape1, shape2);
+					cInfo.c2 = bary.x * closest.v1.B
+						+ bary.y * closest.v2.B
+						+ bary.z * closest.v3.B;
 
-					//u * support
-					//v *
-					//w *
-
-					//cInfo.c1 = 
-					//cInfo.c2 =
-
-					//return cInfo;
+					return cInfo;
 				}
 
-				// (4) Add new faces to connect the new point
-				polytope.push_back(Triangle(minkowskiPoint, closest.v1, closest.v2));
-				polytope.push_back(Triangle(minkowskiPoint, closest.v1, closest.v3));
-				polytope.push_back(Triangle(minkowskiPoint, closest.v2, closest.v3));
+				// (3) Remove closest face
+				polytope.erase(std::remove(polytope.begin(), polytope.end(), closest), polytope.end());
+
+				// (4) Search for new support point in direction of the normal of closet face
+				SupportPoint newSupportPoint = Support(closest.n, shape1, shape2);
+
+				// (5) Add new faces to connect the new point
+				polytope.push_back(Triangle(newSupportPoint, closest.v1, closest.v2));
+				polytope.push_back(Triangle(newSupportPoint, closest.v1, closest.v3));
+				polytope.push_back(Triangle(newSupportPoint, closest.v2, closest.v3));
 
 				previousClosest = closest;
 			}

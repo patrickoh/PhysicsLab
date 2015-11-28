@@ -10,7 +10,7 @@ class GJK
 {
 	private:
 
-		glm::vec3 a, b, c, d;
+		SupportPoint a, b, c, d;
 		int nrPointsSimplex;
 
 	public:
@@ -28,7 +28,7 @@ class GJK
 		void Reset()
 		{
 			nrPointsSimplex = 0;
-			a = b = c = d = glm::vec3(0);
+			//a = b = c = d = glm::vec3(0);
 		}
 
 		#pragma region firsttry
@@ -58,7 +58,7 @@ class GJK
 		#pragma endregion
 
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool Intersects(Model* model1, Model* model2, std::vector<glm::vec3> &simplex)
+		bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplex)
 		{
 			Reset();
 
@@ -66,15 +66,15 @@ class GJK
 		
 			c = Support(dir, model1, model2);
 		 	
-			dir = -c;//negative direction
+			dir = -c.AB;//negative direction
 
 			b = Support(dir, model1, model2);
 
-			if (glm::dot(b, dir) < 0)
+			if (glm::dot(b.AB, dir) < 0)
 			{
 				return false;
 			}
-			dir = doubleCross(c - b, -b);
+			dir = doubleCross(c.AB - b.AB, -b.AB);
 	 
 			nrPointsSimplex = 2; //begin with 2 points in simplex
 	
@@ -82,7 +82,7 @@ class GJK
 			while (steps<50)
 			{
 				a = Support(dir, model1, model2);
-				if (glm::dot(a, dir) < 0)
+				if (glm::dot(a.AB, dir) < 0)
 				{
 					return false;
 				}
@@ -130,9 +130,9 @@ class GJK
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool triangle(glm::vec3& dir)
 		{
-			glm::vec3 ao = glm::vec3(-a.x, -a.y, -a.z);
-			glm::vec3 ab = b - a;
-			glm::vec3 ac = c - a;
+			glm::vec3 ao = glm::vec3(-a.AB.x, -a.AB.y, -a.AB.z);
+			glm::vec3 ab = b.AB - a.AB;
+			glm::vec3 ac = c.AB - a.AB;
 			glm::vec3 abc = glm::cross(ab, ac);
 
 			//point is can't be behind/in the direction of B,C or BC
@@ -198,9 +198,9 @@ class GJK
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool tetrahedron(glm::vec3& dir)
 		{
-			glm::vec3 ao = -a;//0-a
-			glm::vec3 ab = b - a;
-			glm::vec3 ac = c - a;
+			glm::vec3 ao = -a.AB;//0-a
+			glm::vec3 ab = b.AB - a.AB;
+			glm::vec3 ac = c.AB - a.AB;
 	 
 			//build abc triangle
 			glm::vec3 abc = glm::cross(ab, ac);
@@ -216,7 +216,7 @@ class GJK
 
 			//CASE 2:
 	 
-			glm::vec3 ad = d - a;
+			glm::vec3 ad = d.AB - a.AB;
 
 			//build acd triangle
 			glm::vec3 acd = glm::cross(ac, ad);

@@ -104,14 +104,17 @@ class RigidbodyManager
 		{
 			for(int i = 0; i < broadphasePairs.size(); i++)
 			{
-				std::vector<glm::vec3> simplex;
+				std::vector<SupportPoint> simplex;
 
 				if(gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex))
 				{
 					broadphasePairs[i].rb1->model->SetShaderProgramID(collidedShader);//temp
 					broadphasePairs[i].rb2->model->SetShaderProgramID(collidedShader);//
 
-					epa.getContactInfo(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex);
+					ContactInfo cInfo = epa.getContactInfo(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex);
+
+					//Collision Response
+
 				}
 			}
 

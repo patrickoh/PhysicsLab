@@ -4,13 +4,13 @@
 #include <vector>
 #include "Model.h"
 
-struct Support
+struct SupportPoint
 {
-	glm::vec3 AB;
+	glm::vec3 AB; //minkowski difference
 	glm::vec3 A;
 	glm::vec3 B;
 
-	Support()
+	SupportPoint()
 	{
 
 	}
@@ -50,11 +50,23 @@ glm::vec3 Support(glm::vec3 direction, std::vector<glm::vec3> shape1, std::vecto
 	return p1 - p2; //= max Dt ABij (furtest point along direction in minkowski difference)
 }
 
-glm::vec3 Support(glm::vec3 direction, Model* shape1, Model* shape2)
-{
-	glm::vec3 p1 = shape1->GetFurthestPointInDirection(direction);
-	glm::vec3 p2 = shape2->GetFurthestPointInDirection(-direction);
+//glm::vec3 Support(glm::vec3 direction, Model* shape1, Model* shape2)
+//{
+//	glm::vec3 p1 = shape1->GetFurthestPointInDirection(direction);
+//	glm::vec3 p2 = shape2->GetFurthestPointInDirection(-direction);
+//
+//	return p1 - p2; //= max Dt ABij (furtest point along direction in minkowski difference)
+//}
 
-	return p1 - p2; //= max Dt ABij (furtest point along direction in minkowski difference)
+SupportPoint Support(glm::vec3 direction, Model* shape1, Model* shape2)
+{
+	SupportPoint sp;
+
+	sp.A = shape1->GetFurthestPointInDirection(direction);
+	sp.B = shape2->GetFurthestPointInDirection(-direction);
+
+	sp.AB = sp.A - sp.B;
+
+	return sp; //= max Dt ABij (furtest point along direction in minkowski difference)
 }
 
