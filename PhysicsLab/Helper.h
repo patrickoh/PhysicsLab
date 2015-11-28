@@ -29,3 +29,6 @@ glm::quat quatFromAngularVelocityByTimestep(glm::vec3 w);
 glm::vec3 GetOGLPos(int x, int y, int WINDOW_WIDTH, int WINDOW_HEIGHT, glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
 glm::vec3 doubleCross(const glm::vec3& v1, const glm::vec3& v2);
 bool isCCW(glm::vec3 adjEdge1, glm::vec3 adjEdge2);
+glm::vec3 closestPointOnTriangle( const std::vector<glm::vec3> triangle, const glm::vec3 sourcePosition);
+float clamp(float x, float a, float b);
+glm::vec3 barycentric(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c);

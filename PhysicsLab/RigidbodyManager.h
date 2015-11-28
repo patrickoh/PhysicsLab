@@ -36,8 +36,8 @@ class RigidbodyManager
 	public:
 
 		//temp
-		static int shaderID1;
-		static int shaderID2;
+		static int normalShader;
+		static int collidedShader;
 
 		vector<RigidBody*> rigidBodies;
 
@@ -108,11 +108,10 @@ class RigidbodyManager
 
 				if(gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex))
 				{
-					broadphasePairs[i].rb1->model->SetShaderProgramID(shaderID2);//temp
-					broadphasePairs[i].rb2->model->SetShaderProgramID(shaderID2);//
+					broadphasePairs[i].rb1->model->SetShaderProgramID(collidedShader);//temp
+					broadphasePairs[i].rb2->model->SetShaderProgramID(collidedShader);//
 
 					epa.getContactInfo(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex);
-
 				}
 			}
 
@@ -124,7 +123,7 @@ class RigidbodyManager
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
 				//temp change color to white
-				rigidBodies[i]->model->SetShaderProgramID(shaderID1);//temp
+				rigidBodies[i]->model->SetShaderProgramID(normalShader);//temp
 
 				//if bouncy enclosure
 				{

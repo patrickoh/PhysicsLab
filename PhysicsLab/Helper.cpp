@@ -208,3 +208,127 @@ bool isCCW(glm::vec3 adjEdge1, glm::vec3 adjEdge2)
 {
 	return glm::dot(glm::cross(adjEdge1, adjEdge2), glm::vec3(0,0,1)) > 0;
 }
+
+//http://www.geometrictools.com/Documentation/DistancePoint3Triangle3.pdf
+glm::vec3 closestPointOnTriangle( const std::vector<glm::vec3> triangle, const glm::vec3 sourcePosition )
+{
+	glm::vec3 edge0 = triangle[1] - triangle[0];
+	glm::vec3 edge1 = triangle[2] - triangle[0];
+	glm::vec3 v0 = triangle[0] - sourcePosition;
+
+	float a = glm::dot(edge0, edge0);
+	float b = glm::dot(edge0, edge1);
+	float c = glm::dot(edge1, edge1);
+	float d = glm::dot(edge0, v0);
+	float e = glm::dot(edge1, v0);
+
+	float det = a*c - b*b;
+	float s = b*e - c*d;
+	float t = b*d - a*e;
+
+	if ( s + t < det )
+	{
+		if ( s < 0.f )
+		{
+			if ( t < 0.f )
+			{
+				if ( d < 0.f )
+				{
+					s = clamp( -d/a, 0.f, 1.f );
+					t = 0.f;
+				}
+				else
+				{
+					s = 0.f;
+					t = clamp( -e/c, 0.f, 1.f );
+				}
+			}
+			else
+			{
+				s = 0.f;
+				t = clamp( -e/c, 0.f, 1.f );
+			}
+		}
+		else if ( t < 0.f )
+		{
+			s = clamp( -d/a, 0.f, 1.f );
+			t = 0.f;
+		}
+		else
+		{
+			float invDet = 1.f / det;
+			s *= invDet;
+			t *= invDet;
+		}
+	}
+	else
+	{
+		if ( s < 0.f )
+		{
+			float tmp0 = b+d;
+			float tmp1 = c+e;
+			if ( tmp1 > tmp0 )
+			{
+				float numer = tmp1 - tmp0;
+				float denom = a-2*b+c;
+				s = clamp( numer/denom, 0.f, 1.f );
+				t = 1-s;
+			}
+			else
+			{
+				t = clamp( -e/c, 0.f, 1.f );
+				s = 0.f;
+			}
+		}
+		else if ( t < 0.f )
+		{
+			if ( a+d > b+e )
+			{
+				float numer = c+e-b-d;
+				float denom = a-2*b+c;
+				s = clamp( numer/denom, 0.f, 1.f );
+				t = 1-s;
+			}
+			else
+			{
+				s = clamp( -e/c, 0.f, 1.f );
+				t = 0.f;
+			}
+		}
+		else
+		{
+			float numer = c+e-b-d;
+			float denom = a-2*b+c;
+			s = clamp( numer/denom, 0.f, 1.f );
+			t = 1.f - s;
+		}
+	}
+
+	return triangle[0] + s * edge0 + t * edge1;
+}
+
+//http://www.gamedev.net/topic/473207-clamping-a-value-to-a-range-in-c-quickly/#entry4105200
+float clamp(float x, float a, float b)
+{
+	return x < a ? a : (x > b ? b : x);
+}
+
+// Compute barycentric coordinates/weights for
+// point p with respect to triangle (a, b, c)
+// (From Christer Ericson's Real-Time Collision Detection)
+glm::vec3 barycentric(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c) 
+{
+    glm::vec3 v0 = b - a, v1 = c - a, v2 = p - a;
+    float d00 = glm::dot(v0, v0);
+    float d01 = glm::dot(v0, v1);
+    float d11 = glm::dot(v1, v1);
+    float d20 = glm::dot(v2, v0);
+    float d21 = glm::dot(v2, v1);
+	float denom = (d00 * d11 - d01 * d01);
+	glm::vec3 bary;
+	bary.y = (d11 * d20 - d01 * d21) / denom; //v
+    bary.z = (d00 * d21 - d01 * d20) / denom; //w
+    bary.x = 1.f - bary.y - bary.z; //u
+   
+	return bary;
+}

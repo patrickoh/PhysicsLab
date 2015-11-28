@@ -138,8 +138,8 @@ BroadphaseMode broadphaseMode = BroadphaseMode::SAP1D;
 
 int currentLine = 0;
 
-int RigidbodyManager::shaderID1;
-int RigidbodyManager::shaderID2;
+int RigidbodyManager::normalShader;
+int RigidbodyManager::collidedShader;
 
 int main(int argc, char** argv)
 {
@@ -223,9 +223,9 @@ int main(int argc, char** argv)
 	RigidBody::angular = true;
 	RigidBody::linear = true;
 
-	RigidbodyManager::shaderID1 = shaderManager.GetShaderProgramID("red");
-	RigidbodyManager::shaderID2 = shaderManager.GetShaderProgramID("white");
-
+	RigidbodyManager::normalShader = shaderManager.GetShaderProgramID("white");
+	RigidbodyManager::collidedShader = shaderManager.GetShaderProgramID("red");
+	
 	for(int i = 1; i <= 2; i++)
 		AddADude(glm::vec3(i, 0, 0), false);
 
@@ -253,7 +253,7 @@ int main(int argc, char** argv)
 
 void AddADude(glm::vec3 position, bool moving)
 {
-	Model* m = new Model(position, glm::quat(), glm::vec3(0.1f), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white"), false, true);
+	Model* m = new Model(position, glm::quat(), glm::vec3(0.1f), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"), false, true);
 	RigidBody* rb = new RigidBody(m);
 	
 	if(moving)

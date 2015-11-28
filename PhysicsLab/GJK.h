@@ -17,7 +17,7 @@ class GJK
 
 		GJK()
 		{
-			//nrPointsSimplex = 0;
+
 		}
 
 		~GJK()
@@ -57,6 +57,7 @@ class GJK
 		//}
 		#pragma endregion
 
+		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool Intersects(Model* model1, Model* model2, std::vector<glm::vec3> &simplex)
 		{
 			Reset();
@@ -111,6 +112,7 @@ class GJK
 
 		}
 
+		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool ContainsOrigin(glm::vec3& dir)
 		{
 			if (nrPointsSimplex == 2)
@@ -125,6 +127,7 @@ class GJK
 			return false;
 		}
 
+		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool triangle(glm::vec3& dir)
 		{
 			glm::vec3 ao = glm::vec3(-a.x, -a.y, -a.z);
@@ -192,6 +195,7 @@ class GJK
 			return false;
 		}
 
+		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool tetrahedron(glm::vec3& dir)
 		{
 			glm::vec3 ao = -a;//0-a
@@ -258,6 +262,7 @@ class GJK
 
 		}
 
+		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
 		bool checkTetrahedron(const glm::vec3& ao,
 										const glm::vec3& ab,
 										const glm::vec3& ac,

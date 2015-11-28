@@ -4,6 +4,18 @@
 #include <vector>
 #include "Model.h"
 
+struct Support
+{
+	glm::vec3 AB;
+	glm::vec3 A;
+	glm::vec3 B;
+
+	Support()
+	{
+
+	}
+};
+
 //Support - furthest along in that direction 
 glm::vec3 Support(glm::vec3 direction, std::vector<glm::vec3> shape)
 {
