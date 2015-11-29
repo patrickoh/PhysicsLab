@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "RigidBody.h"
 #include <vector>
@@ -108,17 +108,57 @@ class RigidbodyManager
 
 				if(gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex))
 				{
-					broadphasePairs[i].rb1->model->SetShaderProgramID(collidedShader);//temp
-					broadphasePairs[i].rb2->model->SetShaderProgramID(collidedShader);//
+					RigidBody* rb1 = broadphasePairs[i].rb1;
+					RigidBody* rb2 = broadphasePairs[i].rb2;
 
-					ContactInfo cInfo = epa.getContactInfo(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex);
+					rb1->model->SetShaderProgramID(collidedShader);//temp
+					rb2->model->SetShaderProgramID(collidedShader);//
+
+					ContactInfo cInfo = epa.getContactInfo(rb1->model, rb2->model, simplex);
 
 					//Collision Response
+
+					float j = CalculateImpulse(rb1, rb2, cInfo.c1, cInfo.c2, cInfo.normal); 
+
+					//𝑱=𝑗 𝒏
+					glm::vec3 J = j * cInfo.normal;
+
+					//Δ𝑷=𝑱
+					rb1->momentum += J;
+					rb2->momentum -= J;
+
+					//Δ𝑳=(𝒓×𝑱)
+					rb1->angularMomentum += glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
+				
+					rb2->angularMomentum -= glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
 
 				}
 			}
 
 			broadphasePairs.clear();
+		}
+
+		float CalculateImpulse(RigidBody* rb1, RigidBody* rb2, glm::vec3 c1, glm::vec3 c2, glm::vec3 normal, float e = 1.0f)
+		{
+			//vec3 rA = (contact pt of A) - xA (centre of mass position of A)
+			glm::vec3 rA = c1 - rb1->model->worldProperties.translation; //Don't bother with com for the moment
+			glm::vec3 rB = c2 - rb2->model->worldProperties.translation;
+
+			float t1 = 1.0f / rb1->mass;
+			float t2 = 1.0f / rb2->mass;
+			float t3 = glm::dot(normal, glm::cross(rb1->getIntertialTensor() * glm::cross(rA, normal), rA));
+			float t4 = glm::dot(normal, glm::cross(rb2->getIntertialTensor() * glm::cross(rB, normal), rB));
+
+			glm::vec3 pA = rb1->velocity + glm::cross(rb1->angularVelocity, rA);
+			glm::vec3 pB = rb2->velocity + glm::cross(rb2->angularVelocity, rB);
+
+			float vrel = glm::dot(normal, pA - pB);
+	
+			float j = 0.0f;
+			if(vrel < 0.0f) 
+				j = std::max(0.0f, (-(1 + e) * vrel) / (t1 + t2 + t3 + t4) );
+
+			return j;
 		}
 
 		void Update(double deltaTime)

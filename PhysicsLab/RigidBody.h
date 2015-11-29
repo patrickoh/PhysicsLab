@@ -57,4 +57,10 @@ class RigidBody
 			for(int i = 0; i < verts->size(); i++)
 				verts->at(i) = verts->at(i) * glm::toMat3(orientation);
 		}
+
+		glm::mat3 getIntertialTensor()
+		{
+			return glm::transpose(glm::toMat3(model->worldProperties.orientation))
+				* glm::inverse(inertialTensor) * glm::toMat3(model->worldProperties.orientation);
+		}
 };

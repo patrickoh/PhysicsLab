@@ -268,7 +268,7 @@ void AddADude(glm::vec3 position, bool moving)
 
 void TW_CALL ApplyImpulse(void *clientData)
 {
-	//rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
+	rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
 }
 
 void TW_CALL ResetRB(void *clientData)
@@ -392,6 +392,11 @@ void HandleInput()
 		}
 
 		glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+	}
+
+	if(Input::leftClick)
+	{
+		rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
 	}
 
 	if(Input::wasKeyPressed)

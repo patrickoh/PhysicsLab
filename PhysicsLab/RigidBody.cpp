@@ -59,13 +59,13 @@ void RigidBody::StepPhysics(double deltaTime)
 		//v = P/m
 
 		//Momentum method
-		//model->worldProperties.translation += velocity * timestep;
-		//velocity = momentum / mass; //equals is bad :P
-		//momentum += forceNet * timestep;
+		model->worldProperties.translation += velocity * timestep;
+		velocity = momentum / mass; //equals is bad :P
+		momentum += forceNet * timestep;
 		
 		//Acceleration method
-		model->worldProperties.translation += velocity * timestep;
-		velocity += (mass * forceNet)/mass * timestep;
+		//model->worldProperties.translation += velocity * timestep;
+		//velocity += (mass * forceNet)/mass * timestep;
 	}
 
 	if(RigidBody::angular)
@@ -75,10 +75,10 @@ void RigidBody::StepPhysics(double deltaTime)
 		//L = Iw
 		//w = L/I
 		//I(t) - R(t) Ibody R(t)T 
+
+		/// <image <url="$(SolutionDir)\Images\one.png />
 	
-		angularVelocity = angularMomentum * 
-			glm::transpose(glm::toMat3(model->worldProperties.orientation))
-			* glm::inverse(inertialTensor) * glm::toMat3(model->worldProperties.orientation);
+		angularVelocity = angularMomentum * getIntertialTensor();
 		//angularVelocity = glm::vec3(0.0f, 0.0f, 1.0f);
 
 		model->worldProperties.orientation += 
