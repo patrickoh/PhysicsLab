@@ -58,7 +58,7 @@ class GJK
 		#pragma endregion
 
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplex)
+		bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplex, bool stepMode = false)
 		{
 			Reset();
 

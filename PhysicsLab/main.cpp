@@ -39,6 +39,7 @@
 #include "RigidbodyManager.h"
 
 #include "Input.h"
+#include "Gizmo.h"
 
 using namespace std;
 
@@ -141,6 +142,8 @@ int currentLine = 0;
 int RigidbodyManager::normalShader;
 int RigidbodyManager::collidedShader;
 
+Gizmo* giz;
+
 int main(int argc, char** argv)
 {
 	// Set up the window
@@ -211,7 +214,7 @@ int main(int argc, char** argv)
 
 	//glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
 	//cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
-	modelList.push_back(new Model(glm::vec3(0, 0, 5), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+	modelList.push_back(new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
 	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
 	//modelList.push_back(impulseVisualiser);
@@ -227,7 +230,7 @@ int main(int argc, char** argv)
 	RigidbodyManager::collidedShader = shaderManager.GetShaderProgramID("red");
 	
 	for(int i = 1; i <= 2; i++)
-		AddADude(glm::vec3(i, 0, 0), false);
+		AddADude(glm::vec3(0, 0, 0), false);
 
 	tweakBars["main"] = TwNewBar("Main");
 	TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
@@ -245,6 +248,11 @@ int main(int argc, char** argv)
 	TwAddVarRW(tweakBars["main2"], "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[1]->angularMomentum, "");
 	
 	//TODO? - Recalculate inertial tensor if mass changes
+
+	std::vector<glm::vec3> v; 
+	v.push_back(glm::vec3(0));
+	v.push_back(glm::vec3(0,10,0));
+	giz = new Gizmo(v);
 
 	glutMainLoop();
     
@@ -443,9 +451,14 @@ void draw()
 
 	viewMatrix = camera.GetViewMatrix();
 
-	DrawModels();
-
 	glm::mat4 MVP;
+
+	shaderManager.SetShaderProgram("white");
+	MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+	giz->Render(shaderManager.GetCurrentShaderProgramID());
+
+	DrawModels();
 
 	cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
 

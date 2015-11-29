@@ -11,6 +11,8 @@
 #include "GJK.h"
 #include "EPA.h"
 
+#include "Gizmo.h"
+
 struct RbPair
 {
 	RigidBody* rb1;
@@ -46,10 +48,19 @@ class RigidbodyManager
 
 		vector<RbPair> broadphasePairs; //Handed on to narrowphase stage
 
+		vector<Gizmo> gizmos;
+
+		bool bounceyEnclosure;
+
+		bool CR;
+
 		RigidbodyManager()
 		{
 			gjk = GJK();
 			epa = EPA();
+
+			bounceyEnclosure = true;
+			CR = false;
 		}
 
 		~RigidbodyManager(){}
@@ -117,20 +128,22 @@ class RigidbodyManager
 					ContactInfo cInfo = epa.getContactInfo(rb1->model, rb2->model, simplex);
 
 					//Collision Response
+					if(CR)
+					{
+						float j = CalculateImpulse(rb1, rb2, cInfo.c1, cInfo.c2, cInfo.normal); 
 
-					float j = CalculateImpulse(rb1, rb2, cInfo.c1, cInfo.c2, cInfo.normal); 
+						//𝑱=𝑗 𝒏
+						glm::vec3 J = j * cInfo.normal;
 
-					//𝑱=𝑗 𝒏
-					glm::vec3 J = j * cInfo.normal;
+						//Δ𝑷=𝑱
+						rb1->momentum += J;
+						rb2->momentum -= J;
 
-					//Δ𝑷=𝑱
-					rb1->momentum += J;
-					rb2->momentum -= J;
-
-					//Δ𝑳=(𝒓×𝑱)
-					rb1->angularMomentum += glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
+						//Δ𝑳=(𝒓×𝑱)
+						rb1->angularMomentum += glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
 				
-					rb2->angularMomentum -= glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
+						rb2->angularMomentum -= glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
+					}
 
 				}
 			}
@@ -168,7 +181,7 @@ class RigidbodyManager
 				//temp change color to white
 				rigidBodies[i]->model->SetShaderProgramID(normalShader);//temp
 
-				//if bouncy enclosure
+				if(bounceyEnclosure)
 				{
 					glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
 					glm::vec3 plane[] = { glm::vec3(0,-50,0), glm::vec3(0,50,0), glm::vec3(-50,0,0), glm::vec3(50,0,0), glm::vec3(0,0,50), glm::vec3(0,0,-50) };

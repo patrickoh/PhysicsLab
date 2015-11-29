@@ -107,7 +107,7 @@
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Keys.h" />
-    <ClInclude Include="Line.h" />
+    <ClInclude Include="Gizmo.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="RigidbodyManager.h" />
     <ClInclude Include="Shader.h" />
