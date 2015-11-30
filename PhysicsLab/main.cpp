@@ -230,7 +230,7 @@ int main(int argc, char** argv)
 	RigidbodyManager::collidedShader = shaderManager.GetShaderProgramID("red");
 	
 	for(int i = 1; i <= 2; i++)
-		AddADude(glm::vec3(0, 0, 0), false);
+		AddADude(glm::vec3(i * 5.0f, 0, 0), false);
 
 	tweakBars["main"] = TwNewBar("Main");
 	TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
@@ -378,13 +378,10 @@ void update()
 
 	//particleSystem.Update(deltaTime);
 
-	if(!pausedSim)
-	{
-		rigidBodyManager.Update(deltaTime);
+	rigidBodyManager.Update(deltaTime);
 		
-		rigidBodyManager.Broadphase(broadphaseMode);
-		rigidBodyManager.Narrowphase();
-	}
+	rigidBodyManager.Broadphase(broadphaseMode);
+	rigidBodyManager.Narrowphase();
 	
 	draw();
 }
@@ -403,9 +400,7 @@ void HandleInput()
 	}
 
 	if(Input::leftClick)
-	{
 		rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
-	}
 
 	if(Input::wasKeyPressed)
 	{
@@ -429,9 +424,10 @@ void HandleInput()
 		}
 
 		if(Input::keyPress == KEY::KEY_P || Input::keyPress == KEY::KEY_p)
-		{
 			pausedSim = !pausedSim;
-		}
+
+		if(Input::keyPress == KEY::KEY_J || Input::keyPress == KEY::KEY_j)
+			rigidBodyManager.stepGJKonce = true;
 
 		Input::wasKeyPressed = false;
 	}
@@ -441,6 +437,11 @@ void HandleInput()
 		//rigidBodyManager[0]->ApplyImpulse(cursorWorldSpace, camera.viewProperties.forward * RigidBody::forcePush);
 	
 	camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
+
+	if(Input::keyStates[KEY::KEY_G] || Input::keyStates[KEY::KEY_g])
+		rigidBodyManager.stepGJKcontinuous = true;
+	else
+		rigidBodyManager.stepGJKcontinuous = false;
 }
 
 //Draw loops through each 3d object, and switches to the correct shader for that object, and fill the uniform matrices with the up-to-date values,
@@ -474,7 +475,7 @@ void draw()
 		RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
 	}
 
-	//Enclosure
+	if(rigidBodyManager.bounceyEnclosure)
 	{
 		shaderManager.SetShaderProgram("red");
 		MVP = projectionMatrix * viewMatrix;

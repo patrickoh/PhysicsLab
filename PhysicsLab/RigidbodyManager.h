@@ -53,6 +53,11 @@ class RigidbodyManager
 		bool bounceyEnclosure;
 
 		bool CR;
+		bool paused;
+
+		bool debugGJK;
+		bool stepGJKcontinuous;
+		bool stepGJKonce;
 
 		RigidbodyManager()
 		{
@@ -61,6 +66,12 @@ class RigidbodyManager
 
 			bounceyEnclosure = true;
 			CR = false;
+
+			paused = false;
+
+			debugGJK = true;
+			stepGJKcontinuous = false;
+			stepGJKonce = false;
 		}
 
 		~RigidbodyManager(){}
@@ -117,34 +128,52 @@ class RigidbodyManager
 			{
 				std::vector<SupportPoint> simplex;
 
-				if(gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex))
+				if(debugGJK)
 				{
-					RigidBody* rb1 = broadphasePairs[i].rb1;
-					RigidBody* rb2 = broadphasePairs[i].rb2;
+					paused = true;
 
-					rb1->model->SetShaderProgramID(collidedShader);//temp
-					rb2->model->SetShaderProgramID(collidedShader);//
+					if(!stepGJKcontinuous && !stepGJKonce)
+						return;
 
-					ContactInfo cInfo = epa.getContactInfo(rb1->model, rb2->model, simplex);
+					if(stepGJKonce)
+						stepGJKonce = false;
+				}
 
-					//Collision Response
-					if(CR)
+				std::pair<bool, bool> result = gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex, debugGJK);
+
+				if(result.first) //GJK is finished
+				{
+					paused = false;
+
+					if(result.second) //GJK found an intersection
 					{
-						float j = CalculateImpulse(rb1, rb2, cInfo.c1, cInfo.c2, cInfo.normal); 
+						RigidBody* rb1 = broadphasePairs[i].rb1;
+						RigidBody* rb2 = broadphasePairs[i].rb2;
 
-						//𝑱=𝑗 𝒏
-						glm::vec3 J = j * cInfo.normal;
+						rb1->model->SetShaderProgramID(collidedShader);//temp
+						rb2->model->SetShaderProgramID(collidedShader);//
 
-						//Δ𝑷=𝑱
-						rb1->momentum += J;
-						rb2->momentum -= J;
+						ContactInfo cInfo = epa.getContactInfo(rb1->model, rb2->model, simplex);
 
-						//Δ𝑳=(𝒓×𝑱)
-						rb1->angularMomentum += glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
+						//Collision Response
+						if(CR)
+						{
+							float j = CalculateImpulse(rb1, rb2, cInfo.c1, cInfo.c2, cInfo.normal); 
+
+							//𝑱=𝑗 𝒏
+							glm::vec3 J = j * cInfo.normal;
+
+							//Δ𝑷=𝑱
+							rb1->momentum += J;
+							rb2->momentum -= J;
+
+							//Δ𝑳=(𝒓×𝑱)
+							rb1->angularMomentum += glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
 				
-						rb2->angularMomentum -= glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
-					}
+							rb2->angularMomentum -= glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
+						}
 
+					}
 				}
 			}
 
@@ -176,31 +205,34 @@ class RigidbodyManager
 
 		void Update(double deltaTime)
 		{
-			for (int i = 0; i < rigidBodies.size(); i++)
+			if(!paused)
 			{
-				//temp change color to white
-				rigidBodies[i]->model->SetShaderProgramID(normalShader);//temp
-
-				if(bounceyEnclosure)
+				for (int i = 0; i < rigidBodies.size(); i++)
 				{
-					glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
-					glm::vec3 plane[] = { glm::vec3(0,-50,0), glm::vec3(0,50,0), glm::vec3(-50,0,0), glm::vec3(50,0,0), glm::vec3(0,0,50), glm::vec3(0,0,-50) };
+					//temp change color to white
+					rigidBodies[i]->model->SetShaderProgramID(normalShader);//temp
 
-					for(int j = 0; j < 6; j++)
+					if(bounceyEnclosure)
 					{
-						if(glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) < 0.01f
-								&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
-						{
-							rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
-							rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+						glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
+						glm::vec3 plane[] = { glm::vec3(0,-50,0), glm::vec3(0,50,0), glm::vec3(-50,0,0), glm::vec3(50,0,0), glm::vec3(0,0,50), glm::vec3(0,0,-50) };
 
-							//velocity.y = -velocity.y;
+						for(int j = 0; j < 6; j++)
+						{
+							if(glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) < 0.01f
+									&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
+							{
+								rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
+								rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+
+								//velocity.y = -velocity.y;
+							}
 						}
 					}
-				}
 
-				rigidBodies[i]->StepPhysics(deltaTime); //physics update
-				rigidBodies[i]->Update(); //bookkeeping
+					rigidBodies[i]->StepPhysics(deltaTime); //physics update
+					rigidBodies[i]->Update(); //bookkeeping
+				}
 			}
 		}
 

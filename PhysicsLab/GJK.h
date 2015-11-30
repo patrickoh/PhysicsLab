@@ -13,11 +13,13 @@ class GJK
 		SupportPoint a, b, c, d;
 		int nrPointsSimplex;
 
+		bool firstrun;
+
 	public:
 
 		GJK()
 		{
-
+			firstrun = true;
 		}
 
 		~GJK()
@@ -28,7 +30,13 @@ class GJK
 		void Reset()
 		{
 			nrPointsSimplex = 0;
-			//a = b = c = d = glm::vec3(0);
+			
+			a = SupportPoint(); 
+			b = SupportPoint();
+			c = SupportPoint();
+			d = SupportPoint();
+			
+			firstrun = true;
 		}
 
 		#pragma region firsttry
@@ -58,9 +66,12 @@ class GJK
 		#pragma endregion
 
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplex, bool stepMode = false)
+		std::pair<bool, bool> Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplex, bool debugMode = false)
 		{
-			Reset();
+			if(debugMode)
+				return IntersectsStepVersion(model1, model2, simplex);
+
+			//Reset();
 
 			glm::vec3 dir = glm::vec3(1, 1, 1);
 		
@@ -72,19 +83,21 @@ class GJK
 
 			if (glm::dot(b.AB, dir) < 0)
 			{
-				return false;
+				Reset();
+				return make_pair(true, false);
 			}
 			dir = doubleCross(c.AB - b.AB, -b.AB);
 	 
 			nrPointsSimplex = 2; //begin with 2 points in simplex
 	
-			int steps = 0;//avoid infinite loop
+			int steps = 0;
 			while (steps<50)
 			{
 				a = Support(dir, model1, model2);
 				if (glm::dot(a.AB, dir) < 0)
 				{
-					return false;
+					Reset();
+					return make_pair(true, false);
 				}
 				else
 				{
@@ -96,20 +109,84 @@ class GJK
 						simplex.push_back(c);
 						simplex.push_back(d);
 
-						return true;
+						Reset();
+						return make_pair(true, true);
 					}
 				}
 				steps++;
 
 			}
 	
-			 return false;
+			Reset();
+			return make_pair(true, false);
+		}
+
+		//First bool is whether it is finished. Second bool is the actual result.
+		std::pair<bool, bool> IntersectsStepVersion(Model* model1, Model* model2, std::vector<SupportPoint> &simplex)
+		{
+			static int steps;
+
+			static glm::vec3 dir;
+			
+			if(firstrun)
+			{
+				steps = 0;
+
+				dir = glm::vec3(1, 1, 1);
+		
+				c = Support(dir, model1, model2);
+		 	
+				dir = -c.AB;//negative direction
+
+				b = Support(dir, model1, model2);
+
+				if (glm::dot(b.AB, dir) < 0)
+				{
+					Reset();
+					return make_pair(true, false);
+				}
+				dir = doubleCross(c.AB - b.AB, -b.AB);
+
+				nrPointsSimplex = 2; //begin with 2 points in simplex
+
+				firstrun = false;
+			}
+
+			while (steps<50)
+			{
+				a = Support(dir, model1, model2);
+				if (glm::dot(a.AB, dir) < 0)
+				{
+					Reset();
+					return make_pair(true, false);
+				}
+				else
+				{
+			 
+					if (ContainsOrigin(dir))
+					{
+						simplex.push_back(a);
+						simplex.push_back(b);
+						simplex.push_back(c);
+						simplex.push_back(d);
+
+						Reset();
+						return make_pair(true, true);
+					}
+				}
+				steps++;
+
+				return make_pair(false, false);
+			}
+	
+			Reset();
+			return make_pair(true, false);
 		}
 
 		//It's not neccessary to find the explicit Minkowski DIfference for GJK, however it may be handy for visualisation!
 		std::vector<glm::vec3> MinkowskiDifference(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2)
 		{
-
+	
 		}
 
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
