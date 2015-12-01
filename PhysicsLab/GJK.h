@@ -3,6 +3,7 @@
 #include "Common.h"
 #include <vector>
 #include "Support.h"
+#include "Point.h"
 
 //Gilbert Johnson Keerthi algorithm for determining whether or 
 //not two convex solids intersect
@@ -10,12 +11,14 @@ class GJK
 {
 	private:
 
-		SupportPoint a, b, c, d;
-		int nrPointsSimplex;
-
 		bool firstrun;
 
 	public:
+
+		SupportPoint a, b, c, d;
+
+		int nrPointsSimplex;
+		int steps;
 
 		GJK()
 		{
@@ -30,12 +33,6 @@ class GJK
 		void Reset()
 		{
 			nrPointsSimplex = 0;
-			
-			a = SupportPoint(); 
-			b = SupportPoint();
-			c = SupportPoint();
-			d = SupportPoint();
-			
 			firstrun = true;
 		}
 
@@ -71,7 +68,7 @@ class GJK
 			if(debugMode)
 				return IntersectsStepVersion(model1, model2, simplex);
 
-			//Reset();
+			Reset();
 
 			glm::vec3 dir = glm::vec3(1, 1, 1);
 		
@@ -82,21 +79,19 @@ class GJK
 			b = Support(dir, model1, model2);
 
 			if (glm::dot(b.AB, dir) < 0)
-			{
-				Reset();
+			{	
 				return make_pair(true, false);
 			}
 			dir = doubleCross(c.AB - b.AB, -b.AB);
 	 
 			nrPointsSimplex = 2; //begin with 2 points in simplex
 	
-			int steps = 0;
+			steps = 0;
 			while (steps<50)
 			{
-				a = Support(dir, model1, model2);
+				a = Support(dir, model1, model2); 
 				if (glm::dot(a.AB, dir) < 0)
 				{
-					Reset();
 					return make_pair(true, false);
 				}
 				else
@@ -109,7 +104,6 @@ class GJK
 						simplex.push_back(c);
 						simplex.push_back(d);
 
-						Reset();
 						return make_pair(true, true);
 					}
 				}
@@ -117,15 +111,12 @@ class GJK
 
 			}
 	
-			Reset();
 			return make_pair(true, false);
 		}
 
 		//First bool is whether it is finished. Second bool is the actual result.
 		std::pair<bool, bool> IntersectsStepVersion(Model* model1, Model* model2, std::vector<SupportPoint> &simplex)
 		{
-			static int steps;
-
 			static glm::vec3 dir;
 			
 			if(firstrun)
@@ -134,11 +125,11 @@ class GJK
 
 				dir = glm::vec3(1, 1, 1);
 		
-				c = Support(dir, model1, model2);
+				c = Support(dir, model1, model2); 
 		 	
 				dir = -c.AB;//negative direction
 
-				b = Support(dir, model1, model2);
+				b = Support(dir, model1, model2); 
 
 				if (glm::dot(b.AB, dir) < 0)
 				{
@@ -150,6 +141,8 @@ class GJK
 				nrPointsSimplex = 2; //begin with 2 points in simplex
 
 				firstrun = false;
+				
+				return(make_pair(false, false));
 			}
 
 			while (steps<50)
@@ -186,7 +179,13 @@ class GJK
 		//It's not neccessary to find the explicit Minkowski DIfference for GJK, however it may be handy for visualisation!
 		std::vector<glm::vec3> MinkowskiDifference(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2)
 		{
-	
+			std::vector<glm::vec3> minkowski;
+
+			for(int i = 0; i < shape1.size(); i++)
+				for(int j = 0; j < shape2.size(); j++)
+					minkowski.push_back(shape1[i] - shape2[j]);
+
+			return minkowski;
 		}
 
 		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
@@ -252,7 +251,7 @@ class GJK
 			if (glm::dot(abc, ao) > 0)
 			{
 				//base of tetrahedron
-				d = c;
+				d = c; 
 				c = b;
 				b = a;
 
@@ -262,7 +261,7 @@ class GJK
 			else
 			{
 				//upside down tetrahedron
-				d = b;
+				d = b; 
 				b = a;
 				dir = -abc;
 			}
@@ -384,7 +383,7 @@ class GJK
 			}
 
 			//build new tetrahedron with new base
-			d = c;
+			d = c; 
 			c = b;
 			b = a;
 

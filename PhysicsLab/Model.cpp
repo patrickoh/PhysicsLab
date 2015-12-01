@@ -16,6 +16,7 @@ Model::Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const c
 	this->wireframe = wireframe;
 
 	drawMe = true;
+	isColliding = false;
 }
 
 Model::~Model()

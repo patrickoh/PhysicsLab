@@ -83,6 +83,7 @@ class Model
 		
 		bool drawMe;
 		bool wireframe;
+		bool isColliding;
 
 		vector<glm::vec3> vertices;
 

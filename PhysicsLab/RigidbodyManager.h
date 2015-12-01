@@ -11,8 +11,6 @@
 #include "GJK.h"
 #include "EPA.h"
 
-#include "Gizmo.h"
-
 struct RbPair
 {
 	RigidBody* rb1;
@@ -32,14 +30,11 @@ class RigidbodyManager
 	private:
 		vector<AABB::EndPoint*> Axes[3];
 
-		GJK gjk;
 		EPA epa;
 
 	public:
 
-		//temp
-		static int normalShader;
-		static int collidedShader;
+		GJK* gjk;
 
 		vector<RigidBody*> rigidBodies;
 
@@ -48,20 +43,18 @@ class RigidbodyManager
 
 		vector<RbPair> broadphasePairs; //Handed on to narrowphase stage
 
-		vector<Gizmo> gizmos;
-
 		bool bounceyEnclosure;
-
 		bool CR;
 		bool paused;
 
 		bool debugGJK;
-		bool stepGJKcontinuous;
-		bool stepGJKonce;
+		bool stepGJK;
+
+		std::vector<glm::vec3> currentMinkowski;
 
 		RigidbodyManager()
 		{
-			gjk = GJK();
+			gjk = new GJK();
 			epa = EPA();
 
 			bounceyEnclosure = true;
@@ -70,8 +63,7 @@ class RigidbodyManager
 			paused = false;
 
 			debugGJK = true;
-			stepGJKcontinuous = false;
-			stepGJKonce = false;
+			stepGJK = false;
 		}
 
 		~RigidbodyManager(){}
@@ -116,13 +108,18 @@ class RigidbodyManager
 			else if (mode == BroadphaseMode::SAP1D)
 			{
 				SAP1D(Axis::X);
-				//SAP(axes);
+
+				/*std::vector<Axis> axes;
+				axes.push_back(Axis::X);
+				axes.push_back(Axis::Y);
+				axes.push_back(Axis::Z);
+				SAP(axes);*/
 			}
 	
 			QueryPerformance::Finish("Broadphase");
 		}
 
-		void Narrowphase()
+		void Narrowphase(double deltaTime)
 		{
 			for(int i = 0; i < broadphasePairs.size(); i++)
 			{
@@ -132,26 +129,26 @@ class RigidbodyManager
 				{
 					paused = true;
 
-					if(!stepGJKcontinuous && !stepGJKonce)
-						return;
+					if(!stepGJK)
+						continue;
 
-					if(stepGJKonce)
-						stepGJKonce = false;
+					if(stepGJK)
+						stepGJK = false;
 				}
 
-				std::pair<bool, bool> result = gjk.Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex, debugGJK);
+				std::pair<bool, bool> result = gjk->Intersects(broadphasePairs[i].rb1->model, broadphasePairs[i].rb2->model, simplex, debugGJK);
 
 				if(result.first) //GJK is finished
 				{
-					paused = false;
+				    paused = false;
 
 					if(result.second) //GJK found an intersection
 					{
 						RigidBody* rb1 = broadphasePairs[i].rb1;
 						RigidBody* rb2 = broadphasePairs[i].rb2;
 
-						rb1->model->SetShaderProgramID(collidedShader);//temp
-						rb2->model->SetShaderProgramID(collidedShader);//
+						rb1->model->isColliding = rb2->model->isColliding = true;
+						currentMinkowski = gjk->MinkowskiDifference(rb1->model->GetTransformedVertices(), rb2->model->GetTransformedVertices());
 
 						ContactInfo cInfo = epa.getContactInfo(rb1->model, rb2->model, simplex);
 
@@ -209,8 +206,7 @@ class RigidbodyManager
 			{
 				for (int i = 0; i < rigidBodies.size(); i++)
 				{
-					//temp change color to white
-					rigidBodies[i]->model->SetShaderProgramID(normalShader);//temp
+					rigidBodies[i]->model->isColliding = false;
 
 					if(bounceyEnclosure)
 					{

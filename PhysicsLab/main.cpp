@@ -39,7 +39,11 @@
 #include "RigidbodyManager.h"
 
 #include "Input.h"
-#include "Gizmo.h"
+
+#include "Line.h"
+#include "Point.h"
+
+#include "Tetrahedron.h"
 
 using namespace std;
 
@@ -53,6 +57,7 @@ void HandleInput();
 void DrawModels();
 void DrawBoundings();
 void DrawParticles();
+void DrawDebug();
 
 void InitTweakBar();
 void InitTweakBar2();
@@ -116,8 +121,6 @@ std::map<std::string, sint64> QueryPerformance::results;
 int broadphaseResultCounter = 0;
 sint64 broadphaseResults = 0;
 
-bool pausedSim = false;
-
 Input input;
 
 bool Input::directionKeys[4] = { false }; 
@@ -139,10 +142,12 @@ BroadphaseMode broadphaseMode = BroadphaseMode::SAP1D;
 
 int currentLine = 0;
 
-int RigidbodyManager::normalShader;
-int RigidbodyManager::collidedShader;
+//Debug drawing variables
+Point* origin;
 
-Gizmo* giz;
+std::vector<Point*> gjkSimplex;
+Tetrahedron* gjkTetra;
+std::vector<Point*> minkowskiDifferencePoints;
 
 int main(int argc, char** argv)
 {
@@ -192,11 +197,14 @@ int main(int argc, char** argv)
     }
 	#pragma endregion 
 
-	glClearColor(5.0/255.0, 5.0/255.0, 5.0/255.0, 1);
+	glClearColor(155.0/255.0, 155.0/255.0, 155.0/255.0, 1);
 	glEnable (GL_CULL_FACE); // cull face 
 	glCullFace (GL_BACK); // cull back face 
 	glFrontFace (GL_CCW); // GL_CCW for counter clock-wise
 	glEnable(GL_DEPTH_TEST);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable( GL_BLEND );
 
 	projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
 
@@ -205,29 +213,22 @@ int main(int argc, char** argv)
 
 	shaderManager.Init(); //TODO - constructor for shader
 	shaderManager.CreateShaderProgram("diffuse", "Shaders/diffuse.vs", "Shaders/diffuse.ps");
-	shaderManager.CreateShaderProgram("black", "Shaders/diffuse.vs", "Shaders/black.ps");
-	shaderManager.CreateShaderProgram("white", "Shaders/diffuse.vs", "Shaders/white.ps");
-	shaderManager.CreateShaderProgram("red", "Shaders/diffuse.vs", "Shaders/red.ps");
-	shaderManager.CreateShaderProgram("text", "Shaders/diffuse.vs", "Shaders/white.ps");
 	shaderManager.CreateShaderProgram("particle", "Shaders/particle.vs", "Shaders/particle.ps");
 	shaderManager.CreateShaderProgram("bounding", "Shaders/diffuse.vs", "Shaders/bounding.ps");
 
+	origin = new Point(glm::vec3(0));
+
 	//glm::quat cactuarFix = glm::angleAxis(-90.0f, glm::vec3(0,0,1));
 	//cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
-	modelList.push_back(new Model(glm::vec3(0, 0, 0), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+	modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("red"));
+	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding")); //TODO change to sphere
 	//modelList.push_back(impulseVisualiser);
-
-	modelList.push_back(new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("white")));
 
 	RigidBody::impulseVisualiser = impulseVisualiser;
 	RigidBody::forcePush = 1.0f;
 	RigidBody::angular = true;
 	RigidBody::linear = true;
-
-	RigidbodyManager::normalShader = shaderManager.GetShaderProgramID("white");
-	RigidbodyManager::collidedShader = shaderManager.GetShaderProgramID("red");
 	
 	for(int i = 1; i <= 2; i++)
 		AddADude(glm::vec3(i * 5.0f, 0, 0), false);
@@ -249,10 +250,22 @@ int main(int argc, char** argv)
 	
 	//TODO? - Recalculate inertial tensor if mass changes
 
-	std::vector<glm::vec3> v; 
-	v.push_back(glm::vec3(0));
-	v.push_back(glm::vec3(0,10,0));
-	giz = new Gizmo(v);
+	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->a.AB));
+	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->b.AB));
+	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->c.AB));
+	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->d.AB));
+
+	glm::vec3 v1 = glm::vec3(0,1,0);
+	glm::vec3 v2 = glm::vec3(1,0,1);
+	glm::vec3 v3 = glm::vec3(0,0,1);
+	glm::vec3 v4 = glm::vec3(1,0,0);
+	std::vector<glm::vec3> vec;
+	vec.push_back(v1);
+	vec.push_back(v2);
+	vec.push_back(v3);
+	vec.push_back(v4);
+
+	gjkTetra = new Tetrahedron(vec);
 
 	glutMainLoop();
     
@@ -312,7 +325,7 @@ void SetUpMainTweakBar()
 
 	TwAddSeparator(bar, "", ""); //=======================================================
 
-	TwAddVarRW(bar, "Pause simulation", TW_TYPE_BOOL8, &pausedSim, "");
+	TwAddVarRW(bar, "Pause simulation", TW_TYPE_BOOL8, &rigidBodyManager.paused, "");
 
 	TwAddSeparator(bar, "", ""); //=======================================================
 
@@ -381,7 +394,7 @@ void update()
 	rigidBodyManager.Update(deltaTime);
 		
 	rigidBodyManager.Broadphase(broadphaseMode);
-	rigidBodyManager.Narrowphase();
+	rigidBodyManager.Narrowphase(deltaTime);
 	
 	draw();
 }
@@ -424,10 +437,10 @@ void HandleInput()
 		}
 
 		if(Input::keyPress == KEY::KEY_P || Input::keyPress == KEY::KEY_p)
-			pausedSim = !pausedSim;
+			rigidBodyManager.paused = !rigidBodyManager.paused;
 
 		if(Input::keyPress == KEY::KEY_J || Input::keyPress == KEY::KEY_j)
-			rigidBodyManager.stepGJKonce = true;
+			rigidBodyManager.stepGJK= true;
 
 		Input::wasKeyPressed = false;
 	}
@@ -437,11 +450,6 @@ void HandleInput()
 		//rigidBodyManager[0]->ApplyImpulse(cursorWorldSpace, camera.viewProperties.forward * RigidBody::forcePush);
 	
 	camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
-
-	if(Input::keyStates[KEY::KEY_G] || Input::keyStates[KEY::KEY_g])
-		rigidBodyManager.stepGJKcontinuous = true;
-	else
-		rigidBodyManager.stepGJKcontinuous = false;
 }
 
 //Draw loops through each 3d object, and switches to the correct shader for that object, and fill the uniform matrices with the up-to-date values,
@@ -449,16 +457,14 @@ void HandleInput()
 void draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	
+	TwDraw(); // Draw tweak bars
 
 	viewMatrix = camera.GetViewMatrix();
 
 	glm::mat4 MVP;
 
-	shaderManager.SetShaderProgram("white");
-	MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
-	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-	giz->Render(shaderManager.GetCurrentShaderProgramID());
-
+	DrawDebug();
 	DrawModels();
 
 	cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
@@ -477,21 +483,64 @@ void draw()
 
 	if(rigidBodyManager.bounceyEnclosure)
 	{
-		shaderManager.SetShaderProgram("red");
+		shaderManager.SetShaderProgram("bounding");
 		MVP = projectionMatrix * viewMatrix;
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
 		glutWireCube(50);
 	}
 
 	DrawBoundings();
 	DrawParticles();
 
-    TwDraw(); // Draw tweak bars
-
 	if(printText)
 		printouts();
 
 	glutSwapBuffers();
+}
+
+void DrawDebug()
+{
+	glm::mat4 MVP;
+	shaderManager.SetShaderProgram("bounding");
+	MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
+	origin->Render(5.0f);
+
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+	Line line(glm::vec3(0, 2.0f, 0.0f), glm::vec3(0,10.0f,0));
+	line.Render();
+
+	Point point(glm::vec3(0, 2.0f, 0.0f));
+	point.Render(10.0f);
+
+	if(rigidBodyManager.debugGJK)
+	{
+		gjkSimplex[0]->Update(rigidBodyManager.gjk->a.AB);
+		gjkSimplex[1]->Update(rigidBodyManager.gjk->b.AB);
+		gjkSimplex[2]->Update(rigidBodyManager.gjk->c.AB);
+		gjkSimplex[3]->Update(rigidBodyManager.gjk->d.AB);
+
+		for(Point* p : gjkSimplex)
+			p->Render(5.0f);
+
+		gjkTetra->Update(rigidBodyManager.gjk->a.AB, rigidBodyManager.gjk->b.AB,
+			rigidBodyManager.gjk->c.AB, rigidBodyManager.gjk->d.AB);
+
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.1f,0.1f,0.2f));
+		gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), false);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+		gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), true);
+
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
+		for(int i = 0; i < rigidBodyManager.currentMinkowski.size(); i++)
+		{
+			Point p(rigidBodyManager.currentMinkowski[i]);
+			p.Render(5.0f);
+		}
+	}	
 }
 
 void DrawModels()
@@ -500,17 +549,30 @@ void DrawModels()
 	{
 		if (modelList[i]->drawMe)
 		{
-			shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
-			
 			glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
-			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
 			
-			modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+			if(modelList[i]->isColliding)
+			{
+				shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("bounding"));
+				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
+				modelList.at(i)->Render(shaderManager.GetShaderProgramID("bounding"));
+			}
+			else
+			{
+				shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
+				ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
+				modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+			}
+				
 
-			//TODO - dedicated shader
-			shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("black"));
-			ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
-			modelList.at(i)->Render(shaderManager.GetShaderProgramID("black"), true);
+			shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("bounding"));
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+				//if(modelList.at(i)->isColliding)
+					//ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
+				//else
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+			modelList.at(i)->Render(shaderManager.GetShaderProgramID("bounding"), true);
 		}
 	}	
 }
@@ -532,10 +594,10 @@ void DrawBoundings()
 					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale)
 					* rigidBodyManager[i]->model->globalInverseTransform
 					* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->boundingSphere->centre);
-		
+			
 			ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
 			ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->boundingSphere->colour);
-
+			
 			rigidBodyManager[i]->boundingSphere->draw();
 		}
 
@@ -577,7 +639,7 @@ void printouts()
 	ss << " Press 'c' to switch camera modes";
 	printStream();
 
-	ss << " sim paused: " << pausedSim;
+	ss << " sim paused: " << rigidBodyManager.paused;
 	printStream();
 
 	printStream();
@@ -600,6 +662,12 @@ void printouts()
 	printStream();
 
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
+	printStream();
+
+	ss << "nrpointssimplex: " << rigidBodyManager.gjk->nrPointsSimplex;
+	printStream();
+
+	ss << "steps: " << rigidBodyManager.gjk->steps;
 	printStream();
 
 	currentLine = 0;

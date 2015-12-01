@@ -4,6 +4,8 @@
 #include <vector>
 #include "Model.h"
 
+#include "Point.h"
+
 struct SupportPoint
 {
 	glm::vec3 AB; //minkowski difference
@@ -12,7 +14,6 @@ struct SupportPoint
 
 	SupportPoint()
 	{
-
 	}
 };
 
