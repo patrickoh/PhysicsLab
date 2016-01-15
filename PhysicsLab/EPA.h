@@ -9,49 +9,37 @@
 #define EPA_MAX_ITERATIONS 100
 #define EPA_TOLERANCE .00001
 
-//The contact info comprises two contact points, penetration depth, and penetration direction (normal)
-struct ContactInfo
-{
-	glm::vec3 c1;
-	glm::vec3 c2;
-	float depth;
-	glm::vec3 normal;
-
-	ContactInfo(glm::vec3 p1, glm::vec3 p2, float p_depth, glm::vec3 norm) 
-		: c1(p1), c2(p2), depth(p_depth), normal(norm) 
-	{
-	}
-};
-
 //A face comprises three vertices and a surface normal
-struct Triangle
+struct TriangleEPA
 {
-	SupportPoint v1, v2, v3;
+	SupportPoint a, b, c;
 	glm::vec3 n;
 
-	Triangle(SupportPoint p_v1, SupportPoint p_v2, SupportPoint p_v3) : v1(p_v1), v2(p_v2), v3(p_v3)
+	TriangleEPA(SupportPoint p_v1, SupportPoint p_v2, SupportPoint p_v3) : a(p_v1), b(p_v2), c(p_v3)
 	{
 		//Winding needs to be CCW
 		//EPA retains winding of the simplex, so this is just to make sure the initial simplex is CCW
-		if(!isCCW(v1.AB, v2.AB))
+		/*if(!isCCW(v1.AB, v2.AB))
 		{
 			SupportPoint tmp = v1;
 			v1 = v3;
 			v3 = tmp;
-		}
+		}*/
 
-		n = glm::cross(v2.AB-v1.AB, v3.AB-v1.AB); //CCW winding assumed
-		n = glm::normalize(n);
+		n = glm::normalize(glm::cross(b.AB-a.AB, c.AB-a.AB)); //CCW winding assumed
+
+		if (n != n)
+			n = glm::vec3(0.0f);
 	}
 
-	Triangle(){}
+	TriangleEPA(){}
 
 	std::vector<glm::vec3> getPoints()
 	{
 		std::vector<glm::vec3> points;
-		points.push_back(v1.AB);
-		points.push_back(v2.AB);
-		points.push_back(v3.AB);
+		points.push_back(a.AB);
+		points.push_back(b.AB);
+		points.push_back(c.AB);
 		return points;
 	}
 
@@ -61,14 +49,48 @@ struct Triangle
 	}
 };
 
-//TODO - perhaps give them a unique id?
-bool operator==(const Triangle& left, const Triangle& right)
+struct Edge
 {
-	return left.v1.AB == right.v1.AB 
-		&& left.v2.AB == right.v2.AB 
-		&& left.v3.AB == right.v3.AB
+	SupportPoint p1,p2;
+
+	Edge(SupportPoint p1,SupportPoint p2)
+		: p1(p1),p2(p2)
+	{
+
+	}
+
+	bool operator== (const Edge& edge) const
+	{
+		return (edge.p1 == p1 && edge.p2 == p2) || (edge.p1 == p2 && edge.p2 == p1);
+	}
+};
+
+//TODO - perhaps give them a unique id?
+bool operator==(const TriangleEPA& left, const TriangleEPA& right)
+{
+	return left.a.AB == right.a.AB 
+		&& left.b.AB == right.b.AB 
+		&& left.c.AB == right.c.AB
 		&& left.n == right.n;
 }
+
+//The contact info comprises two contact points, penetration depth, and penetration direction (normal)
+struct ContactInfo
+{
+	glm::vec3 c1, c2;
+	float depth;
+	glm::vec3 normal;
+	TriangleEPA f;
+
+	ContactInfo(glm::vec3 p1, glm::vec3 p2, float p_depth, glm::vec3 norm) 
+		: c1(p1), c2(p2), depth(p_depth), normal(norm) 
+	{
+	}
+
+	ContactInfo()
+	{
+	}
+};
 
 //The EPA (Expanding Polytope Algorithm) computes the penetration depth, penetration vector, and contact points between two objects.
 //The goal of EPA is to find the closest face (to the origin) on the minkowski difference boundary.
@@ -83,14 +105,22 @@ bool operator==(const Triangle& left, const Triangle& right)
 class EPA
 {
 	private:
-		std::vector<Triangle> polytope;
-		//std::vector<glm::vec3> pointList;
 
+		std::vector<Edge> edges;
+		bool firstrun;
+		
 	public:
+		int steps;
+		std::vector<TriangleEPA> polytope;
+
+		glm::vec3 nsp; //for debugging purposes
 
 		EPA()
 		{
-			
+			firstrun = true;
+			steps = 0;
+
+			nsp = glm::vec3(0,100,0);
 		}
 
 		~EPA()
@@ -98,73 +128,146 @@ class EPA
 
 		}
 
-		ContactInfo getContactInfo(Model* shape1, Model* shape2, std::vector<SupportPoint> simplex) 
+		void Reset()
 		{
-			Reset();
+			polytope.clear();
+			edges.clear();
 
-			polytope.push_back(Triangle(simplex[0], simplex[1], simplex[2]));
-			polytope.push_back(Triangle(simplex[0], simplex[1], simplex[3]));
-			polytope.push_back(Triangle(simplex[0], simplex[2], simplex[3]));
-			polytope.push_back(Triangle(simplex[1], simplex[2], simplex[3]));
+			firstrun = true;
+			steps = 0;
+		}
+
+		ContactInfo getContactInfo(Model* shape1, Model* shape2, std::vector<SupportPoint> simplex, bool& finished, bool debug = false) 
+		{
+			if(!debug || firstrun)
+			{
+				SupportPoint A = simplex[3];
+				SupportPoint B = simplex[2];
+				SupportPoint C = simplex[1];
+				SupportPoint D = simplex[0]; 
+
+				polytope.push_back(TriangleEPA(A,B,C));
+				polytope.push_back(TriangleEPA(A,C,D));
+				polytope.push_back(TriangleEPA(A,D,B));
+				polytope.push_back(TriangleEPA(B,D,C));
+
+				firstrun = false;
+			}
 
 			ContactInfo cInfo(glm::vec3(0), glm::vec3(0), 0.0f, glm::vec3(0,0,1)); //tmp
+			TriangleEPA closest;
 
-			Triangle closest, previousClosest;
-
-			for(int i = 0; i < EPA_MAX_ITERATIONS; i++)
+			while(steps < EPA_MAX_ITERATIONS)
 			{
-				// (1) Pick closest face of polytope to origin
-				closest = findClosestFace();
+				// Get the closest face of the polytope to the origin
+				closest = FindClosestFace();
 
-				// (3) Check if the new closest 
-				float d = closest.getDistance(glm::vec3(0));
-				if(i != 0 && d - previousClosest.getDistance(glm::vec3(0)) < EPA_TOLERANCE)
+				glm::vec3 direction = glm::normalize(closest.n);
+				if (glm::dot(direction, closest.a.AB) <= 0.0f) //if direction vector projection along vector AB is negative, it's facing the wrong way
+					direction = -direction;
+
+				//Search for furthest support point in direction of the normal of closest face
+				SupportPoint newSupportPoint = Support(/*closest.n*/ direction, shape1, shape2);
+
+				//Check the distance from the origin to the edge 
+				// against the distance the new support point is along the normal of the closest face
+				float d = glm::dot(closest.n, newSupportPoint.AB);	
+				
+				//if(d - closest.getDistance(glm::vec3(0)) < EPA_TOLERANCE) //Tolerance positive close to zero
+				if(glm::dot(newSupportPoint.AB - closest.a.AB, closest.n) - glm::dot(closest.a.AB, closest.n) < EPA_TOLERANCE) 
 				{
+					//If the distance is less than the tolerance then we can assume that the simplex cannot expand any further.
+					//Slightly above zero to avoid as an approximation is okay for a CSO with a high resolution
+
 					//calculatue barycentric coords of the closest tri with respect to proj of the origin onto the face
-					glm::vec3 bary = barycentric(glm::vec3(0), closest.v1.AB, closest.v2.AB, closest.v3.AB);
+					glm::vec3 bary = barycentric(glm::vec3(0), closest.a.AB, closest.b.AB, closest.c.AB); 
 
 					cInfo.depth = d; //the penetration depth is the distance between the closest minkowski facet and the origin
 					cInfo.normal = closest.n; // the normal of the contact is the normal of the closest minkowski facet
 
-					cInfo.c1 = bary.x/*u*/ * closest.v1.A
-						+ bary.y/*v*/ * closest.v2.A
-						+ bary.z/*w*/ * closest.v3.A;
+					cInfo.c1 = bary.x/*u*/ * closest.a.A
+						+ bary.y/*v*/ * closest.b.A
+						+ bary.z/*w*/ * closest.c.A;
 
-					cInfo.c2 = bary.x * closest.v1.B
-						+ bary.y * closest.v2.B
-						+ bary.z * closest.v3.B;
+					cInfo.c2 = bary.x * closest.a.B
+						+ bary.y * closest.b.B
+						+ bary.z * closest.c.B;
 
+					cInfo.f = closest;
+
+					Reset();
+					finished = true;
 					return cInfo;
 				}
+					
+				ExpandPolytope(newSupportPoint);
 
-				// (3) Remove closest face
-				polytope.erase(std::remove(polytope.begin(), polytope.end(), closest), polytope.end());
+				steps++;
+				nsp = newSupportPoint.AB;
 
-				// (4) Search for new support point in direction of the normal of closet face
-				SupportPoint newSupportPoint = Support(closest.n, shape1, shape2);
-
-				// (5) Add new faces to connect the new point
-				polytope.push_back(Triangle(newSupportPoint, closest.v1, closest.v2));
-				polytope.push_back(Triangle(newSupportPoint, closest.v1, closest.v3));
-				polytope.push_back(Triangle(newSupportPoint, closest.v2, closest.v3));
-
-				previousClosest = closest;
+				if(debug)
+				{
+					finished = false;
+					return cInfo;
+				}
 			}
 
+			Reset();
+			finished = true;
 			return cInfo;
 		}
 
 
-	private:
-		void Reset()
+		//Remove faces from the polytope that can be "seen" by the new support point
+		//Add new faces that cover up the hole. The new faces all share the new support point as a common vertex.
+		void ExpandPolytope(SupportPoint newSupportPoint)
 		{
-			polytope.clear();
-			//pointList.clear();
+			for (int i = polytope.size() - 1; i >= 0 ; i--)
+			{
+				TriangleEPA triangle = polytope[i];
+			
+				bool canBeSeen = isSameDirection(newSupportPoint.AB - triangle.a.AB, triangle.n); //All triangles that can be seen are removed to perserve convexity
+				
+				if (canBeSeen) 
+				{ 
+					//Add the edges of the "hole"
+					AddEdge(Edge(triangle.a, triangle.b));
+					AddEdge(Edge(triangle.b, triangle.c));
+					AddEdge(Edge(triangle.c, triangle.a));
+					
+					//Remove the face
+					polytope.erase(polytope.begin() + i);
+				}
+			}
+
+			//Patch up the hole
+			for (auto edge : edges)
+			{
+				polytope.push_back(TriangleEPA(newSupportPoint, edge.p1, edge.p2));
+			}
+
+			edges.clear(); 
 		}
 
-		Triangle findClosestFace()
+		//When an edge is added to the edge list, if the opposite edge already exists, then that edge is shared by two of the faces that are to be removed, and
+		//therefore is not used for closing up the gap.
+		void AddEdge(Edge edge)
 		{
-			Triangle closest;
+			 for(auto it = edges.begin(); it != edges.end(); it++) 
+			 {
+				 if(*it == edge) 
+				 {
+					 edges.erase(it);
+					 return;
+				 }
+			 }
+
+			 edges.push_back(edge);
+		}
+
+		TriangleEPA FindClosestFace()
+		{
+			TriangleEPA closest;
 			float min = std::numeric_limits<float>::max();
 
 			for(int i = 0; i < polytope.size(); i++)

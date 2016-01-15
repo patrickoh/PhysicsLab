@@ -7,6 +7,8 @@
 
 //Gilbert Johnson Keerthi algorithm for determining whether or 
 //not two convex solids intersect
+
+//Implementation based on the mollyrocket.com/849 video
 class GJK
 {
 	private:
@@ -15,14 +17,15 @@ class GJK
 
 	public:
 
-		SupportPoint a, b, c, d;
-
-		int nrPointsSimplex;
+		std::vector<SupportPoint> simplex;  //a simplex is simply a list of points that form an n-dimensional construct
+		
 		int steps;
+		glm::vec3 dir; //now a member variable for debug purposes
 
 		GJK()
 		{
 			firstrun = true;
+			steps = 0;
 		}
 
 		~GJK()
@@ -32,366 +35,236 @@ class GJK
 
 		void Reset()
 		{
-			nrPointsSimplex = 0;
 			firstrun = true;
-		}
-
-		#pragma region firsttry
-		//bool Intersects(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2)
-		//{
-			//std::vector<glm::vec3> simplex; //a simplex is simply a list of points that form an n-dimensional construct
-
-			////arbitrary starting direction to get the ball rolling
-			//glm::vec3 dir = glm::vec3(0,1,0);
-			//simplex.push_back(Support(dir, shape1, shape2)); //Go as far as possible in search direction
-
-			//dir = -dir; //Go in opposite direction (far side of origin)
-
-			//for (int i = 0; i < 50; i++) //allow 50 iterations to converge
-			//{
-			//	glm::vec3 A = Support(dir, shape1, shape2);
-
-			//	if(glm::dot(A, dir) < 0) //Didn't reach the origin i.e. no intersection (can't enclose the origin)
-			//		return false;
-
-			//	if(Update(simplex, dir)) //Returns true if the new point results in a simplex which encloses the origin
-			//		return true;
-			//}
-
-			//return false;
-		//}
-		#pragma endregion
-
-		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		std::pair<bool, bool> Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplex, bool debugMode = false)
-		{
-			if(debugMode)
-				return IntersectsStepVersion(model1, model2, simplex);
-
-			Reset();
-
-			glm::vec3 dir = glm::vec3(1, 1, 1);
-		
-			c = Support(dir, model1, model2);
-		 	
-			dir = -c.AB;//negative direction
-
-			b = Support(dir, model1, model2);
-
-			if (glm::dot(b.AB, dir) < 0)
-			{	
-				return make_pair(true, false);
-			}
-			dir = doubleCross(c.AB - b.AB, -b.AB);
-	 
-			nrPointsSimplex = 2; //begin with 2 points in simplex
-	
 			steps = 0;
-			while (steps<50)
-			{
-				a = Support(dir, model1, model2); 
-				if (glm::dot(a.AB, dir) < 0)
-				{
-					return make_pair(true, false);
-				}
-				else
-				{
-			 
-					if (ContainsOrigin(dir))
-					{
-						simplex.push_back(a);
-						simplex.push_back(b);
-						simplex.push_back(c);
-						simplex.push_back(d);
-
-						return make_pair(true, true);
-					}
-				}
-				steps++;
-
-			}
-	
-			return make_pair(true, false);
 		}
 
-		//First bool is whether it is finished. Second bool is the actual result.
-		std::pair<bool, bool> IntersectsStepVersion(Model* model1, Model* model2, std::vector<SupportPoint> &simplex)
+		bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplexForEPA, bool &finished, bool debug = false)
 		{
-			static glm::vec3 dir;
-			
-			if(firstrun)
+			if(!debug || firstrun)
 			{
-				steps = 0;
+				simplex.clear();
 
-				dir = glm::vec3(1, 1, 1);
-		
-				c = Support(dir, model1, model2); 
-		 	
-				dir = -c.AB;//negative direction
+				//arbitrary starting direction to get the ball rolling
+				dir = glm::vec3(1,0,0);
 
-				b = Support(dir, model1, model2); 
+				SupportPoint sp = Support(dir, model1, model2); //Go as far as possible in search direction
+				simplex.push_back(sp); 
 
-				if (glm::dot(b.AB, dir) < 0)
-				{
-					Reset();
-					return make_pair(true, false);
-				}
-				dir = doubleCross(c.AB - b.AB, -b.AB);
-
-				nrPointsSimplex = 2; //begin with 2 points in simplex
+				dir = -sp.AB; //Go in opposite direction (far side of origin)
+				//= glm::normalize(dir); 
 
 				firstrun = false;
-				
-				return(make_pair(false, false));
 			}
 
-			while (steps<50)
+			while(steps < 50)
 			{
-				a = Support(dir, model1, model2);
-				if (glm::dot(a.AB, dir) < 0)
+				SupportPoint A = Support(dir, model1, model2);
+
+				if(glm::dot(A.AB, dir) < 0)  //Didn't reach the origin i.e. no intersection (can't enclose the origin)
 				{
 					Reset();
-					return make_pair(true, false);
+					finished = true;
+					return false;
 				}
-				else
+
+				simplex.push_back(A);
+
+				if (ContainsOrigin(simplex, dir))  //Returns true if the new point results in a simplex which encloses the origin
 				{
-			 
-					if (ContainsOrigin(dir))
-					{
-						simplex.push_back(a);
-						simplex.push_back(b);
-						simplex.push_back(c);
-						simplex.push_back(d);
-
-						Reset();
-						return make_pair(true, true);
-					}
+					simplexForEPA = simplex;
+					Reset();
+					finished = true;
+					return true;
 				}
+
 				steps++;
-
-				return make_pair(false, false);
+				
+				if(debug)
+				{
+					finished = false;
+					return false;
+				}
 			}
-	
-			Reset();
-			return make_pair(true, false);
-		}
 
-		//It's not neccessary to find the explicit Minkowski DIfference for GJK, however it may be handy for visualisation!
-		std::vector<glm::vec3> MinkowskiDifference(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2)
-		{
-			std::vector<glm::vec3> minkowski;
-
-			for(int i = 0; i < shape1.size(); i++)
-				for(int j = 0; j < shape2.size(); j++)
-					minkowski.push_back(shape1[i] - shape2[j]);
-
-			return minkowski;
-		}
-
-		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool ContainsOrigin(glm::vec3& dir)
-		{
-			if (nrPointsSimplex == 2)
-			{
-				return triangle(dir);
-			}
-			else if (nrPointsSimplex == 3)
-			{
-				return tetrahedron(dir);
-			}
-	
+			finished = true;
 			return false;
 		}
 
-		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool triangle(glm::vec3& dir)
+		bool ContainsOrigin(vector<SupportPoint>& simplex, glm::vec3& direction)
 		{
-			glm::vec3 ao = glm::vec3(-a.AB.x, -a.AB.y, -a.AB.z);
-			glm::vec3 ab = b.AB - a.AB;
-			glm::vec3 ac = c.AB - a.AB;
-			glm::vec3 abc = glm::cross(ab, ac);
-
-			//point is can't be behind/in the direction of B,C or BC
-
-	
-			glm::vec3 ab_abc = glm::cross(ab, abc);
-			// is the origin away from ab edge? in the same plane
-			//if a0 is in that direction than
-			if (glm::dot(ab_abc, ao) > 0)
-			{
-				//change points
-				c = b;
-				b = a;
-
-				//dir is not ab_abc because it's not point towards the origin
-				dir = doubleCross(ab,ao);
-
-				//direction change; can't build tetrahedron
-				return false;
-			}
-
-	
-			glm::vec3 abc_ac = glm::cross(abc, ac); 
-
-			// is the origin away from ac edge? or it is in abc?
-			//if a0 is in that direction than
-			if (glm::dot(abc_ac, ao) > 0)
-			{
-				//keep c the same
-				b = a;
-
-				//dir is not abc_ac because it's not point towards the origin
-				dir = doubleCross(ac, ao);
+			//There are always at least 2 points in the simplex
 				
-				//direction change; can't build tetrahedron
-				return false;
+			if(simplex.size() == 2) //1-simplex (line)
+				return Line(simplex, direction);
+			else if (simplex.size() == 3) //2-simplex (triangle)
+				return Triangle(simplex, direction);
+			else if (simplex.size() == 4) //3-simplex (tetrahedron)		
+				return Tetrahedron(simplex, direction);
+
+			return false;
+		}
+
+		bool Line(vector<SupportPoint>& simplex, glm::vec3 &direction)
+		{
+			SupportPoint A = simplex[1]; // A is the point we just added, the direction that we moved
+			SupportPoint B = simplex[0]; // B is further from origin than A, because A went past the origin, so B cannot be the closest point
+
+			glm::vec3 AO = -A.AB;		//The line from A to the origin;
+			glm::vec3 AB = B.AB - A.AB;    
+
+			if (isSameDirection(AO, AB)) //AB and AO are in the same direction, therefore the origin is in the edge region.
+			{
+				direction = glm::cross(glm::cross(AB, AO), AB); //cross the two vectors twice to get the vector perpendicular to AB in the direction AO
+			}
+			else //A is closest feature to the origin
+			{	
+				direction = AO;
+							
+				simplex.clear();
+				simplex.push_back(A);
 			}
 
-			//now can build tetrahedron; check if it's above or below
-			if (glm::dot(abc, ao) > 0)
-			{
-				//base of tetrahedron
-				d = c; 
-				c = b;
-				b = a;
+			return false;
+		}
 
-				//new direction
-				dir = abc;
+		bool Triangle(vector<SupportPoint>& simplex, glm::vec3 &direction)
+		{
+			SupportPoint A = simplex[2]; //A is always the last point inserted into the simplex. Because of this, assumptions can be made as to which feature is closest to the origin.
+			SupportPoint B = simplex[1];
+			SupportPoint C = simplex[0];
+
+			glm::vec3 AO = -A.AB;
+			glm::vec3 AB = B.AB - A.AB;
+			glm::vec3 AC = C.AB - A.AB;
+
+			glm::vec3 ABC = glm::cross(AB, AC);
+
+			if (isSameDirection(glm::cross(ABC, AC), AO)) //Origin is in perpendicular direction of AC. This narrows down the closest feature to either AC, A, or AB
+			{
+				if (isSameDirection(AC, AO)) //The closest feature is AC
+				{
+					simplex.clear();
+					simplex.push_back(C);
+					simplex.push_back(A);
+
+					direction = glm::cross(glm::cross(AC, AO), AC); //perpendicular of AC facing in direction of origin
+				}
+				else
+				{
+					//*
+					if (isSameDirection(AB, AO)) //AB is the closest feature
+					{
+						simplex.clear();
+						simplex.push_back(B);
+						simplex.push_back(A);
+
+						direction = glm::cross(glm::cross(AB, AO), AB); //perpendicular of AB facing in direction of origin
+					}
+					else //A is the closest feature
+					{
+						simplex.clear();
+						simplex.push_back(A);
+						
+						direction = AO; //Search in direction from A to origin
+					}
+				}
 			}
 			else
 			{
-				//upside down tetrahedron
-				d = b; 
-				b = a;
-				dir = -abc;
+				if (isSameDirection(glm::cross(AB, ABC), AO)) 
+				{
+					//*
+					if (isSameDirection(AB,AO)) //AB is the closest feature
+					{
+						simplex.clear();
+						simplex.push_back(B);
+						simplex.push_back(A);
+						
+						direction = glm::cross(glm::cross(AB,AO), AB); //perpendicular of AB facing in direction of origin
+					}
+					else //A is the closest feature
+					{
+						simplex.clear();
+						simplex.push_back(A);
+						
+						direction = AO; //Search in direction from A to origin
+					}
+				}
+				else //the origin is above or below the triangle plane
+				{ 
+					if (isSameDirection(ABC, AO)) //Origin is above the triangle plane (i.e. direction of triangle's normal)
+					{
+						simplex.clear();
+						simplex.push_back(C);
+						simplex.push_back(B);
+						simplex.push_back(A);
+						
+						direction = ABC;
+					}
+					else //Origin is below the triangle plane (opposite direction of triangle's normal)
+					{
+						simplex.clear();
+						simplex.push_back(B);
+						simplex.push_back(C);
+						simplex.push_back(A);
+						
+						direction = -ABC;
+					}
+				}
 			}
-
-			nrPointsSimplex = 3;
-	
-			return false;
-		}
-
-		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool tetrahedron(glm::vec3& dir)
-		{
-			glm::vec3 ao = -a.AB;//0-a
-			glm::vec3 ab = b.AB - a.AB;
-			glm::vec3 ac = c.AB - a.AB;
-	 
-			//build abc triangle
-			glm::vec3 abc = glm::cross(ab, ac);
-
-			//CASE 1
-			if (glm::dot(abc, ao) > 0)
-			{
-				//in front of triangle ABC
-				//we don't have to change the ao,ab,ac,abc meanings
-				checkTetrahedron(ao,ab,ac,abc,dir);
-			}
-	 
-
-			//CASE 2:
-	 
-			glm::vec3 ad = d.AB - a.AB;
-
-			//build acd triangle
-			glm::vec3 acd = glm::cross(ac, ad);
-
-			//same direaction with ao
-			if (glm::dot(acd, ao) > 0)
-			{
-
-				//in front of triangle ACD
-				b = c;
-				c = d;
-				ab = ac;
-				ac = ad;
-				abc = acd;
-
-				checkTetrahedron(ao, ab, ac, abc, dir);
-			}
-
-			//build adb triangle
-			glm::vec3 adb = glm::cross(ad, ab);
-
-			//case 3:
-	 
-			//same direaction with ao
-			if (glm::dot(adb, ao) > 0)
-			{
-
-				//in front of triangle ADB
-
-				c = b;
-				b = d;
-
-				ac = ab;
-				ab = ad;
-
-				abc = adb;
-				checkTetrahedron(ao, ab, ac, abc, dir);
-			}
-
-
-			//origin in tetrahedron
-			return true;
-
-		}
-
-		//http://in2gpu.com/2014/05/18/gjk-algorithm-3d/
-		bool checkTetrahedron(const glm::vec3& ao,
-										const glm::vec3& ab,
-										const glm::vec3& ac,
-										const glm::vec3& abc,
-										glm::vec3& dir)
-		{
-	 
-			//almost the same like triangle checks
-			glm::vec3 ab_abc = glm::cross(ab, abc);
-
-			if (glm::dot(ab_abc, ao) > 0)
-			{
-				c = b;
-				b = a;
-
-				//dir is not ab_abc because it's not point towards the origin;
-				//ABxA0xAB direction we are looking for
-				dir = doubleCross(ab, ao);
-		 
-				//build new triangle
-				// d will be lost
-				nrPointsSimplex = 2;
-
-				return false;
-			}
-
-			glm::vec3 acp = glm::cross(abc, ac);
-
-			if (glm::dot(acp, ao) > 0)
-			{
-				b = a;
-
-				//dir is not abc_ac because it's not point towards the origin;
-				//ACxA0xAC direction we are looking for
-				dir = doubleCross(ac, ao);
-		 
-				//build new triangle
-				// d will be lost
-				nrPointsSimplex = 2;
-
-				return false;
-			}
-
-			//build new tetrahedron with new base
-			d = c; 
-			c = b;
-			b = a;
-
-			dir = abc;
-
-			nrPointsSimplex = 3;
 
 			return false;
+		}	
+
+		bool Tetrahedron(vector<SupportPoint>& simplex, glm::vec3 &direction)
+		{
+			SupportPoint A = simplex[3];
+			SupportPoint B = simplex[2];
+			SupportPoint C = simplex[1];
+			SupportPoint D = simplex[0];
+
+			glm::vec3 AO = -A.AB;
+			
+			glm::vec3 AB = B.AB - A.AB;
+			glm::vec3 AC = C.AB - A.AB;
+			glm::vec3 AD = D.AB - A.AB;
+
+			glm::vec3 ABC = glm::cross(AB, AC);
+			glm::vec3 ACD = glm::cross(AC, AD);
+			glm::vec3 ADB = glm::cross(AD, AB);
+
+			if (isSameDirection(ABC, AO)) //Origin is the the direction of the normal of ABC
+			{
+				simplex.clear();
+				simplex.push_back(C);
+				simplex.push_back(B);
+				simplex.push_back(A);
+					
+				return Triangle(simplex, direction);
+			}
+			else if (isSameDirection(ADB,AO)) //Origin is the the direction of the normal of ADB
+			{
+				simplex.clear(); 
+				simplex.push_back(B);
+				simplex.push_back(D);
+				simplex.push_back(A);
+
+				return Triangle(simplex, direction);
+			} 
+			else if (isSameDirection(ACD,AO)) //Origin is the the direction of the normal of ACD
+			{
+				simplex.clear(); 
+				simplex.push_back(D);
+				simplex.push_back(C);
+				simplex.push_back(A);
+
+				return Triangle(simplex, direction);
+			}
+
+			//Just 3 triangle checks, as the face BCD can't possibly be the closest feature as A was the last added point to the simplex.
+
+			return true; //The origin is INSIDE the tetrahedron
 		}
 };
 

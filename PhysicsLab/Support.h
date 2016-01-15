@@ -71,3 +71,10 @@ SupportPoint Support(glm::vec3 direction, Model* shape1, Model* shape2)
 	return sp; //= max Dt ABij (furtest point along direction in minkowski difference)
 }
 
+bool operator==(const SupportPoint& left, const SupportPoint& right)
+{
+	return left.AB == right.AB 
+		&& left.A == right.A 
+		&& left.B == right.B;
+}
+

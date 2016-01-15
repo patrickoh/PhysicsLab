@@ -332,3 +332,82 @@ glm::vec3 barycentric(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c)
    
 	return bary;
 }
+
+//https://github.com/tangrams/glmTools/
+std::vector<glm::vec3> getConvexHull(std::vector<glm::vec3> &pts){
+    std::vector<glm::vec3> hull;
+    glm::vec3 h1,h2,h3;
+    
+    if (pts.size() < 3) {
+        //std::cout << "Error: you need at least three points to calculate the convex hull" << std::endl;
+        return hull;
+    }
+    
+    std::sort(pts.begin(), pts.end(), &lexicalComparison);
+    
+    hull.push_back(pts.at(0));
+    hull.push_back(pts.at(1));
+    
+    int currentPoint = 2;
+    int direction = 1;
+    
+    for (int i=0; i<3000; i++) { //max 1000 tries
+        
+        hull.push_back(pts.at(currentPoint));
+        
+        // look at the turn direction in the last three points
+        h1 = hull.at(hull.size()-3);
+        h2 = hull.at(hull.size()-2);
+        h3 = hull.at(hull.size()-1);
+        
+        // while there are more than two points in the hull
+        // and the last three points do not make a right turn
+        while (!isRightTurn(h1, h2, h3) && hull.size() > 2) {
+            
+            // remove the middle of the last three points
+            hull.erase(hull.end() - 2);
+            
+            if (hull.size() >= 3) {
+                h1 = hull.at(hull.size()-3);
+            }
+            h2 = hull.at(hull.size()-2);
+            h3 = hull.at(hull.size()-1);
+        }
+        
+        // going through left-to-right calculates the top hull
+        // when we get to the end, we reverse direction
+        // and go back again right-to-left to calculate the bottom hull
+        if (currentPoint == pts.size() -1 || currentPoint == 0) {
+            direction = direction * -1;
+        }
+        
+        currentPoint+=direction;
+        
+        if (hull.front()==hull.back()) {
+            if(currentPoint == 3 && direction == 1){
+                currentPoint = 4;
+            } else {
+                break;
+            }
+        }
+    }
+    
+    return hull;
+}
+
+bool lexicalComparison(const glm::vec3 &_v1, const glm::vec3 &_v2) {
+    if (_v1.x > _v2.x) return true;
+    else if (_v1.x < _v2.x) return false;
+    else if (_v1.y > _v2.y) return true;
+    else return false;
+}
+
+bool isRightTurn(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c) {
+    // use the cross product to determin if we have a right turn
+    return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+}
+
+bool isSameDirection(glm::vec3 v1, glm::vec3 v2)
+{
+	return glm::dot(v1, v2) > 0.0f;
+}

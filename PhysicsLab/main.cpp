@@ -44,6 +44,7 @@
 #include "Point.h"
 
 #include "Tetrahedron.h"
+#include "Triangle.h"
 
 using namespace std;
 
@@ -58,6 +59,10 @@ void DrawModels();
 void DrawBoundings();
 void DrawParticles();
 void DrawDebug();
+
+void DrawGJK();
+void DrawEPA();
+void DrawContacts();
 
 void InitTweakBar();
 void InitTweakBar2();
@@ -144,10 +149,12 @@ int currentLine = 0;
 
 //Debug drawing variables
 Point* origin;
-
-std::vector<Point*> gjkSimplex;
 Tetrahedron* gjkTetra;
 std::vector<Point*> minkowskiDifferencePoints;
+
+bool bRenderImpulseVis = false;
+
+bool bClickImpulse = false;
 
 int main(int argc, char** argv)
 {
@@ -250,12 +257,8 @@ int main(int argc, char** argv)
 	
 	//TODO? - Recalculate inertial tensor if mass changes
 
-	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->a.AB));
-	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->b.AB));
-	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->c.AB));
-	gjkSimplex.push_back(new Point(rigidBodyManager.gjk->d.AB));
 
-	glm::vec3 v1 = glm::vec3(0,1,0);
+	glm::vec3 v1 = glm::vec3(0,8,0);
 	glm::vec3 v2 = glm::vec3(1,0,1);
 	glm::vec3 v3 = glm::vec3(0,0,1);
 	glm::vec3 v4 = glm::vec3(1,0,0);
@@ -363,6 +366,19 @@ void SetUpMainTweakBar()
 
 	TwAddButton(bar, "Reset2", ResetPerformanceCounter, NULL, "");
 	TwAddButton(bar, "Add Dude", AddDudeButton, NULL, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Debug GJK", TW_TYPE_BOOL8, &rigidBodyManager.debugGJK, "");
+	TwAddVarRW(bar, "Debug EPA", TW_TYPE_BOOL8, &rigidBodyManager.debugEPA, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Collision Response", TW_TYPE_BOOL8, &rigidBodyManager.CR, "");
+
+	TwAddSeparator(bar, "", ""); //=======================================================
+
+	TwAddVarRW(bar, "Click impulse", TW_TYPE_BOOL8, &bClickImpulse, "");
 }
 
 // GLUT CALLBACK FUNCTIONS
@@ -412,8 +428,8 @@ void HandleInput()
 		glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 	}
 
-	if(Input::leftClick)
-		rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
+	//if(Input::leftClick)
+		//rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
 
 	if(Input::wasKeyPressed)
 	{
@@ -440,14 +456,14 @@ void HandleInput()
 			rigidBodyManager.paused = !rigidBodyManager.paused;
 
 		if(Input::keyPress == KEY::KEY_J || Input::keyPress == KEY::KEY_j)
-			rigidBodyManager.stepGJK= true;
+			rigidBodyManager.stepDebug = true;
 
 		Input::wasKeyPressed = false;
 	}
 
 	////TODO - actually check which object it is hitting
-	//if(Input::leftClick)
-		//rigidBodyManager[0]->ApplyImpulse(cursorWorldSpace, camera.viewProperties.forward * RigidBody::forcePush);
+	if(Input::leftClick && bClickImpulse)
+		rigidBodyManager[0]->ApplyImpulse(cursorWorldSpace, camera.viewProperties.forward * RigidBody::forcePush);
 	
 	camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
 }
@@ -478,7 +494,8 @@ void draw()
 		MVP = projectionMatrix * viewMatrix * RigidBody::impulseVisualiser->GetModelMatrix(); //TODO - move these calculations to the graphics card?
 		ShaderManager::SetUniform(RigidBody::impulseVisualiser->GetShaderProgramID(), "mvpMatrix", MVP);
 			
-		RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
+		if(bRenderImpulseVis)
+			RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
 	}
 
 	if(rigidBodyManager.bounceyEnclosure)
@@ -501,46 +518,130 @@ void draw()
 
 void DrawDebug()
 {
-	glm::mat4 MVP;
+	glm::mat4 MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
+	
 	shaderManager.SetShaderProgram("bounding");
-	MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
 	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-
-	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
+	
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,1,1));
 	origin->Render(5.0f);
-
-	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
-	Line line(glm::vec3(0, 2.0f, 0.0f), glm::vec3(0,10.0f,0));
-	line.Render();
-
-	Point point(glm::vec3(0, 2.0f, 0.0f));
-	point.Render(10.0f);
+	
 
 	if(rigidBodyManager.debugGJK)
+		DrawGJK(); //todo (for each gjk...)
+
+	if(rigidBodyManager.debugEPA)
+		DrawEPA();
+
+	if(rigidBodyManager.bVisContacts)
+		DrawContacts();
+}
+
+void DrawGJK()
+{
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+	for(SupportPoint p : rigidBodyManager.gjk->simplex)
 	{
-		gjkSimplex[0]->Update(rigidBodyManager.gjk->a.AB);
-		gjkSimplex[1]->Update(rigidBodyManager.gjk->b.AB);
-		gjkSimplex[2]->Update(rigidBodyManager.gjk->c.AB);
-		gjkSimplex[3]->Update(rigidBodyManager.gjk->d.AB);
+		Point p(p.AB);
+		p.Render(5.0f);
+	}
 
-		for(Point* p : gjkSimplex)
-			p->Render(5.0f);
+	int simplexSize = rigidBodyManager.gjk->simplex.size();
+	
+	if(simplexSize == 2)
+	{
+		Line l(rigidBodyManager.gjk->simplex[0].AB, rigidBodyManager.gjk->simplex[1].AB);
+		l.Render();
+	}
+	else if(simplexSize == 3)
+	{	
+		Triangle t(rigidBodyManager.gjk->simplex[0].AB, 
+			rigidBodyManager.gjk->simplex[1].AB, rigidBodyManager.gjk->simplex[2].AB);
+			
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
+		t.Render();
 
-		gjkTetra->Update(rigidBodyManager.gjk->a.AB, rigidBodyManager.gjk->b.AB,
-			rigidBodyManager.gjk->c.AB, rigidBodyManager.gjk->d.AB);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+		t.Render(true);
 
-		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.1f,0.1f,0.2f));
+	}
+	else if(simplexSize == 4)
+	{
+		gjkTetra->Update(rigidBodyManager.gjk->simplex);
+
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
 		gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), false);
+		
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
 		gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), true);
+	}
 
-		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
-		for(int i = 0; i < rigidBodyManager.currentMinkowski.size(); i++)
-		{
-			Point p(rigidBodyManager.currentMinkowski[i]);
-			p.Render(5.0f);
-		}
-	}	
+	/*ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
+	for(int i = 0; i < rigidBodyManager.currentMinkowski.size(); i++)
+	{
+		Point p(rigidBodyManager.currentMinkowski[i]);
+		p.Render(7.5f);
+	}*/
+}
+
+void DrawEPA()
+{
+	std::vector<TriangleEPA> polytope = rigidBodyManager.epa.polytope;
+	for(int i = 0; i < polytope.size(); i++)
+	{
+		Triangle t(polytope[i].a.AB, polytope[i].b.AB, polytope[i].c.AB);
+
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.3f,0.3f,0.3f,0.3f));
+		t.Render();
+
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+		t.Render(true);
+
+		Point p1(polytope[i].a.AB);
+		p1.Render(5.0f);
+
+		Point p2(polytope[i].b.AB);
+		p2.Render(5.0f);
+
+		Point p3(polytope[i].c.AB);
+		p3.Render(5.0f);
+
+		//ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,0.2f));
+		//t.Render(false);
+	}
+
+	if(polytope.size() > 0)
+	{
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
+		Point nsp(rigidBodyManager.epa.nsp);
+		nsp.Render(10.0f);	
+	}
+}
+
+void DrawContacts()
+{
+	Point c1(rigidBodyManager.cInfo.c1);
+	Point c2(rigidBodyManager.cInfo.c2);
+
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+	c1.Render(10.0f);
+	c2.Render(10.0f);
+
+	Line depth(rigidBodyManager.cInfo.c1, rigidBodyManager.cInfo.c2);
+	depth.Render();
+
+	Triangle fA(rigidBodyManager.cInfo.f.a.A,
+		rigidBodyManager.cInfo.f.b.A, rigidBodyManager.cInfo.f.c.A);
+	fA.Render();
+		
+	Triangle fB = Triangle(rigidBodyManager.cInfo.f.a.B,
+		rigidBodyManager.cInfo.f.b.B, rigidBodyManager.cInfo.f.c.B);
+	fB.Render();
+
+
+	ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.8f,0.2f,0.5f,1));
+	Line l(rigidBodyManager.cInfo.c1, rigidBodyManager.cInfo.c1 + rigidBodyManager.J);
+	l.Render();
 }
 
 void DrawModels()
@@ -556,7 +657,7 @@ void DrawModels()
 				shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("bounding"));
 				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
-				modelList.at(i)->Render(shaderManager.GetShaderProgramID("bounding"));
+				modelList.at(i)->Render(shaderManager.GetShaderProgramID("bounding"), true);
 			}
 			else
 			{
@@ -664,10 +765,16 @@ void printouts()
 	ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
 	printStream();
 
-	ss << "nrpointssimplex: " << rigidBodyManager.gjk->nrPointsSimplex;
+	ss << "gjk->simplex.size(): " << rigidBodyManager.gjk->simplex.size();
 	printStream();
 
-	ss << "steps: " << rigidBodyManager.gjk->steps;
+	ss << "gjk steps: " << rigidBodyManager.gjk->steps;
+	printStream();
+
+	ss << "epa steps: " << rigidBodyManager.epa.steps;
+	printStream();
+
+	ss << "J: (" << rigidBodyManager.J.x << ", " << rigidBodyManager.J.y << ", " << rigidBodyManager.J.z << ")";
 	printStream();
 
 	currentLine = 0;

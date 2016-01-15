@@ -59,6 +59,12 @@ class Tetrahedron
 			for(glm::vec3 p : p_vertices)
 				vertices.push_back(p);
 
+			/*if(vertices.size() < 4)
+			{
+				for(int i = 0; i < 4 - vertices.size(); i++)
+					vertices.push_back(glm::vec3(
+			}*/
+
 			glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
 			glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STREAM_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -72,6 +78,16 @@ class Tetrahedron
 			vec.push_back(v2);
 			vec.push_back(v3);
 			vec.push_back(v4);
+
+			Update(vec);
+		}
+
+		void Update(std::vector<SupportPoint> p_vertices)
+		{
+			std::vector<glm::vec3> vec;
+
+			for(int i = 0; i < p_vertices.size(); i++)
+				vec.push_back(p_vertices[i].AB);
 
 			Update(vec);
 		}
