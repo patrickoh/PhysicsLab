@@ -218,8 +218,7 @@ void Model::Render(GLuint shader, bool bWireframe)
 	if(bWireframe || wireframe)
 		glPolygonMode(GL_FRONT, GL_FILL); 
 
-	// Make sure the VAO is not changed from the outside    
-    //glBindVertexArray(0); //?
+    glBindVertexArray(0);
 }
 
 GLuint Model::LoadTexture(const char* fileName) 
