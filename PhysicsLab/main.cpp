@@ -47,6 +47,7 @@
 #include "Triangle.h"
 
 #include "imgui.h"
+#include "ImGuiImpl.h"
 
 using namespace std;
 
@@ -84,14 +85,6 @@ std::stringstream ss;
 
 void AddADude(glm::vec3 position, bool moving = true);
 
-void ImGui_RenderDrawLists(ImDrawData* draw_data);
-bool ImGui_Init();
-void ImGui_Shutdown();
-void ImGui_InvalidateDeviceObjects();
-void ImGui_NewFrame();
-bool ImGui_CreateFontsTexture();
-bool ImGui_CreateDeviceObjects();
-
 Camera camera;
 glm::mat4 projectionMatrix; // Store the projection matrix
 bool freeMouse = false;
@@ -114,6 +107,7 @@ vector<Model*> modelList;
 bool printText = true;
 
 ParticleSystem particleSystem(10000);
+Model* plane;
 
 std::map<std::string, TwBar*> tweakBars;
 
@@ -239,31 +233,31 @@ int main(int argc, char** argv)
 	//cactuarFix *= glm::angleAxis(-90.0f, glm::vec3(0,1,0));
 	modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-	impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding")); //TODO change to sphere
+	//impulseVisualiser = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding")); //TODO change to sphere
 	//modelList.push_back(impulseVisualiser);
 
-	RigidBody::impulseVisualiser = impulseVisualiser;
+	/*RigidBody::impulseVisualiser = impulseVisualiser;
 	RigidBody::forcePush = 1.0f;
 	RigidBody::angular = true;
-	RigidBody::linear = true;
+	RigidBody::linear = true;*/
 	
-	for(int i = 1; i <= 2; i++)
-		AddADude(glm::vec3(i * 5.0f, 0, 0), false);
+	//for(int i = 1; i <= 2; i++)
+		//AddADude(glm::vec3(i * 5.0f, 0, 0), false);
 
-	tweakBars["main"] = TwNewBar("Main");
-	TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
-	SetUpMainTweakBar();
+	//tweakBars["main"] = TwNewBar("Main");
+	//TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
+	//SetUpMainTweakBar();
 
-	tweakBars["main2"] = TwNewBar("TweakBar2");
-	TwDefine(" TweakBar2 size='250 700' color='125 125 125' "); // change default tweak bar size and color
+	//tweakBars["main2"] = TwNewBar("TweakBar2");
+	//TwDefine(" TweakBar2 size='250 700' color='125 125 125' "); // change default tweak bar size and color
 
-	selectedRigidbody = rigidBodyManager.rigidBodies[0];
+	//selectedRigidbody = rigidBodyManager.rigidBodies[0];
 	
-	TwAddVarRW(tweakBars["main2"], "SelectedRB", TW_TYPE_DIR3F, &selectedRigidbody->model->worldProperties.translation, "");
+	/*TwAddVarRW(tweakBars["main2"], "SelectedRB", TW_TYPE_DIR3F, &selectedRigidbody->model->worldProperties.translation, "");
 	TwAddVarRW(tweakBars["main2"], "SelectedRB", TW_TYPE_INT32, &selectedRigidbodyIndex, "");
 
 	TwAddVarRW(tweakBars["main2"], "Angular Velocity", TW_TYPE_DIR3F, &rigidBodyManager[1]->angularVelocity, "");
-	TwAddVarRW(tweakBars["main2"], "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[1]->angularMomentum, "");
+	TwAddVarRW(tweakBars["main2"], "Angular Momentum", TW_TYPE_DIR3F, &rigidBodyManager[1]->angularMomentum, "");*/
 	
 	//TODO? - Recalculate inertial tensor if mass changes
 
@@ -279,7 +273,14 @@ int main(int argc, char** argv)
 
 	gjkTetra = new Tetrahedron(vec);
 
-	ImGui_Init();
+
+
+	plane = new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(2), "Models/plane.dae", shaderManager.GetShaderProgramID("bounding"));
+	plane->wireframe = true;
+	modelList.push_back(plane);
+	particleSystem.Generate();
+
+	ImGui_Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	glutMainLoop();
     
@@ -395,10 +396,8 @@ void SetUpMainTweakBar()
 // GLUT CALLBACK FUNCTIONS
 void update()
 {
-	
-
 	//TODO - make a function for this
-	selectedRigidbody = rigidBodyManager.rigidBodies[0];
+	//selectedRigidbody = rigidBodyManager.rigidBodies[0];
 
 	//Calculate deltaTime
 	int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
@@ -418,7 +417,7 @@ void update()
 	
 	camera.Update(deltaTime);
 
-	//particleSystem.Update(deltaTime);
+	particleSystem.Update(deltaTime);
 
 	rigidBodyManager.Update(deltaTime);
 		
@@ -503,23 +502,23 @@ void draw()
 
 	glm::mat4 MVP;
 
-	DrawDebug();
+	//DrawDebug();
 	DrawModels();
 
 	cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
 
 	//ImpulseVisualiser
-	{
-		RigidBody::impulseVisualiser->worldProperties.translation = cursorWorldSpace;
+	//{
+	//	RigidBody::impulseVisualiser->worldProperties.translation = cursorWorldSpace;
 
-		shaderManager.SetShaderProgram(RigidBody::impulseVisualiser->GetShaderProgramID());
-			
-		MVP = projectionMatrix * viewMatrix * RigidBody::impulseVisualiser->GetModelMatrix(); //TODO - move these calculations to the graphics card?
-		ShaderManager::SetUniform(RigidBody::impulseVisualiser->GetShaderProgramID(), "mvpMatrix", MVP);
-			
-		if(bRenderImpulseVis)
-			RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
-	}
+	//	shaderManager.SetShaderProgram(RigidBody::impulseVisualiser->GetShaderProgramID());
+	//		
+	//	MVP = projectionMatrix * viewMatrix * RigidBody::impulseVisualiser->GetModelMatrix(); //TODO - move these calculations to the graphics card?
+	//	ShaderManager::SetUniform(RigidBody::impulseVisualiser->GetShaderProgramID(), "mvpMatrix", MVP);
+	//		
+	//	if(bRenderImpulseVis)
+	//		RigidBody::impulseVisualiser->Render(shaderManager.GetCurrentShaderProgramID());
+	//}
 
 	if(rigidBodyManager.bounceyEnclosure)
 	{
@@ -745,12 +744,13 @@ void DrawBoundings()
 
 void DrawParticles()
 {
-	//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("particle"));
-	//int viewLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "view"); // TODO - make a function in shadermanager to do these lines
-	//glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(viewMatrix)); 
-	//int projLocation = glGetUniformLocation(shaderManager.GetCurrentShaderProgramID(), "proj"); 
-	//glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-	//particleSystem.Render();
+	GLuint particleShader = shaderManager.GetShaderProgramID("particle");
+	shaderManager.SetShaderProgram(particleShader);
+
+	ShaderManager::SetUniform(particleShader, "view", viewMatrix);
+	ShaderManager::SetUniform(particleShader, "proj", projectionMatrix);
+	
+	particleSystem.Render();
 }
 
 void printouts()
@@ -814,190 +814,6 @@ void printStream()
 /////////////////////////////
 // IMGUI ////////////////////
 /////////////////////////////
-
-static GLuint       g_FontTexture = 0;
-
-// This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
-// If text or lines are blurry when integrating ImGui in your engine:
-// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
-void ImGui_RenderDrawLists(ImDrawData* draw_data)
-{
-    // We are using the OpenGL fixed pipeline to make the example code simpler to read!
-    // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, vertex/texcoord/color pointers.
-    GLint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-    GLint last_viewport[4]; glGetIntegerv(GL_VIEWPORT, last_viewport);
-   
-	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_SCISSOR_TEST);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glEnable(GL_TEXTURE_2D);
-    
-	glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
-
-    // Handle cases of screen coordinates != from framebuffer coordinates (e.g. retina displays)
-    ImGuiIO& io = ImGui::GetIO();
-    int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-    int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-    draw_data->ScaleClipRects(io.DisplayFramebufferScale);
-
-    // Setup viewport, orthographic projection matrix
-    glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    // Render command lists
-    #define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-    for (int n = 0; n < draw_data->CmdListsCount; n++)
-    {
-        const ImDrawList* cmd_list = draw_data->CmdLists[n];
-        const unsigned char* vtx_buffer = (const unsigned char*)&cmd_list->VtxBuffer.front();
-        const ImDrawIdx* idx_buffer = &cmd_list->IdxBuffer.front();
-        glVertexPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)(vtx_buffer + OFFSETOF(ImDrawVert, pos)));
-        glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)(vtx_buffer + OFFSETOF(ImDrawVert, uv)));
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)(vtx_buffer + OFFSETOF(ImDrawVert, col)));
-
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.size(); cmd_i++)
-        {
-            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-            if (pcmd->UserCallback)
-            {
-                pcmd->UserCallback(cmd_list, pcmd);
-            }
-            else
-            {
-                glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-                glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
-                glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
-            }
-            idx_buffer += pcmd->ElemCount;
-        }
-    }
-    #undef OFFSETOF
-
-    // Restore modified state
-    glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glBindTexture(GL_TEXTURE_2D, last_texture);
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glPopAttrib();
-    glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
-}
-
-void ImGui_NewFrame()
-{
-	if (!g_FontTexture)
-        ImGui_CreateDeviceObjects();
-
-    ImGuiIO& io = ImGui::GetIO();
-    
-	ImGui::NewFrame();
-}
-
-bool ImGui_Init()
-{
-	ImGuiIO& guiIO = ImGui::GetIO();
-	
-	guiIO.DisplaySize.x = WINDOW_WIDTH;
-    guiIO.DisplaySize.y = WINDOW_HEIGHT; 
-	guiIO.IniFilename = "imgui.ini"; 
-	// Fill others settings of the io structure
-	guiIO.DeltaTime = 1.0f / 60.0f;
-
-	guiIO.KeyMap[0] = 9;    // tab
-    guiIO.KeyMap[1] = GLUT_KEY_LEFT;    // Left
-    guiIO.KeyMap[2] = GLUT_KEY_RIGHT;   // Right
-    guiIO.KeyMap[3] = GLUT_KEY_UP;      // Up
-    guiIO.KeyMap[4] = GLUT_KEY_DOWN;    // Down
-    guiIO.KeyMap[5] = GLUT_KEY_HOME;    // Home
-    guiIO.KeyMap[6] = GLUT_KEY_END;     // End
-    guiIO.KeyMap[7] = 127;  // Delete
-    guiIO.KeyMap[8] = 8;    // Backspace
-    guiIO.KeyMap[9] = 13;   // Enter
-    guiIO.KeyMap[10] = 27;  // Escape
-    guiIO.KeyMap[11] = 1;   // ctrl-A
-    guiIO.KeyMap[12] = 3;   // ctrl-C
-    guiIO.KeyMap[13] = 22;  // ctrl-V
-    guiIO.KeyMap[14] = 24;  // ctrl-X
-    guiIO.KeyMap[15] = 25;  // ctrl-Y
-    guiIO.KeyMap[16] = 26;  // ctrl-Z
-
-	guiIO.RenderDrawListsFn = ImGui_RenderDrawLists;  // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-
-	 /*io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;
-    io.GetClipboardTextFn = ImGui_ImplGlfwGL3_GetClipboardText;
-#ifdef _WIN32
-    io.ImeWindowHandle = glfwGetWin32Window(g_Window);
-#endif
-
-    if (install_callbacks)
-    {
-        glfwSetMouseButtonCallback(window, ImGui_ImplGlfwGL3_MouseButtonCallback);
-        glfwSetScrollCallback(window, ImGui_ImplGlfwGL3_ScrollCallback);
-        glfwSetKeyCallback(window, ImGui_ImplGlfwGL3_KeyCallback);
-        glfwSetCharCallback(window, ImGui_ImplGlfwGL3_CharCallback);
-    }*/
-
-	return true;
-}
-
-bool ImGui_CreateDeviceObjects()
-{
-    // Build texture atlas
-    ImGuiIO& io = ImGui::GetIO();
-    unsigned char* pixels;
-    int width, height;
-    io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height);
-
-    // Upload texture to graphics system
-    GLint last_texture;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-    glGenTextures(1, &g_FontTexture);
-    glBindTexture(GL_TEXTURE_2D, g_FontTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pixels);
-
-    // Store our identifier
-    io.Fonts->TexID = (void *)(intptr_t)g_FontTexture;
-
-    // Restore state
-    glBindTexture(GL_TEXTURE_2D, last_texture);
-
-    return true;
-}
-
-void ImGui_InvalidateDeviceObjects()
-{
-    if (g_FontTexture)
-    {
-        glDeleteTextures(1, &g_FontTexture);
-        ImGui::GetIO().Fonts->TexID = 0;
-        g_FontTexture = 0;
-    }
-}
-
-void ImGui_Shutdown()
-{
-    ImGui_InvalidateDeviceObjects();
-    ImGui::Shutdown();
-}
-
-
 
 
 

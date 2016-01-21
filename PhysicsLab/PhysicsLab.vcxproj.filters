@@ -49,6 +49,12 @@
     <Filter Include="Source Files\ImGui">
       <UniqueIdentifier>{ba5a4782-f136-4c7a-a06d-a8d0259e4720}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{b5bf267b-7819-4ff8-91b9-1bf0312081d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{d04e18a8-20e9-4055-83f9-272f73002b6c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -85,7 +91,7 @@
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="ImGuiImpl.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="Keys.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleSystem.h">
-      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
@@ -176,8 +179,11 @@
     <ClInclude Include="imgui.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiImpl.h">
+    <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiImpl.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

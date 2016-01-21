@@ -6,11 +6,15 @@
 //and ImGui_ImplXXXX_Shutdown().
 
 #include "imgui.h"
+#include "Common.h"
 
-IMGUI_API bool        ImGui_Init();
+IMGUI_API bool        ImGui_Init(float w, float h);
 IMGUI_API void        ImGui_Shutdown();
 IMGUI_API void        ImGui_NewFrame();
 
 // Use if you want to reset your rendering device without losing ImGui state.
 IMGUI_API void        ImGui_InvalidateDeviceObjects();
 IMGUI_API bool        ImGui_CreateDeviceObjects();
+
+//void ImGui_RenderDrawLists(ImDrawData* draw_data);
+

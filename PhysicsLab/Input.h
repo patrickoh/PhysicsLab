@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "imgui.h"
 
 class Input 
 {
@@ -27,14 +28,20 @@ public:
 	{  
 		TwEventKeyboardGLUT(key, x, y);
 
-		keyStates[key] = true; // Set the state of the current key to pressed  
+		ImGuiIO& io = ImGui::GetIO();
+		io.KeysDown[key] = true;
 
+		keyStates[key] = true; // Set the state of the current key to pressed  
+		 
 		wasKeyPressed = true;
 		keyPress = key;
 	}  
   
 	static void keyUp (unsigned char key, int x, int y) 
 	{  
+		ImGuiIO& io = ImGui::GetIO();
+		io.KeysDown[key] = false;
+
 	 	keyStates[key] = false; // Set the state of the current key to not pressed  
 	}  
 
@@ -91,6 +98,9 @@ public:
 	{
 		TwEventMouseMotionGLUT(x, y); // send event to AntTweakBar
 
+		ImGuiIO& io = ImGui::GetIO();
+		io.MousePos = ImVec2((float)x, (float)y);
+
 		mouseMoved = true;
 		mouseX = x;
 		mouseY = y;
@@ -99,6 +109,9 @@ public:
 	static void mouseButton(int button, int state, int x, int y)
 	{
 		TwEventMouseButtonGLUT(button, state, x, y);  // send event to AntTweakBar
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.MouseDown[button] = state; 
 
 		if(button == GLUT_LEFT_BUTTON)
 		{
