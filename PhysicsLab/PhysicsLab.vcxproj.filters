@@ -191,6 +191,9 @@
     <ClInclude Include="ParticleSystemGPU.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleDemo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\diffuse.ps">

@@ -32,7 +32,6 @@ bool isCCW(glm::vec3 adjEdge1, glm::vec3 adjEdge2);
 glm::vec3 closestPointOnTriangle( const std::vector<glm::vec3> triangle, const glm::vec3 sourcePosition);
 float clamp(float x, float a, float b);
 glm::vec3 barycentric(glm::vec3 p, glm::vec3 a, glm::vec3 b, glm::vec3 c);
-
 std::vector<glm::vec3> getConvexHull(std::vector<glm::vec3> &_pts);
 bool lexicalComparison(const glm::vec3 &_v1, const glm::vec3 &_v2);
 bool isRightTurn(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c);
