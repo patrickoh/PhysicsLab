@@ -106,7 +106,7 @@ vector<Model*> modelList;
 
 bool printText = true;
 
-ParticleSystem particleSystem(10000);
+ParticleSystem particleSystem(100000);
 Model* plane;
 
 std::map<std::string, TwBar*> tweakBars;
@@ -283,6 +283,9 @@ int main(int argc, char** argv)
 	ImGui_Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	glutMainLoop();
+
+	delete plane;
+	delete gjkTetra;
     
 	return 0;
 }

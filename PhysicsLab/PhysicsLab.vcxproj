@@ -112,6 +112,7 @@
     <ClInclude Include="imgui_internal.h" />
     <ClInclude Include="Inertia.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="ParticleSystemGPU.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="QueryPerformance.h" />
     <ClInclude Include="RigidBody.h" />

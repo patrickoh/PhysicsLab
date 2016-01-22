@@ -37,7 +37,7 @@ struct BufferData
 	glm::vec4 colour;
 };
 
-enum IntegratorMode { Euler, RK4, None };
+enum IntegratorMode { Euler, RK2, RK4, None };
 
 struct Particle
 {
@@ -111,7 +111,7 @@ class ParticleSystem
 		GLuint posBuffer;
 		GLuint colBuffer;
 
-		int size;
+		int maxSize;
 
 	public:
 
@@ -174,7 +174,7 @@ class ParticleSystem
 
 			mass = 1;
 
-			this->size = size;
+			this->maxSize = size;
 			liveParticles = 0;
 
 			for(int i = 0; i < size; i++)
@@ -195,6 +195,17 @@ class ParticleSystem
 		~ParticleSystem()
 		{
 			//clean up particles
+			for(auto it = particles.begin(); it != particles.end(); it++)
+			{
+				delete *it;
+			}
+
+			while(inactiveParticles.size() > 0)
+			{
+				Particle* p = inactiveParticles.front();
+				inactiveParticles.pop();
+				delete p;
+			}
 		}
 
 		void Generate()
@@ -204,7 +215,7 @@ class ParticleSystem
 
 			glGenBuffers(1, &vbo);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferData(GL_ARRAY_BUFFER, this->size * sizeof(BufferData), nullptr, GL_STREAM_DRAW);  
+			glBufferData(GL_ARRAY_BUFFER, this->maxSize * sizeof(BufferData), nullptr, GL_STREAM_DRAW);  
 
 			glEnableVertexAttribArray(0); 
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BufferData), (GLvoid*)0);	
@@ -240,6 +251,8 @@ class ParticleSystem
 					//INTEGRATION
 					if(mode == IntegratorMode::Euler)
 						Euler(particles[i], timestep * simulationSpeed);
+					else if(mode == IntegratorMode::RK2)
+						Midpoint(particles[i], timestep * simulationSpeed);
 					else if (mode == IntegratorMode::RK4)
 						RK4(particles[i], timestep * simulationSpeed);
 
@@ -283,7 +296,11 @@ class ParticleSystem
 			if(liveParticles > 0)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, vbo);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, data.size()*sizeof(data[0]), &data[0]);
+				
+				//glBufferSubData(GL_ARRAY_BUFFER, 0, data.size()*sizeof(data[0]), &data[0]);
+
+				glBufferData(GL_ARRAY_BUFFER, maxSize*sizeof(data[0]), NULL, GL_STREAM_DRAW); // Buffer orphaning
+				glBufferSubData(GL_ARRAY_BUFFER, 0, liveParticles*sizeof(data[0]), &data[0]);
 				
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
@@ -303,7 +320,7 @@ class ParticleSystem
 			glBindVertexArray(vao);
 
 			glPointSize(1.5f);              //specify size of points in pixels
-			glDrawArrays(GL_POINTS, 0, size - inactiveParticles.size());
+			glDrawArrays(GL_POINTS, 0, maxSize - inactiveParticles.size());
  
 			glBindVertexArray(0);
 		}
@@ -314,6 +331,18 @@ class ParticleSystem
 			p->velocity += timeStep * p->acceleration;
 
 			p->acceleration = fNet(p->position, p->velocity) / mass;
+		}
+
+		//Also known as RK2, Improved Euler method, or Heun's Method
+		void Midpoint(Particle* p, float timeStep)
+		{
+			glm::vec3 p2 = p->position + p->velocity * timeStep;
+			glm::vec3 v2 = p->velocity + p->acceleration * timeStep;
+			glm::vec3 a2 = fNet(p2, v2) / mass;
+
+			p->position += (p->velocity + v2) * (timeStep / 2);
+			p->velocity += (p->acceleration + a2) * (timeStep / 2);
+			p->acceleration = fNet(p->position, p->velocity) / mass;   
 		}
 
 		void RK4(Particle* p, float timeStep)

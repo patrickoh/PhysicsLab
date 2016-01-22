@@ -55,6 +55,9 @@
     <Filter Include="Header Files\GUI">
       <UniqueIdentifier>{d04e18a8-20e9-4055-83f9-272f73002b6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Demos">
+      <UniqueIdentifier>{198d397d-76dd-4a2d-89d4-b81f56be0878}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="ImGuiImpl.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystemGPU.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
