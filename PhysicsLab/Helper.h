@@ -12,6 +12,9 @@
 
 #include <vector>
 
+#include "Magick++.h"
+#include <iostream>
+
 glm::mat4 convertAssimpMatrix (aiMatrix4x4 m);
 glm::quat formQuaternion(double x, double y, double z, double angle);
 glm::vec3 lerp(glm::vec3 v0, glm::vec3 v1, float t);
@@ -36,3 +39,4 @@ std::vector<glm::vec3> getConvexHull(std::vector<glm::vec3> &_pts);
 bool lexicalComparison(const glm::vec3 &_v1, const glm::vec3 &_v2);
 bool isRightTurn(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c);
 bool isSameDirection(glm::vec3 v1, glm::vec3 v2);
+GLuint loadTexture(const char* fileName);

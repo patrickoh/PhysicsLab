@@ -411,3 +411,43 @@ bool isSameDirection(glm::vec3 v1, glm::vec3 v2)
 {
 	return glm::dot(v1, v2) > 0.0f;
 }
+
+GLuint loadTexture(const char* fileName) 
+{		
+	Magick::Blob blob;
+	Magick::Image* image; 
+
+	std::string stringFileName(fileName);
+	std::string fullPath = "Textures/" + stringFileName;
+
+	try {
+		image = new Magick::Image(fullPath.c_str());
+		image->write(&blob, "RGBA");
+	}
+	catch (Magick::Error& Error) {
+		std::cout << "Error loading texture '" << fullPath << "': " << Error.what() << std::endl;
+
+		delete image;
+		return false;
+	}
+
+	GLuint textureID;
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+			
+	//Load the image data in to the texture
+	glTexImage2D(GL_TEXTURE_2D, 0/*LOD*/, GL_RGBA, image->columns(), image->rows(), 0/*BORDER*/, GL_RGBA, GL_UNSIGNED_BYTE, blob.data());
+
+	//Parameter stuff, for magnifying texture etc.
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+			
+	glBindTexture(GL_TEXTURE_2D, 0); 
+
+	delete image;  
+	return textureID;
+}

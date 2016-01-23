@@ -121,7 +121,7 @@ bool Model::Load(const char* file_name)
 				aiString str;
 				material->GetTexture(aiTextureType_DIFFUSE, i, &str);
 
-				GLuint textureID = LoadTexture(str.C_Str());
+				GLuint textureID = loadTexture(str.C_Str());
 				textures.push_back(textureID); 
 
 				meshEntry.TextureIndex = textureID;
@@ -174,6 +174,8 @@ bool Model::Load(const char* file_name)
 	printf ("\nMesh loaded.\n");
 
 	delete[] buffers;
+
+	//glBindVertexArray(0);
 	
 	return true;
 }
@@ -219,44 +221,4 @@ void Model::Render(GLuint shader, bool bWireframe)
 		glPolygonMode(GL_FRONT, GL_FILL); 
 
     glBindVertexArray(0);
-}
-
-GLuint Model::LoadTexture(const char* fileName) 
-{		
-	Magick::Blob blob;
-	Magick::Image* image; 
-
-	string stringFileName(fileName);
-	string fullPath = "Textures/" + stringFileName;
-
-	try {
-		image = new Magick::Image(fullPath.c_str());
-		image->write(&blob, "RGBA");
-	}
-	catch (Magick::Error& Error) {
-		std::cout << "Error loading texture '" << fullPath << "': " << Error.what() << std::endl;
-
-		delete image;
-		return false;
-	}
-
-	GLuint textureID;
-
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-			
-	//Load the image data in to the texture
-	glTexImage2D(GL_TEXTURE_2D, 0/*LOD*/, GL_RGBA, image->columns(), image->rows(), 0/*BORDER*/, GL_RGBA, GL_UNSIGNED_BYTE, blob.data());
-
-	//Parameter stuff, for magnifying texture etc.
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-			
-	glBindTexture(GL_TEXTURE_2D, 0); 
-
-	delete image;  
-	return textureID;
 }

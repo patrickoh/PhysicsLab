@@ -104,7 +104,6 @@ class Model
 			
 		}*/
 
-		GLuint LoadTexture(const char* fileName);
 		void LoadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
 
 		//Getters

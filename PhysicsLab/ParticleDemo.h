@@ -101,6 +101,14 @@ public:
 	{
 		delete particleSystem;
 		delete plane;
+
+		// TODO - Cleanup VBO and shader
+		/*glDeleteBuffers(1, &particles_color_buffer);
+		glDeleteBuffers(1, &particles_position_buffer);
+		glDeleteBuffers(1, &billboard_vertex_buffer);
+		glDeleteProgram(programID);
+		glDeleteTextures(1, &TextureID);
+		glDeleteVertexArrays(1, &VertexArrayID);*/
 	}
 
 	void Init(int argc, char** argv)
@@ -149,6 +157,9 @@ public:
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable( GL_BLEND );
+
+		glEnable(GL_POINT_SPRITE);
+		glEnable(GL_PROGRAM_POINT_SIZE);
 
 		projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
 
