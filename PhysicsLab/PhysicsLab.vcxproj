@@ -105,6 +105,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
+    <ClInclude Include="GLProgram.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="ImGuiImpl.h" />

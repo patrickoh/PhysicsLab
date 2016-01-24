@@ -217,19 +217,6 @@ class ParticleSystem
 			glGenVertexArrays(1, &vao); 
 			glBindVertexArray(vao); 
 
-			// The VBO containing the 4 vertices of the particles.
-			// Thanks to instancing, they will be shared by all particles.
-			/*static const GLfloat g_vertex_buffer_data[] = { 
-				 -0.5f, -0.5f, 0.0f,
-				  0.5f, -0.5f, 0.0f,
-				 -0.5f,  0.5f, 0.0f,
-				  0.5f,  0.5f, 0.0f,
-			};
-			GLuint billboard_vertex_buffer;
-			glGenBuffers(1, &billboard_vertex_buffer);
-			glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);*/
-
 			glGenBuffers(1, &vbo);
 			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glBufferData(GL_ARRAY_BUFFER, this->maxSize * sizeof(BufferData), nullptr, GL_STREAM_DRAW);  
@@ -331,12 +318,7 @@ class ParticleSystem
 			//glUniform1i(glGetUniformLocation(shader, "texture_diffuse"), 0); //set the sampler in the shader to the correct texture 
 			glBindTexture(GL_TEXTURE_2D, textureID);
 
-			//glPointSize(1.5f);              //specify size of points in pixels
 			glDrawArrays(GL_POINTS, 0, maxSize - inactiveParticles.size());
-
-			//glVertexAttribDivisor(0, 0); // particles vertices : always reuse the same 4 vertices -> 0
-			//glVertexAttribDivisor(1, 1); // positions : one per quad (its center)                 -> 1
-			//glVertexAttribDivisor(2, 1); // color : one per quad                                  -> 1
  
 			glBindVertexArray(0);
 		}
@@ -345,7 +327,6 @@ class ParticleSystem
 		{
 			p->position += timeStep * p->velocity;
 			p->velocity += timeStep * p->acceleration;
-
 			p->acceleration = fNet(p->position, p->velocity) / mass;
 		}
 
