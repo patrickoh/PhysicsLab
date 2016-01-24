@@ -76,25 +76,30 @@ struct Emitter
 	glm::vec3 centre;
 	
 	//TODO
-	//area
-	//tex support?
 	//mesh object emitter.
 
-	glm::vec3 velRangeMin, velRangeMax; 
+	float velYMin;
+	float velYMax;
+	float velRadiusMin;
+	float velRadiusMax;
 
 	Emitter()
 	{
 		centre = glm::vec3(0);
 		emitRate = 10;
 
-		velRangeMin = glm::vec3(-1.0f, 3.0f, -1.0f);
-		velRangeMax = glm::vec3(1.0f, 5.0f, 1.0f);
+		velYMin = 3.0f;
+		velYMax = 5.0f;
+		velRadiusMin = 1.0f;
+		velRadiusMax = 2.0f;
 	}
 
 	void Emit(Particle* particle)
 	{
 		particle->position = centre;
-		particle->velocity = glm::linearRand(velRangeMin, velRangeMax);
+		
+		glm::vec2 xz = glm::circularRand(glm::linearRand(velRadiusMin, velRadiusMax));
+		particle->velocity = glm::vec3(xz.x, glm::linearRand(velYMin, velYMax), xz.y);
 	}
 };
 

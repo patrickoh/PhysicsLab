@@ -1,4 +1,6 @@
 #include "ParticleDemo.h"
+#include "GLProgram.h"
+#include "QueryPerformance.h"
 
 long long int QueryPerformance::ts = 0;
 long long int QueryPerformance::tf = 0;

@@ -451,3 +451,11 @@ GLuint loadTexture(const char* fileName)
 	delete image;  
 	return textureID;
 }
+
+glm::vec2 randomPointOnCircumference(float radius)
+{
+	//float angle = glm::linearRand(0.0f, 1.0f) * 3.14f * 2;
+	//return glm::vec2(glm::cos(angle)*radius, glm::sin(angle)*radius);
+
+	return glm::circularRand(radius);
+}
