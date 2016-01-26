@@ -272,7 +272,7 @@ class ParticleSystem
 						if(bCollisions)
 						{
 							particles[i]->position += -glm::dot(particles[i]->position - plane, normal) * normal; //post processing method
-							particles[i]->velocity += (1 + coefficientOfRestitution) * -(particles[i]->velocity * normal) * normal;
+							particles[i]->velocity += (1 + coefficientOfRestitution) * -glm::dot(particles[i]->velocity, normal) * normal;
 						}
 						else
 						{
