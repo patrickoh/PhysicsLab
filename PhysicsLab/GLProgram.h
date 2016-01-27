@@ -40,7 +40,7 @@ class GLProgram
 public:
 	std::stringstream ss;
 
-	Camera camera;
+	Camera* camera;
 
 	glm::mat4 projectionMatrix; // Store the projection matrix
 	glm::mat4 viewMatrix;
@@ -134,9 +134,8 @@ public:
 
 		projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
 
-		camera = Camera();
-		camera.Init(glm::vec3(0.0f, 0.0f, 0.0f), 0.0002f, 0.01f); //TODO - constructor for camera
-		camera.mode = CameraMode::tp;
+		camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+		camera->mode = CameraMode::tp;
 
 		shaderManager.Init(); //TODO - constructor for shader
 	}
@@ -165,7 +164,7 @@ public:
 
 		HandleInput();
 	
-		camera.Update(deltaTime);
+		camera->Update(deltaTime);
 	}
 
 	void HandleInput()
@@ -174,7 +173,7 @@ public:
 		{
 			if(Input::mouseMoved)
 			{
-				camera.MouseRotate(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime); 
+				camera->MouseRotate(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime); 
 				Input::mouseMoved = false;
 			}
 
@@ -186,7 +185,7 @@ public:
 
 		if(Input::wasKeyPressed)
 		{
-			camera.ProcessKeyboardOnce(Input::keyPress); 
+			camera->ProcessKeyboardOnce(Input::keyPress); 
 
 			if(Input::keyPress == KEY::KEY_h || Input::keyPress == KEY::KEY_H) 
 				printText = !printText;
@@ -208,7 +207,7 @@ public:
 			Input::wasKeyPressed = false;
 		}
 	
-		camera.ProcessKeyboardContinuous(Input::keyStates, deltaTime);
+		camera->ProcessKeyboardContinuous(Input::keyStates, deltaTime);
 	}
 
 	void DrawModels()
@@ -251,13 +250,13 @@ public:
 		ss << " fps: " << fps;
 		printStream();
 
-		ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.forward.x << ", " << camera.viewProperties.forward.y << ", " << camera.viewProperties.forward.z << ")";
+		ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.forward.x << ", " << camera->viewProperties.forward.y << ", " << camera->viewProperties.forward.z << ")";
 		printStream();
 
-		ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.position.x << ", " << camera.viewProperties.position.y << ", " << camera.viewProperties.position.z << ")";
+		ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.position.x << ", " << camera->viewProperties.position.y << ", " << camera->viewProperties.position.z << ")";
 		printStream();
 
-		ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera.viewProperties.up.x << ", " << camera.viewProperties.up.y << ", " << camera.viewProperties.up.z << ")";
+		ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.up.x << ", " << camera->viewProperties.up.y << ", " << camera->viewProperties.up.z << ")";
 		printStream();
 
 		currentLine = 0;

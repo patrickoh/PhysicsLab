@@ -41,6 +41,9 @@ bool operator<(BufferData& bd1, BufferData& bd2)
 {
 	// reverse order
 	//return this->cameraDistance > that.cameraDistance;
+
+	return glm::length2(bd1.position - Camera::Instance->viewProperties.position)
+				> glm::length2(bd2.position - Camera::Instance->viewProperties.position);
 }
 
 //CALCULATE CAMERA DISTANCE
@@ -348,7 +351,7 @@ class ParticleSystem
 			}
 
 			liveParticles = data.size();
-			//std::sort(data.begin(), data.end());
+			std::sort(data.begin(), data.end());
 
 			if(liveParticles > 0)
 			{
@@ -367,9 +370,9 @@ class ParticleSystem
 		{
 			glBindVertexArray(vao);
 
-			glEnable(GL_BLEND);
-			glDepthMask(GL_FALSE);
-			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			//glEnable(GL_BLEND);
+			//glDepthMask(GL_FALSE);
+			//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
 			glActiveTexture(GL_TEXTURE0);
 			//glUniform1i(glGetUniformLocation(shader, "texture_diffuse"), 0); //set the sampler in the shader to the correct texture 
@@ -377,8 +380,8 @@ class ParticleSystem
 
 			glDrawArrays(GL_POINTS, 0, maxSize - inactiveParticles.size());
 
-			glDepthMask(GL_TRUE);
-			glDisable(GL_BLEND);
+			//glDepthMask(GL_TRUE);
+			//glDisable(GL_BLEND);
  
 			glBindVertexArray(0);
 		}

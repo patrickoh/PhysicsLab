@@ -53,8 +53,17 @@ class Camera
 		//float yMinLimit; //=70f
 
 		glm::vec3 targetYOffset;
+
+		static Camera* Instance;
+
+		Camera(glm::vec3 position)
+		{
+			Instance = this;
+			Init(position);
+		}
 		
-		void Init(glm::vec3 position, float p_turnSpeed = 0.005f, float p_moveSpeed = 0.01f ) 
+		//0.005f, 0.01f
+		void Init(glm::vec3 position, float p_turnSpeed = 0.0002f, float p_moveSpeed = 0.01f ) 
 		{ 
 			viewProperties.position = position;
 			viewProperties.up = glm::vec3(0,1,0);

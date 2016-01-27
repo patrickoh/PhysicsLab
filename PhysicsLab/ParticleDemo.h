@@ -50,7 +50,7 @@ public:
 
 		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-		particleSystem = new ParticleSystem(&camera, 1000000);
+		particleSystem = new ParticleSystem(camera, 1000000);
 		
 		plane = new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(2), "Models/plane.dae", shaderManager.GetShaderProgramID("bounding"));
 		plane->wireframe = true;
@@ -103,7 +103,7 @@ public:
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		viewMatrix = camera.GetViewMatrix();
+		viewMatrix = camera->GetViewMatrix();
 
 		glm::mat4 MVP;
 

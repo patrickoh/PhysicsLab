@@ -19,6 +19,8 @@ bool Input::leftClick = false;
 GLProgram* GLProgram::Instance;
 ParticleDemo* ParticleDemo::Instance;
 
+Camera* Camera::Instance;
+
 int main(int argc, char** argv)
 {
 	ParticleDemo* demo = new ParticleDemo();
