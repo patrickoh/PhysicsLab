@@ -10,6 +10,8 @@ private:
 	ParticleSystem* particleSystem;
 	Model* plane;
 
+	Model* attractorVis;
+
 public:
 
 	static ParticleDemo* Instance;
@@ -48,12 +50,16 @@ public:
 
 		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-		particleSystem = new ParticleSystem(100000);
+		particleSystem = new ParticleSystem(1000000);
 		
 		plane = new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(2), "Models/plane.dae", shaderManager.GetShaderProgramID("bounding"));
 		plane->wireframe = true;
 		modelList.push_back(plane);
-		
+
+		attractorVis = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"));
+		//attractorVis = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse"));
+		modelList.push_back(attractorVis);
+
 		particleSystem->Generate();
 
 		tweakBars["main"] = TwNewBar("Main");
@@ -82,6 +88,8 @@ public:
 
 		particleSystem->Update(deltaTime);
 
+		attractorVis->worldProperties.translation = particleSystem->userGravity;
+
 		Draw();
 	}
 
@@ -96,6 +104,7 @@ public:
 		glm::mat4 MVP;
 
 		DrawModels();
+
 		DrawParticles();
 
 		if(printText)
@@ -152,6 +161,11 @@ public:
 		TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &particleSystem->env.gravity, " label='GravityStr'");
 
 		TwAddSeparator(bar, "", "");
+		TwAddVarRW(bar, "UserGravity", TW_TYPE_BOOL8, &particleSystem->bUserGravity, " label='UserGravity'");
+		TwAddVarRW(bar, "UserGravityPos", TW_TYPE_DIR3F, &particleSystem->userGravity, " label='UserGravityPos'");
+		TwAddVarRW(bar, "UserGravityStr", TW_TYPE_FLOAT, &particleSystem->userGravityScalar, " label='UserGravityStr'");
+
+		TwAddSeparator(bar, "", "");
 		TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &particleSystem->drag, " label='Drag'");
 		TwAddVarRW(bar, "Cd ", TW_TYPE_FLOAT, &particleSystem->dragCoefficient, " label='Cd' group='Drag Settings'");
 		TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &particleSystem->env.fluid.density, " label='Fluid Density' group='Drag Settings'");
@@ -179,5 +193,9 @@ public:
 		TwAddSeparator(bar, "", "");
 		TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem->liveParticles, " label='ParticleCount'");
 		TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem->mass, "min=0.1");
+
+		TwAddSeparator(bar, "", "");
+		TwAddVarRW(bar, "RecycleAge", TW_TYPE_BOOL8, &particleSystem->bRecycleAge, " label='RecycleAge'");
+		TwAddVarRW(bar, "RecyclePlane", TW_TYPE_BOOL8, &particleSystem->bRecyclePlane, "label='RecyclePlane'");
 	}
 };

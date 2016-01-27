@@ -147,7 +147,14 @@ class ParticleSystem
 
 		float particleLife;
 
-		Model* planeModel;
+		//Model* planeModel;
+
+		bool bUserGravity;
+		glm::vec3 userGravity;
+		float userGravityScalar;
+
+		bool bRecyclePlane;
+		bool bRecycleAge;
 
 		ParticleSystem(int size = 1000)
 		{
@@ -199,6 +206,13 @@ class ParticleSystem
 			bCollisions = true;
 
 			mode = IntegratorMode::RK4;
+
+			bUserGravity = true;
+			userGravity = glm::vec3(0,0,0);
+			userGravityScalar = 1;
+
+			bRecycleAge = true;
+			bRecyclePlane = true;
 		}
 
 		~ParticleSystem()
@@ -276,16 +290,19 @@ class ParticleSystem
 						}
 						else
 						{
-							inactiveParticles.push(particles[i]);
-							particles[i]->active = false;
-							particles[i]->Reset();
+							if(bRecyclePlane)
+							{
+								inactiveParticles.push(particles[i]);
+								particles[i]->active = false;
+								particles[i]->Reset();
+							}
 						}
 					}
 
 					//ADVANCE AGE & UPDATE COLOUR
 					particles[i]->age += timestep * simulationSpeed;
 					particles[i]->colour = glm::mix(startColour, endColour, particles[i]->age / particleLife);
-					if(particles[i]->age > particleLife)
+					if(particles[i]->age > particleLife && bRecycleAge)
 					{
 						inactiveParticles.push(particles[i]);
 						particles[i]->active = false;
@@ -377,6 +394,8 @@ class ParticleSystem
 					fNet += PressureDrag(pos, vel, true);
 				else
 					fNet += PressureDrag(pos, vel, false);
+			if(bUserGravity)
+				fNet += Attract(pos, vel);
 
 			return fNet;
 		}
@@ -384,6 +403,12 @@ class ParticleSystem
 		glm::vec3 Gravity(glm::vec3 pos, glm::vec3 vel)
 		{
 			return mass * env.gravity * glm::vec3(0,-1,0);
+		}
+
+		glm::vec3 Attract(glm::vec3 pos, glm::vec3 vel)
+		{
+			//ab = b-a
+			return (userGravity - pos) * userGravityScalar;
 		}
 
 		glm::vec3 PressureDrag(glm::vec3 pos, glm::vec3 vel, bool wind)
