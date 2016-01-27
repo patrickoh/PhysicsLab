@@ -10,7 +10,7 @@ private:
 	ParticleSystem* particleSystem;
 	Model* plane;
 
-	Model* attractorVis;
+	//Model* attractorVis;
 
 public:
 
@@ -50,21 +50,25 @@ public:
 
 		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-		particleSystem = new ParticleSystem(1000000);
+		particleSystem = new ParticleSystem(&camera, 1000000);
 		
 		plane = new Model(glm::vec3(0,0,0), glm::quat(), glm::vec3(2), "Models/plane.dae", shaderManager.GetShaderProgramID("bounding"));
 		plane->wireframe = true;
 		modelList.push_back(plane);
 
-		attractorVis = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"));
+		//attractorVis = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"));
 		//attractorVis = new Model(glm::vec3(0,1,0), glm::quat(), glm::vec3(.01), "Models/crate.dae", shaderManager.GetShaderProgramID("diffuse"));
-		modelList.push_back(attractorVis);
+		//modelList.push_back(attractorVis);
 
 		particleSystem->Generate();
 
-		tweakBars["main"] = TwNewBar("Main");
-		TwDefine(" Main size='250 700' color='125 125 125' "); // change default tweak bar size and color
-		SetUpTweakBar();
+		tweakBars["emitter"] = TwNewBar("Emitter");
+		TwDefine(" Emitter size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
+
+		tweakBars["physics"] = TwNewBar("Physics");
+		TwDefine(" Physics label='Physics TweakBar' position='1000 300' color='125 125 125' "); // change default tweak bar size and color
+		
+		SetUpTweakBars();
 	}
 
 	static void updateCB()
@@ -88,7 +92,7 @@ public:
 
 		particleSystem->Update(deltaTime);
 
-		attractorVis->worldProperties.translation = particleSystem->userGravity;
+		//attractorVis->worldProperties.translation = particleSystem->userGravity;
 
 		Draw();
 	}
@@ -104,6 +108,18 @@ public:
 		glm::mat4 MVP;
 
 		DrawModels();
+
+		{
+			shaderManager.SetShaderProgram("bounding");
+			
+			MVP = projectionMatrix * viewMatrix *  
+				glm::translate(glm::mat4(1.0f), particleSystem->emitter.centre)
+				* glm::scale(glm::mat4(1.0f), 2.0f * particleSystem->emitter.variance);
+			
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
+			glutWireCube(1);
+		}
 
 		DrawParticles();
 
@@ -122,6 +138,7 @@ public:
 
 		ShaderManager::SetUniform(particleShader, "view", viewMatrix);
 		ShaderManager::SetUniform(particleShader, "proj", projectionMatrix);
+		ShaderManager::SetUniform(particleShader, "size", particleSystem->pointSize);
 	
 		particleSystem->Render();
 	}
@@ -142,11 +159,20 @@ public:
 		GLProgram::printouts();
 	}
 
-	void SetUpTweakBar()
+	void SetUpTweakBars()
 	{
-		TwBar* bar = tweakBars["main"];
+		SetUpEmitterTweakBar();
+		SetUpPhysicsTweakBar();
+	}
+
+	void SetUpEmitterTweakBar()
+	{
+		TwBar* bar = tweakBars["emitter"];
 
 		TwAddVarRW(bar, "EmitRate", TW_TYPE_INT32, &particleSystem->emitter.emitRate, "");
+
+		TwAddVarRW(bar, "ParticleSize", TW_TYPE_FLOAT, &particleSystem->pointSize, "min=0.0");
+
 		TwAddVarRW(bar, "Particle life", TW_TYPE_FLOAT, &particleSystem->particleLife, "min=0.0 step=0.25");
 		TwAddVarRW(bar, "StartColour", TW_TYPE_COLOR3F, &particleSystem->startColour, " group='Colours' ");
 		TwAddVarRW(bar, "EndColour", TW_TYPE_COLOR3F, &particleSystem->endColour, " group='Colours' ");
@@ -157,15 +183,35 @@ public:
 		TwAddVarRW(bar, "VelRadiusMax", TW_TYPE_FLOAT, &particleSystem->emitter.velRadiusMax, " group='Initial Velocity' ");
 
 		TwAddSeparator(bar, "", "");
+
+		TwAddVarRW(bar, "variance", TW_TYPE_DIR3F, &particleSystem->emitter.variance, " ");
+
+		TwAddVarRW(bar, "emitterPos", TW_TYPE_DIR3F, &particleSystem->emitter.centre, " ");
+
+		TwAddSeparator(bar, "", "");
+
+		TwAddVarRW(bar, "RecycleAge", TW_TYPE_BOOL8, &particleSystem->bRecycleAge, " label='RecycleAge'");
+		TwAddVarRW(bar, "RecyclePlane", TW_TYPE_BOOL8, &particleSystem->bRecyclePlane, "label='RecyclePlane'");
+
+		TwAddSeparator(bar, "", "");
+		TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem->liveParticles, " label='ParticleCount'");
+		TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem->mass, "min=0.1");
+	}
+
+	void SetUpPhysicsTweakBar()
+	{
+		TwBar* bar = tweakBars["physics"];
+
+		/*TwAddSeparator(bar, "", "");
+		TwAddVarRW(bar, "UserGravity", TW_TYPE_BOOL8, &particleSystem->, " label='UserGravity'");
+		TwAddVarRW(bar, "UserGravityPos", TW_TYPE_DIR3F, &particleSystem->userGravity, " label='UserGravityPos'");
+		TwAddVarRW(bar, "UserGravityStr", TW_TYPE_FLOAT, &particleSystem->userGravityScalar, " label='UserGravityStr'");*/
+		
 		TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &particleSystem->gravity, " label='Gravity'");
 		TwAddVarRW(bar, "GravityStr", TW_TYPE_FLOAT, &particleSystem->env.gravity, " label='GravityStr'");
-
+		
 		TwAddSeparator(bar, "", "");
-		TwAddVarRW(bar, "UserGravity", TW_TYPE_BOOL8, &particleSystem->bUserGravity, " label='UserGravity'");
-		TwAddVarRW(bar, "UserGravityPos", TW_TYPE_DIR3F, &particleSystem->userGravity, " label='UserGravityPos'");
-		TwAddVarRW(bar, "UserGravityStr", TW_TYPE_FLOAT, &particleSystem->userGravityScalar, " label='UserGravityStr'");
 
-		TwAddSeparator(bar, "", "");
 		TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &particleSystem->drag, " label='Drag'");
 		TwAddVarRW(bar, "Cd ", TW_TYPE_FLOAT, &particleSystem->dragCoefficient, " label='Cd' group='Drag Settings'");
 		TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &particleSystem->env.fluid.density, " label='Fluid Density' group='Drag Settings'");
@@ -189,13 +235,5 @@ public:
 					" label='Plane Normal' opened=false help='Change the plane normal.' group='Plane Settings'");
 		TwAddVarRW(bar, "Kr", TW_TYPE_FLOAT, &particleSystem->coefficientOfRestitution, "help='Coefficient of Restitution.' min=0.0 max=1.0 step=0.1 group='Plane Settings'");
 		TwAddButton(bar, "Reset Plane", ResetPlaneCB, NULL, "group='Plane Settings'");
-
-		TwAddSeparator(bar, "", "");
-		TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem->liveParticles, " label='ParticleCount'");
-		TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem->mass, "min=0.1");
-
-		TwAddSeparator(bar, "", "");
-		TwAddVarRW(bar, "RecycleAge", TW_TYPE_BOOL8, &particleSystem->bRecycleAge, " label='RecycleAge'");
-		TwAddVarRW(bar, "RecyclePlane", TW_TYPE_BOOL8, &particleSystem->bRecyclePlane, "label='RecyclePlane'");
 	}
 };

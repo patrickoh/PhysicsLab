@@ -1,6 +1,6 @@
 #version 330
 
-//This is the layout convention accross all shader files
+//This is the layout convention across all shader files
 layout(location = 0) in vec3 vertex_position;
 layout(location = 1) in vec3 vertex_normal;
 layout(location = 2) in vec2 texture_coord;

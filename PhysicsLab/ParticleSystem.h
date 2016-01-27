@@ -37,6 +37,15 @@ struct BufferData
 	glm::vec4 colour;
 };
 
+bool operator<(BufferData& bd1, BufferData& bd2)
+{
+	// reverse order
+	//return this->cameraDistance > that.cameraDistance;
+}
+
+//CALCULATE CAMERA DISTANCE
+//particles[i]->cameraDistance = glm::length2(particles[i]->position - camera->viewProperties.position);
+
 enum IntegratorMode { Euler, RK2, RK4, None };
 
 struct Particle
@@ -50,6 +59,8 @@ struct Particle
 	glm::vec4 colour;
 	float age;
 
+	//float cameraDistance;
+
 	Particle(glm::vec3 startPos)
 	{
 		position = startPos;
@@ -58,6 +69,8 @@ struct Particle
 
 		active = true;
 		age = 0;
+
+		//cameraDistance = -1;
 	}
 
 	void Reset()
@@ -67,6 +80,8 @@ struct Particle
 		acceleration = glm::vec3(0);
 
 		age = 0;
+
+		//cameraDistance = -1;
 	}	
 };
 
@@ -83,6 +98,8 @@ struct Emitter
 	float velRadiusMin;
 	float velRadiusMax;
 
+	glm::vec3 variance;
+
 	Emitter()
 	{
 		centre = glm::vec3(0);
@@ -96,7 +113,9 @@ struct Emitter
 
 	void Emit(Particle* particle)
 	{
-		particle->position = centre;
+		particle->position = glm::vec3(centre.x + glm::linearRand(-variance.x, variance.x),
+			centre.y + glm::linearRand(-variance.y, variance.y),
+			centre.z + glm::linearRand(-variance.z, variance.z));
 		
 		glm::vec2 xz = glm::circularRand(glm::linearRand(velRadiusMin, velRadiusMax));
 		particle->velocity = glm::vec3(xz.x, glm::linearRand(velYMin, velYMax), xz.y);
@@ -149,15 +168,21 @@ class ParticleSystem
 
 		//Model* planeModel;
 
-		bool bUserGravity;
+		/*bool bUserGravity;
 		glm::vec3 userGravity;
-		float userGravityScalar;
+		float userGravityScalar;*/
 
 		bool bRecyclePlane;
 		bool bRecycleAge;
 
-		ParticleSystem(int size = 1000)
+		float pointSize;
+
+		Camera* camera;
+
+		ParticleSystem(Camera* p_camera, int size = 1000)
 		{
+			camera = p_camera;
+
 			textureID = loadTexture("particle.DDS");
 
 			startColour = glm::vec4(1,1,1,1);
@@ -193,6 +218,8 @@ class ParticleSystem
 			this->maxSize = size;
 			liveParticles = 0;
 
+			pointSize = 5.0f;
+
 			for(int i = 0; i < size; i++)
 			{	
 				Particle* p = new Particle(emitter.centre);
@@ -207,9 +234,9 @@ class ParticleSystem
 
 			mode = IntegratorMode::RK4;
 
-			bUserGravity = true;
+			/*bUserGravity = true;
 			userGravity = glm::vec3(0,0,0);
-			userGravityScalar = 1;
+			userGravityScalar = 1;*/
 
 			bRecycleAge = true;
 			bRecyclePlane = true;
@@ -309,6 +336,9 @@ class ParticleSystem
 						particles[i]->Reset();
 					}
 
+					//CALCULATE CAMERA DISTANCE
+					//particles[i]->cameraDistance = glm::length2(particles[i]->position - camera->viewProperties.position);
+
 					//ADD TO BUFFER
 					BufferData bd;
 					bd.position = particles[i]->position;
@@ -318,6 +348,7 @@ class ParticleSystem
 			}
 
 			liveParticles = data.size();
+			//std::sort(data.begin(), data.end());
 
 			if(liveParticles > 0)
 			{
@@ -336,11 +367,18 @@ class ParticleSystem
 		{
 			glBindVertexArray(vao);
 
+			glEnable(GL_BLEND);
+			glDepthMask(GL_FALSE);
+			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
 			glActiveTexture(GL_TEXTURE0);
 			//glUniform1i(glGetUniformLocation(shader, "texture_diffuse"), 0); //set the sampler in the shader to the correct texture 
 			glBindTexture(GL_TEXTURE_2D, textureID);
 
 			glDrawArrays(GL_POINTS, 0, maxSize - inactiveParticles.size());
+
+			glDepthMask(GL_TRUE);
+			glDisable(GL_BLEND);
  
 			glBindVertexArray(0);
 		}
@@ -394,8 +432,8 @@ class ParticleSystem
 					fNet += PressureDrag(pos, vel, true);
 				else
 					fNet += PressureDrag(pos, vel, false);
-			if(bUserGravity)
-				fNet += Attract(pos, vel);
+			//if(bUserGravity)
+				//fNet += Attract(pos, vel);
 
 			return fNet;
 		}
@@ -405,11 +443,10 @@ class ParticleSystem
 			return mass * env.gravity * glm::vec3(0,-1,0);
 		}
 
-		glm::vec3 Attract(glm::vec3 pos, glm::vec3 vel)
+		/*glm::vec3 Attract(glm::vec3 pos, glm::vec3 vel)
 		{
-			//ab = b-a
 			return (userGravity - pos) * userGravityScalar;
-		}
+		}*/
 
 		glm::vec3 PressureDrag(glm::vec3 pos, glm::vec3 vel, bool wind)
 		{
