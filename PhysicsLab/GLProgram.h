@@ -67,6 +67,8 @@ public:
 
 	int currentLine;
 
+	static GLProgram* Instance;
+
 	GLProgram()
 	{
 		currentLine = 0;
@@ -78,6 +80,8 @@ public:
 		WINDOW_HEIGHT = 720;
 		freeMouse = false;
 		printText = true;
+
+		Instance = this;
 	}
 
 	virtual ~GLProgram() = 0;
@@ -132,7 +136,7 @@ public:
 
 		camera = Camera();
 		camera.Init(glm::vec3(0.0f, 0.0f, 0.0f), 0.0002f, 0.01f); //TODO - constructor for camera
-		camera.mode = CameraMode::flycam;
+		camera.mode = CameraMode::tp;
 
 		shaderManager.Init(); //TODO - constructor for shader
 	}

@@ -16,6 +16,7 @@ unsigned char Input::keyPress = KEY::KEY_F12;
 bool Input::wasKeyPressed = false;
 bool Input::leftClick = false;
 
+GLProgram* GLProgram::Instance;
 ParticleDemo* ParticleDemo::Instance;
 
 int main(int argc, char** argv)

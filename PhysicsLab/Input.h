@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "imgui.h"
 
+class GLProgram;
+
 class Input 
 {
 
@@ -126,11 +128,5 @@ public:
 		}
 	}
 
-	static void mouseWheel(int button, int dir, int x, int y)
-	{
-		//if (dir > 0)
-			//camera.Zoom(-deltaTime);
-		//else
-			//camera.Zoom(deltaTime);
-	}
+	static void mouseWheel(int button, int dir, int x, int y);
 };
