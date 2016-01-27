@@ -89,7 +89,7 @@ public:
 		glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
 		glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		glutInitWindowPosition (0, 0); 
-		glutCreateWindow("Unconstrained Rigid Body! by Pad");
+		glutCreateWindow("Particles! by Pad");
 
 		//AntTweakBar
 		TwInit(TW_OPENGL_CORE, NULL);
