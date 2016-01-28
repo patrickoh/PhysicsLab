@@ -184,7 +184,7 @@ public:
 
 		TwAddSeparator(bar, "", "");
 
-		TwAddVarRW(bar, "variance", TW_TYPE_DIR3F, &particleSystem->emitter.variance, " ");
+		TwAddVarRW(bar, "emitterArea", TW_TYPE_DIR3F, &particleSystem->emitter.variance, " ");
 
 		TwAddVarRW(bar, "emitterPos", TW_TYPE_DIR3F, &particleSystem->emitter.centre, " ");
 
@@ -196,6 +196,10 @@ public:
 		TwAddSeparator(bar, "", "");
 		TwAddVarRO(bar, "Live Particles", TW_TYPE_INT32, &particleSystem->liveParticles, " label='ParticleCount'");
 		TwAddVarRW(bar, "Particle mass", TW_TYPE_FLOAT, &particleSystem->mass, "min=0.1");
+
+		TwAddSeparator(bar, "", "");
+		TwAddVarRW(bar, "ZSort", TW_TYPE_BOOL8, &particleSystem->bZSort, "");
+
 	}
 
 	void SetUpPhysicsTweakBar()

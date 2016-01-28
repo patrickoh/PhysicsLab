@@ -182,6 +182,8 @@ class ParticleSystem
 
 		Camera* camera;
 
+		bool bZSort;
+
 		ParticleSystem(Camera* p_camera, int size = 1000)
 		{
 			camera = p_camera;
@@ -243,6 +245,8 @@ class ParticleSystem
 
 			bRecycleAge = true;
 			bRecyclePlane = true;
+
+			bZSort = true;
 		}
 
 		~ParticleSystem()
@@ -351,7 +355,9 @@ class ParticleSystem
 			}
 
 			liveParticles = data.size();
-			std::sort(data.begin(), data.end());
+			
+			if(bZSort)
+				std::sort(data.begin(), data.end());
 
 			if(liveParticles > 0)
 			{
