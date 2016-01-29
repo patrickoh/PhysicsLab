@@ -107,7 +107,6 @@
     <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="GLProgram.h" />
-    <ClInclude Include="Header.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="ImGuiImpl.h" />
     <ClInclude Include="imgui.h" />
@@ -115,7 +114,6 @@
     <ClInclude Include="Inertia.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="ParticleDemo.h" />
-    <ClInclude Include="ParticleSystemGPU.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="QueryPerformance.h" />
     <ClInclude Include="RigidBody.h" />
@@ -123,6 +121,7 @@
     <ClInclude Include="Keys.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="RigidBodyDemo.h" />
     <ClInclude Include="RigidbodyManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />

@@ -52,6 +52,9 @@
     <Filter Include="Source Files\Demos">
       <UniqueIdentifier>{198d397d-76dd-4a2d-89d4-b81f56be0878}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Demos">
+      <UniqueIdentifier>{fa7ad2a3-a275-4341-8831-889ae31ad9bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -155,9 +158,6 @@
     <ClInclude Include="Tetrahedron.h">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="Header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Triangle.h">
       <Filter>Header Files\Primitives</Filter>
     </ClInclude>
@@ -182,17 +182,17 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleSystemGPU.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ParticleDemo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuiImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GLProgram.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBodyDemo.h">
+      <Filter>Header Files\Demos</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
