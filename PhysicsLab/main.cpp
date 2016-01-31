@@ -1,4 +1,5 @@
 #include "ParticleDemo.h"
+#include "RigidBodyDemo.h"
 #include "GLProgram.h"
 #include "QueryPerformance.h"
 
@@ -8,12 +9,13 @@ std::map<std::string, sint64> QueryPerformance::results;
 
 GLProgram* GLProgram::Instance;
 ParticleDemo* ParticleDemo::Instance;
+RigidBodyDemo* RigidBodyDemo::Instance;
 
 Camera* Camera::Instance;
 
 int main(int argc, char** argv)
 {
-	ParticleDemo* demo = new ParticleDemo();
+	RigidBodyDemo* demo = new RigidBodyDemo();
 
 	demo->Init(argc, argv);
 	demo->Run();
