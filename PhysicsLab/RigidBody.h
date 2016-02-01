@@ -30,16 +30,18 @@ class RigidBody
 		glm::vec3 com;
 
 		Model* model;
+
+		#pragma region _
 		BoundingSphere* boundingSphere;
 		AABB* aabb;
+		#pragma endregion
 
 		int id;
-
-		//static float forcePush;
-		//static Model* impulseVisualiser;
 		
 		static bool angular;
 		static bool linear;
+
+		static bool bDriftCorrection;
 
 		void StepPhysics(double deltaTime);
 		void Update();

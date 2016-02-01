@@ -5,6 +5,7 @@
 //Model* RigidBody::impulseVisualiser;
 bool RigidBody::angular = true; 
 bool RigidBody::linear = true; 
+bool RigidBody::bDriftCorrection = true;
 
 RigidBody::RigidBody(Model* model)
 {
@@ -28,8 +29,10 @@ RigidBody::RigidBody(Model* model)
 
 	ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
 
+	#pragma region _
 	boundingSphere = new BoundingSphere(model->vertices, this);
 	aabb = new AABB(model->vertices, this);
+	#pragma endregion 
 }
 
 RigidBody::~RigidBody()
@@ -75,8 +78,6 @@ void RigidBody::StepPhysics(double deltaTime)
 		//L = Iw
 		//w = L/I
 		//I(t) - R(t) Ibody R(t)T 
-
-		/// <image <url="$(SolutionDir)\Images\one.png />
 	
 		angularVelocity = angularMomentum * getIntertialTensor(); //Inertial tensor is invariant to translation but changes with a body’s orientation
 		//angularVelocity = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -85,18 +86,25 @@ void RigidBody::StepPhysics(double deltaTime)
 			timestep * model->worldProperties.orientation * glm::quat(setAsCrossProductMatrix(angularVelocity));
 		//model->worldProperties.orientation *= glm::angleAxis(1.0f, glm::vec3(0,0,1.0f));
 
+		#pragma region _
 		//if(angularVelocity.x != 0 || angularVelocity.y != 0 || angularVelocity.z != 0)
 		//{
 			std::vector<glm::vec3> extents = aabb->restBBverts;
 			RigidBody::transformBatch(&extents, model->worldProperties.orientation);
 			aabb->Calculate(extents);
 		//}
+		#pragma endregion
 	
 		angularMomentum += torqueNet * timestep;
 		
+		//Any operation that produces a quaternion will need to be normalized because floating-point precession errors will cause it to not be unit length.
 		//Due to numerical drift (this arises from incremental update of the matrix) your object may shear over time, you need to renormalize and re-orthogonalise??.
-		model->worldProperties.orientation
-			= glm::normalize(model->worldProperties.orientation); //DRIFT CORRECTION
+		
+		if(bDriftCorrection)
+		{
+			model->worldProperties.orientation
+				= glm::normalize(model->worldProperties.orientation); //DRIFT CORRECTION
+		}
 	}
 
 	forceNet = glm::vec3(0);

@@ -20,9 +20,11 @@ private:
 	
 	bool bClickImpulse;
 
+	float simulationSpeed;
+
 public:
 
-	glm::vec3 forcePush;
+	float forcePush;
 
 	static RigidBodyDemo* Instance;
 
@@ -47,11 +49,14 @@ public:
 
 		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-		AddADude(glm::vec3(0,0,0));
+		AddABox(glm::vec3(0,0,0));
 
-		bClickImpulse = true;
+		bClickImpulse = false;
 
 		mass = 1;
+		forcePush = 1.0f;
+
+		simulationSpeed = 1.0f;
 
 		tweakBars["main"] = TwNewBar("Main");
 		TwDefine(" Main size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
@@ -59,7 +64,7 @@ public:
 		SetUpTweakBars();
 	}
 
-	void AddADude(glm::vec3 position)
+	void AddABox(glm::vec3 position)
 	{
 		Model* m = new Model(position, glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"), false, false, true);
 		RigidBody* rb = new RigidBody(m);
@@ -95,22 +100,24 @@ public:
 				}
 			}
 
-			rigidBodies[i]->StepPhysics(deltaTime); //physics update				
+			rigidBodies[i]->StepPhysics(deltaTime * simulationSpeed); //physics update				
 			rigidBodies[i]->Update(); //bookkeeping
 		}
 
-		if(Input::leftClick)
+		if(Input::leftClick && bClickImpulse)
 		{
 			//Do Stuff
 			
-			glm::vec3 p1 = camera->viewProperties.position;
-			glm::vec3 p2 = cursorWorldSpace;
+			//glm::vec3 p1 = camera->viewProperties.position;
+			//glm::vec3 p2 = cursorWorldSpace;
+
+			/////
 
 			GLbyte color[4];
 			GLfloat depth;
 			GLuint index;
 
-			float x = Input::leftClickX;
+			/*float x = Input::leftClickX;
 			float y = Input::leftClickY;
   
 			glReadPixels(x, WINDOW_HEIGHT - y - 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, color);
@@ -118,10 +125,10 @@ public:
 			glReadPixels(x, WINDOW_HEIGHT - y - 1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
 
 			printf("Clicked on pixel %d, %d, color %02hhx%02hhx%02hhx%02hhx, depth %f, stencil index %u\n",
-					x, y, color[0], color[1], color[2], color[3], depth, index);
+					x, y, color[0], color[1], color[2], color[3], depth, index);*/
 
+			rigidBodies[0]->ApplyImpulse(cursorWorldSpace, camera->viewProperties.forward * forcePush);
 		}
-			//rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
 		
 		Draw();
 	}
@@ -169,16 +176,6 @@ public:
 		glutSolidSphere(.05, 25, 25);
 	}
 
-	void ApplyImpulse()
-	{
-		//rigidBodies[0]->ApplyImpulse(impulseVis->worldProperties.translation, forcePush);
-	}
-
-	static void TW_CALL ApplyImpulseCB(void *clientData)
-	{
-		RigidBodyDemo::Instance->ApplyImpulse();
-	}
-
 	void CalculateNewTensors()
 	{
 		for(RigidBody* rb : rigidBodies)
@@ -191,6 +188,60 @@ public:
 	static void TW_CALL CalculateNewTensorsCB(void *clientData)
 	{
 		RigidBodyDemo::Instance->CalculateNewTensors();
+	}
+
+	void ResetRB()
+	{
+		rigidBodies[0]->Reset();
+	}
+
+	static void TW_CALL ResetRBCB(void *clientData)
+	{
+		RigidBodyDemo::Instance->ResetRB();
+	}
+
+	void HandleInput() override //TODO - Improve OO here
+	{
+		if(!freeMouse)
+		{
+			if(Input::mouseMoved)
+			{
+				camera->MouseRotate(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime); 
+				Input::mouseMoved = false;
+			}
+
+			glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+		}
+
+		if(Input::wasKeyPressed)
+		{
+			camera->ProcessKeyboardOnce(Input::keyPress); 
+
+			if(Input::keyPress == KEY::KEY_h || Input::keyPress == KEY::KEY_H) 
+				printText = !printText;
+
+			if(Input::keyPress == KEY::KEY_SPACE || Input::keyPress == KEY::KEY_ESCAPE) 
+			{
+				if(!freeMouse)
+				{
+					freeMouse = true;
+					glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+				}
+				else
+				{
+					freeMouse = false;
+					glutSetCursor(GLUT_CURSOR_NONE);
+				}
+			}
+
+			if(Input::keyPress == KEY::KEY_K ||
+				Input::keyPress == KEY::KEY_k)
+				bClickImpulse = !bClickImpulse;
+
+			Input::wasKeyPressed = false;
+		}
+	
+		camera->ProcessKeyboardContinuous(Input::keyStates, deltaTime);
 	}
 
 	void printouts()
@@ -218,6 +269,9 @@ public:
 		toStringStream(cursorWorldSpace, ss);
 		printStream();
 
+		ss << "bClickImpulse: " << bClickImpulse;
+		printStream();
+
 		currentLine = 0;
 	}
 
@@ -237,29 +291,24 @@ public:
 
 		TwAddSeparator(bar, "", "");
 
-		//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed," label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
-		TwAddVarRW(bar, "Impulse Force", TW_TYPE_DIR3F, &forcePush, "");
+		TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBodies[0]->angularMomentum, "");
+		
+		TwAddSeparator(bar, "", "");
+
+		TwAddVarRW(bar, "Impulse Force", TW_TYPE_FLOAT, &forcePush, "");
 
 		TwAddSeparator(bar, "", "");
 
 		TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &mass, "");
-		TwAddButton(bar, "Recalculate TensorS", CalculateNewTensorsCB, NULL, "");
+		TwAddButton(bar, "Recalculate Tensors", CalculateNewTensorsCB, NULL, "");
 
+		TwAddSeparator(bar, "", "");
 
-		//TO DO: show that your rigid body can update automatically based on a given linear velocity 𝒗 and angular velocity 𝝎
-		//TO DO: show that your rigid body updates correctly when you manually change its position 𝒙 and orientation 𝑹
+		TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed," label='Simulation Speed' step=0.1 opened=true help='Change the simulation speed.' ");
+		TwAddVarRW(bar, "Drift Correction", TW_TYPE_BOOL8, &RigidBody::bDriftCorrection, "");
 
+		TwAddSeparator(bar, "", "");
 
-		//TwAddVarRW(bar, "Angular Velocity", TW_TYPE_DIR3F, &rigidBodies[0]->angularVelocity, "");
-		//TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBodies[0]->angularMomentum, "");
-		//TwAddSeparator(bar, "", "");
-
-		//TwAddVarRW(bar, "Centre of Mass", TW_TYPE_DIR3F, &rigidBodies[0]->com, "");
-
-		//TwAddSeparator(bar, "", "");
-
-		//TwAddButton(bar, "Reset", ResetRBCB, NULL, "");
-	
-		//Recalculate inertial tensor if mass changes
+		TwAddButton(bar, "Reset", ResetRBCB, NULL, "");
 	}
 };

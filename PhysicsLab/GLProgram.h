@@ -156,7 +156,7 @@ public:
 		camera->Update(deltaTime);
 	}
 
-	void HandleInput()
+	virtual void HandleInput()
 	{
 		if(!freeMouse)
 		{
