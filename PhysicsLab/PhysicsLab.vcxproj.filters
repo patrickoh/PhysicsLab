@@ -194,6 +194,9 @@
     <ClInclude Include="Inertia.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Integrator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\diffuse.ps">
