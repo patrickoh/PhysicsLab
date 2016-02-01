@@ -85,11 +85,15 @@ class Model
 		bool wireframe;
 		bool isColliding;
 
+		bool renderColour;
+		glm::vec4 colour;
+
 		vector<glm::vec3> vertices;
 
 		glm::mat4 globalInverseTransform;
 
-		Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const char* file_name, GLuint shaderProgramID, bool serialise = true, bool wireframe = false);
+		Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const char* file_name, GLuint shaderProgramID, bool serialise = true, bool wireframe = false, 
+			bool bRenderColour = false, glm::vec4 p_colour = glm::vec4(0.5,0.5,0.5,1.0));
 		~Model();
 
 		WorldProperties worldProperties;

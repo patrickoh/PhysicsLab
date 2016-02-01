@@ -7,6 +7,7 @@
 static class Inertia
 {
 	public:
+		//Game Physics By David H. Eberly
 		static glm::mat3 Compute(Model* mesh, float mass)
 		{
 			static float mult[10]={1.0f/6.0f,1.0f/24.0f,1.0f/24.0f,1.0f/24.0f,1.0f/60.0f,1.0f/60.0f,1.0f/60.0f,1.0f/120.0f,1.0f/120.0f,1.0f/120.0f};
@@ -116,6 +117,7 @@ static class Inertia
 		}
 
 	private:	
+		//Game Physics By David H. Eberly
 		static void Subexpressions(float& w0,float& w1,float& w2,float& f1,float& f2,float& f3,float& g0,float& g1,float& g2)
 		{
 			float temp0=w0+w1;

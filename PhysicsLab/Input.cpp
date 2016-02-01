@@ -7,9 +7,11 @@ bool Input::keyStates[256] = { false };
 bool Input::mouseMoved = false;
 int Input::mouseX = 0;
 int Input::mouseY = 0;
-unsigned char Input::keyPress = KEY::KEY_F12;
+unsigned char Input::keyPress = KEY::KEY_F11;
 bool Input::wasKeyPressed = false;
 bool Input::leftClick = false;
+float Input::leftClickX = 0;
+float Input::leftClickY = 0;
 
 void Input::mouseWheel(int button, int dir, int x, int y)
 {

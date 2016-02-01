@@ -13,13 +13,26 @@ RigidBodyDemo* RigidBodyDemo::Instance;
 
 Camera* Camera::Instance;
 
+glm::vec3 RigidBodyDemo::normal[6] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
+glm::vec3 RigidBodyDemo::plane[6] = { glm::vec3(0,-5,0), glm::vec3(0,5,0), glm::vec3(-5,0,0), glm::vec3(5,0,0), glm::vec3(0,0,5), glm::vec3(0,0,-5) };
+
 int main(int argc, char** argv)
 {
-	RigidBodyDemo* demo = new RigidBodyDemo();
+	GLProgram* demo;
+
+	int demoIndex = -1;
+	do {
+		std::cin >> demoIndex;
+	}
+	while(demoIndex < 0 || demoIndex > 1);
+
+	if(demoIndex == 0)
+		demo = new ParticleDemo();	
+	else if(demoIndex == 1)
+		demo = new RigidBodyDemo();
 
 	demo->Init(argc, argv);
 	demo->Run();
-
 	delete demo;
 
 	return 0;

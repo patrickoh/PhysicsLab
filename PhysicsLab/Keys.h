@@ -3,6 +3,7 @@
 
 enum KEY
 {
+	KEY_TAB =				9,
 	KEY_ESCAPE =			27,
 	KEY_SPACE =             32,
 	KEY_APOSTROPHE =        39,
@@ -78,8 +79,7 @@ enum KEY
 	KEY_x =                 120,
 	KEY_y =                 121,
 	KEY_z =                 122,
-	KEY_ENTER,          
-	KEY_TAB,            
+	KEY_ENTER,                 
 	KEY_BACKSPACE,      
 	KEY_INSERT,         
 	KEY_DELETE,            

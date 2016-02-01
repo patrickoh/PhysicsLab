@@ -459,3 +459,8 @@ glm::vec2 randomPointOnCircumference(float radius)
 
 	return glm::circularRand(radius);
 }
+
+void toStringStream(glm::vec3 v, std::stringstream& ss)
+{
+	ss << "(" << std::fixed << std::setprecision(PRECISION) << v.x << ", " << v.y << ", " << v.z << ")";
+}

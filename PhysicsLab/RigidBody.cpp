@@ -1,10 +1,10 @@
 #include "RigidBody.h"
 #include "Inertia.h"
 
-float RigidBody::forcePush;
-Model* RigidBody::impulseVisualiser;
-bool RigidBody::angular; 
-bool RigidBody::linear; 
+//float RigidBody::forcePush;
+//Model* RigidBody::impulseVisualiser;
+bool RigidBody::angular = true; 
+bool RigidBody::linear = true; 
 
 RigidBody::RigidBody(Model* model)
 {
@@ -19,14 +19,14 @@ RigidBody::RigidBody(Model* model)
 	angularMomentum = glm::vec3(0,0,0);
 	
 	//inertialTensor = mass * length * length * 1.0f / 6.0f; 
-	inertialTensor = Inertia::Compute2(model, mass);
+	inertialTensor = Inertia::Compute2(model, mass);  //cube approximation
 
 	//Things that affect the tensor
 	//1) increasing mass increases moment of inertia
 	//2) distribution of mass from com increase moment of inertia
 	//3) for most objects will depend on the axis of rotation
 
-	//ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
+	ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
 
 	boundingSphere = new BoundingSphere(model->vertices, this);
 	aabb = new AABB(model->vertices, this);
@@ -59,13 +59,13 @@ void RigidBody::StepPhysics(double deltaTime)
 		//v = P/m
 
 		//Momentum method
-		model->worldProperties.translation += velocity * timestep;
-		velocity = momentum / mass; //equals is bad :P
-		momentum += forceNet * timestep;
+		//model->worldProperties.translation += velocity * timestep;
+		//velocity = momentum / mass; //equals is bad :P
+		//momentum += forceNet * timestep;
 		
 		//Acceleration method
-		//model->worldProperties.translation += velocity * timestep;
-		//velocity += (mass * forceNet)/mass * timestep;
+		model->worldProperties.translation += velocity * timestep;
+		velocity += (mass * forceNet)/mass * timestep;
 	}
 
 	if(RigidBody::angular)
@@ -78,7 +78,7 @@ void RigidBody::StepPhysics(double deltaTime)
 
 		/// <image <url="$(SolutionDir)\Images\one.png />
 	
-		angularVelocity = angularMomentum * getIntertialTensor();
+		angularVelocity = angularMomentum * getIntertialTensor(); //Inertial tensor is invariant to translation but changes with a body’s orientation
 		//angularVelocity = glm::vec3(0.0f, 0.0f, 1.0f);
 
 		model->worldProperties.orientation += 
@@ -94,8 +94,9 @@ void RigidBody::StepPhysics(double deltaTime)
 	
 		angularMomentum += torqueNet * timestep;
 		
+		//Due to numerical drift (this arises from incremental update of the matrix) your object may shear over time, you need to renormalize and re-orthogonalise??.
 		model->worldProperties.orientation
-			= glm::normalize(model->worldProperties.orientation);
+			= glm::normalize(model->worldProperties.orientation); //DRIFT CORRECTION
 	}
 
 	forceNet = glm::vec3(0);

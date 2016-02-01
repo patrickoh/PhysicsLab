@@ -19,19 +19,9 @@
 #include "Common.h"
 #include "Keys.h"
 
-#include <string> 
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-
 #include <map>
 #include <vector>
 #include <list>
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 
 #include "Input.h"
 
@@ -93,7 +83,7 @@ public:
 		glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB|GLUT_DEPTH);
 		glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		glutInitWindowPosition (0, 0); 
-		glutCreateWindow("Particles! by Pad");
+		glutCreateWindow("All of the Physics");
 
 		//AntTweakBar
 		TwInit(TW_OPENGL_CORE, NULL);
@@ -134,8 +124,7 @@ public:
 
 		projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
 
-		camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
-		camera->mode = CameraMode::tp;
+		camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f), CameraMode::tp);
 
 		shaderManager.Init(); //TODO - constructor for shader
 	}
@@ -180,9 +169,6 @@ public:
 			glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 		}
 
-		//if(Input::leftClick)
-			//rigidBodyManager[0]->ApplyImpulse(impulseVisualiser->worldProperties.translation, camera.viewProperties.forward * RigidBody::forcePush);
-
 		if(Input::wasKeyPressed)
 		{
 			camera->ProcessKeyboardOnce(Input::keyPress); 
@@ -220,11 +206,15 @@ public:
 			
 				shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
 				ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);
+
+				if(modelList[i]->renderColour)
+					ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "boundColour", modelList[i]->colour);
+
 				modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
 	
 				shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("bounding"));
 				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
 				modelList.at(i)->Render(shaderManager.GetShaderProgramID("bounding"), true);
 			}
 		}	
@@ -237,30 +227,7 @@ public:
 		ss.str(std::string()); //reset
 	}
 
-	virtual void printouts()
-	{
-		shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
-
-		ss << " Press 'spacebar' or 'esc' to toggle camera/cursor";
-		printStream();
-
-		ss << " Press 'c' to switch camera modes";
-		printStream();
-
-		ss << " fps: " << fps;
-		printStream();
-
-		ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.forward.x << ", " << camera->viewProperties.forward.y << ", " << camera->viewProperties.forward.z << ")";
-		printStream();
-
-		ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.position.x << ", " << camera->viewProperties.position.y << ", " << camera->viewProperties.position.z << ")";
-		printStream();
-
-		ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.up.x << ", " << camera->viewProperties.up.y << ", " << camera->viewProperties.up.z << ")";
-		printStream();
-
-		currentLine = 0;
-	}
+	virtual void printouts() = 0;
 
 };
 

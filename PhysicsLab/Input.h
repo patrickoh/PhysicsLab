@@ -25,6 +25,10 @@ public:
 	static int mouseY;
 
 	static bool leftClick;
+	static float leftClickX;
+	static float leftClickY;
+
+	static int DemoIndex;
 
 	static void keyPressed (unsigned char key, int x, int y) 
 	{  
@@ -120,6 +124,8 @@ public:
 			if (state == GLUT_DOWN)
 			{
 				leftClick = true;
+				leftClickX = x;
+				leftClickY = y;
 			}
 			else if (state == GLUT_UP)
 			{

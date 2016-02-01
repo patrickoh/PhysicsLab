@@ -56,32 +56,34 @@ class Camera
 
 		static Camera* Instance;
 
-		Camera(glm::vec3 position)
+		Camera(glm::vec3 position, CameraMode p_mode, float p_turnSpeed = 0.0002f, float p_moveSpeed = 0.01f)
 		{
 			Instance = this;
-			Init(position);
+
+			turnSpeed =  p_turnSpeed; 
+			moveSpeed = p_moveSpeed; 
+	
+			minDistance = 2;
+			maxDistance = 15;
+			scrollWheelSensivity = 0.15f;
+
+			SetUp(position, p_mode);
 		}
 		
 		//0.005f, 0.01f
-		void Init(glm::vec3 position, float p_turnSpeed = 0.0002f, float p_moveSpeed = 0.01f ) 
+		void SetUp(glm::vec3 position, CameraMode p_mode) 
 		{ 
 			viewProperties.position = position;
 			viewProperties.up = glm::vec3(0,1,0);
 
-			turnSpeed =  p_turnSpeed; 
-			moveSpeed = p_moveSpeed; 
-
-			mode = CameraMode::flycam;
-
+			mode = p_mode;
 			distance = 3;
-			minDistance = 2;
-			maxDistance = 10;
-
-			scrollWheelSensivity = 0.15f;
 
 			target = glm::vec3(0,0,0);
 			targetYOffset = glm::vec3(0,1,0);
 
+			horizontalXZAngle = 0;
+			verticalAngle = 0;
 		}
 
 		void MouseRotate(int x, int y, int p_winw, int p_winh, int deltaTime)
@@ -182,6 +184,8 @@ class Camera
 			if (key == KEY::KEY_C || key == KEY::KEY_c)
 			{
 				mode = static_cast<CameraMode>((mode+1) % NUM_CAM_MODES);
+
+				SetUp(glm::vec3(0), mode);
 			}
 		}
 

@@ -35,8 +35,8 @@ class RigidBody
 
 		int id;
 
-		static float forcePush;
-		static Model* impulseVisualiser;
+		//static float forcePush;
+		//static Model* impulseVisualiser;
 		
 		static bool angular;
 		static bool linear;

@@ -13,6 +13,8 @@
 
 #include <vector>
 
+#include "Common.h"
+
 #include "Magick++.h"
 #include <iostream>
 
@@ -42,3 +44,4 @@ bool isRightTurn(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c);
 bool isSameDirection(glm::vec3 v1, glm::vec3 v2);
 GLuint loadTexture(const char* fileName);
 glm::vec2 randomXZ(float radius);
+void toStringStream(glm::vec3 v, std::stringstream& ss);

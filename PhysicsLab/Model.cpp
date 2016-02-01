@@ -1,6 +1,7 @@
 #include "Model.h"
 
-Model::Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const char* file_name, GLuint p_shaderProgramID, bool serialise, bool wireframe)
+Model::Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const char* file_name, GLuint p_shaderProgramID, bool serialise, bool wireframe,
+			 bool bRenderColour, glm::vec4 p_colour)
 {
 	worldProperties.translation = position;
 	worldProperties.orientation = orientation;
@@ -17,6 +18,9 @@ Model::Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const c
 
 	drawMe = true;
 	isColliding = false;
+
+	renderColour = bRenderColour;
+	colour = p_colour;
 }
 
 Model::~Model()

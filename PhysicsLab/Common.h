@@ -22,6 +22,15 @@
 #include <GL/freeglut.h>
 #include <AntTweakBar.h>
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <string> 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+
 #define NOMINMAX
 #include <Windows.h> //QueryPerformanceCounter
 

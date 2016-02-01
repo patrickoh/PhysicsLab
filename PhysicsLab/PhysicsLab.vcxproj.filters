@@ -40,19 +40,19 @@
     <Filter Include="Header Files\Demos">
       <UniqueIdentifier>{fa7ad2a3-a275-4341-8831-889ae31ad9bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ImGui\Physics">
+    <Filter Include="Header Files\Physics">
       <UniqueIdentifier>{f850a68d-414f-4005-9d86-119a9f15dc1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ImGui\Physics\Collision Response">
+    <Filter Include="Header Files\Physics\Collision Response">
       <UniqueIdentifier>{a93a90e1-dcad-4af1-9f93-09d2bcb295ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ImGui\Physics\CD - Broadphase">
+    <Filter Include="Header Files\Physics\CD - Broadphase">
       <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ImGui\Physics\CD - Narrowphase">
+    <Filter Include="Header Files\Physics\CD - Narrowphase">
       <UniqueIdentifier>{a2a3cd8d-1806-412f-ae10-80507c78cc51}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ImGui\Physics">
+    <Filter Include="Source Files\Physics">
       <UniqueIdentifier>{a724956f-c2cc-4b72-acca-9aa551542f5d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -73,10 +73,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AABB.cpp">
-      <Filter>Source Files\ImGui\Physics</Filter>
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="BoundingSphere.cpp">
-      <Filter>Source Files\ImGui\Physics</Filter>
+      <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="imgui_demo.cpp">
       <Filter>Source Files\ImGui</Filter>
@@ -120,13 +120,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RigidbodyManager.h">
-      <Filter>Header Files\ImGui\Physics</Filter>
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="AABB.h">
-      <Filter>Header Files\ImGui\Physics\CD - Broadphase</Filter>
+      <Filter>Header Files\Physics\CD - Broadphase</Filter>
     </ClInclude>
     <ClInclude Include="BoundingSphere.h">
-      <Filter>Header Files\ImGui\Physics\CD - Broadphase</Filter>
+      <Filter>Header Files\Physics\CD - Broadphase</Filter>
     </ClInclude>
     <ClInclude Include="QueryPerformance.h">
       <Filter>Header Files</Filter>
@@ -135,13 +135,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GJK.h">
-      <Filter>Header Files\ImGui\Physics\CD - Narrowphase</Filter>
+      <Filter>Header Files\Physics\CD - Narrowphase</Filter>
     </ClInclude>
     <ClInclude Include="Support.h">
-      <Filter>Header Files\ImGui\Physics</Filter>
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="EPA.h">
-      <Filter>Header Files\ImGui\Physics\Collision Response</Filter>
+      <Filter>Header Files\Physics\Collision Response</Filter>
     </ClInclude>
     <ClInclude Include="Line.h">
       <Filter>Header Files\Primitives</Filter>

@@ -156,7 +156,27 @@ public:
 
 	void printouts()
 	{
-		GLProgram::printouts();
+		shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
+
+		ss << " Press 'spacebar' or 'esc' to toggle camera/cursor";
+		printStream();
+
+		ss << " Press 'c' to switch camera modes";
+		printStream();
+
+		ss << " fps: " << fps;
+		printStream();
+
+		ss << "camera.forward: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.forward.x << ", " << camera->viewProperties.forward.y << ", " << camera->viewProperties.forward.z << ")";
+		printStream();
+
+		ss << "camera.pos: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.position.x << ", " << camera->viewProperties.position.y << ", " << camera->viewProperties.position.z << ")";
+		printStream();
+
+		ss << "camera.up: (" << std::fixed << std::setprecision(PRECISION) << camera->viewProperties.up.x << ", " << camera->viewProperties.up.y << ", " << camera->viewProperties.up.z << ")";
+		printStream();
+
+		currentLine = 0;
 	}
 
 	void SetUpTweakBars()
