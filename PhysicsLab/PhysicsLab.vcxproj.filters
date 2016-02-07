@@ -49,11 +49,11 @@
     <Filter Include="Header Files\Physics\Collision Response">
       <UniqueIdentifier>{a93a90e1-dcad-4af1-9f93-09d2bcb295ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Physics\CD - Broadphase">
-      <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Physics\CD - Narrowphase">
       <UniqueIdentifier>{a2a3cd8d-1806-412f-ae10-80507c78cc51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CD - Broadphase">
+      <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -119,14 +119,11 @@
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RigidbodyManager.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="AABB.h">
-      <Filter>Header Files\Physics\CD - Broadphase</Filter>
+      <Filter>Header Files\CD - Broadphase</Filter>
     </ClInclude>
     <ClInclude Include="BoundingSphere.h">
-      <Filter>Header Files\Physics\CD - Broadphase</Filter>
+      <Filter>Header Files\CD - Broadphase</Filter>
     </ClInclude>
     <ClInclude Include="QueryPerformance.h">
       <Filter>Header Files</Filter>
@@ -199,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="BroadphaseDemo.h">
       <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidbodyManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

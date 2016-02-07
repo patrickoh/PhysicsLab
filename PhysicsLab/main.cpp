@@ -1,5 +1,6 @@
 #include "ParticleDemo.h"
 #include "RigidBodyDemo.h"
+#include "BroadphaseDemo.h"
 #include "GLProgram.h"
 #include "QueryPerformance.h"
 
@@ -8,8 +9,10 @@ long long int QueryPerformance::tf = 0;
 std::map<std::string, sint64> QueryPerformance::results;
 
 GLProgram* GLProgram::Instance;
+
 ParticleDemo* ParticleDemo::Instance;
 RigidBodyDemo* RigidBodyDemo::Instance;
+BroadphaseDemo* BroadphaseDemo::Instance;
 
 Camera* Camera::Instance;
 
@@ -24,12 +27,14 @@ int main(int argc, char** argv)
 	do {
 		std::cin >> demoIndex;
 	}
-	while(demoIndex < 0 || demoIndex > 1);
+	while(demoIndex < 0 || demoIndex > 2);
 
 	if(demoIndex == 0)
 		demo = new ParticleDemo();	
 	else if(demoIndex == 1)
 		demo = new RigidBodyDemo();
+	else if(demoIndex == 2)
+		demo = new BroadphaseDemo();
 
 	demo->Init(argc, argv);
 	demo->Run();
@@ -37,23 +42,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -29,10 +29,8 @@ RigidBody::RigidBody(Model* model)
 
 	ApplyImpulse(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-1.0, 0.0f, 0.0)); 
 
-	#pragma region _
 	boundingSphere = new BoundingSphere(model->vertices, this);
 	aabb = new AABB(model->vertices, this);
-	#pragma endregion 
 }
 
 RigidBody::~RigidBody()
@@ -86,14 +84,12 @@ void RigidBody::StepPhysics(double deltaTime)
 			timestep * model->worldProperties.orientation * glm::quat(setAsCrossProductMatrix(angularVelocity));
 		//model->worldProperties.orientation *= glm::angleAxis(1.0f, glm::vec3(0,0,1.0f));
 
-		#pragma region _
 		//if(angularVelocity.x != 0 || angularVelocity.y != 0 || angularVelocity.z != 0)
 		//{
 			std::vector<glm::vec3> extents = aabb->restBBverts;
 			RigidBody::transformBatch(&extents, model->worldProperties.orientation);
 			aabb->Calculate(extents);
 		//}
-		#pragma endregion
 	
 		angularMomentum += torqueNet * timestep;
 		

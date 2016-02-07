@@ -8,8 +8,11 @@
 #include <algorithm> 
 
 #include "QueryPerformance.h"
+
+#pragma region _
 #include "GJK.h"
 #include "EPA.h"
+#pragma endregion
 
 struct RbPair
 {
@@ -23,8 +26,11 @@ struct RbPair
 	}
 };
 
-enum BroadphaseMode { Sphere, BruteAABB, SAP1D};
+enum BroadphaseMode { Sphere, BruteAABB, SAP1D };
+
+#pragma region _
 enum DebugStage { Gjk, Epa };
+#pragma endregion
 
 class RigidbodyManager
 { 
@@ -32,12 +38,6 @@ class RigidbodyManager
 		vector<AABB::EndPoint*> Axes[3];
 
 	public:
-
-		ContactInfo cInfo;
-		bool bVisContacts;
-
-		GJK* gjk;
-		EPA epa;
 
 		vector<RigidBody*> rigidBodies;
 
@@ -48,7 +48,15 @@ class RigidbodyManager
 
 		bool bounceyEnclosure;
 		
-		bool paused;
+		bool pausedSim;
+		bool autoPause;
+
+		#pragma region _
+		ContactInfo cInfo;
+		bool bVisContacts;
+
+		GJK* gjk;
+		EPA epa;
 
 		bool debugGJK, debugEPA, stepDebug;
 		DebugStage debugStage;
@@ -58,16 +66,20 @@ class RigidbodyManager
 		std::vector<glm::vec3> currentMinkowski;
 
 		glm::vec3 J;
+		#pragma endregion
 
 		RigidbodyManager()
 		{
+			bounceyEnclosure = true;
+			
+			pausedSim = false;
+			autoPause = false;
+
+			#pragma region _
 			gjk = new GJK();
 			epa = EPA();
 
-			bounceyEnclosure = true;
 			CR = false;
-
-			paused = false;
 
 			debugGJK = false; //Are we debug drawing GJK?
 			debugEPA = false; //Are we debug drawing EPA?
@@ -75,14 +87,10 @@ class RigidbodyManager
 			debugStage = DebugStage::Gjk; //Which narrowphase stage are we at?
 
 			bVisContacts = false;
+			#pragma endregion
 		}
 
 		~RigidbodyManager(){}
-
-		/*void Add(RigidBody* rigidbody)
-		{
-			xAxis.push_back(rigidbody->aabb->min.x);
-		}*/
 
 		RigidBody* operator [](int i) const    { return rigidBodies[i]; }
 		RigidBody* & operator [](int i) { return rigidBodies[i]; }
@@ -130,6 +138,7 @@ class RigidbodyManager
 			QueryPerformance::Finish("Broadphase");
 		}
 
+		#pragma region _
 		void Narrowphase(double deltaTime)
 		{
 			for(int i = 0; i < broadphasePairs.size(); i++)
@@ -145,7 +154,7 @@ class RigidbodyManager
 
 				if(debugGJK && debugStage == DebugStage::Gjk)
 				{
-					paused = true;
+					pausedSim = true;
 					if(!stepDebug)
 						continue;
 					else
@@ -156,7 +165,7 @@ class RigidbodyManager
 				bool intersecting = gjk->Intersects(rb1->model, rb2->model, simplexForEPA, /* debug stuff --> */ gjkFinished, (debugGJK && debugStage == DebugStage::Gjk));
 
 				if(gjkFinished)
-					paused = false; //If it was in gjk Debug, simulation may resume
+					pausedSim = false; //If it was in gjk Debug, simulation may resume
 					
 				if((!debugGJK || gjkFinished) && intersecting) //GJK is finished, and found an intersection
 				{
@@ -165,7 +174,7 @@ class RigidbodyManager
 
 					if(debugEPA)
 					{
-						paused = true;
+						pausedSim = true;
 						if(!stepDebug)
 							continue;
 						else
@@ -179,7 +188,7 @@ class RigidbodyManager
 					{
 						debugStage = DebugStage::Gjk; //Put it back to the default
 						gjk->simplex.clear(); //Can now clear the original gjk simplex which we were using for vis
-						paused = false; // resume simulation (in case was paused for debugging)
+						pausedSim = false; // resume simulation (in case was paused for debugging)
 							
 						bVisContacts = true; //visualise contacts
 					}
@@ -229,6 +238,7 @@ class RigidbodyManager
 
 			return j;
 		}
+		#pragma endregion
 
 		void Update(double deltaTime)
 		{
@@ -254,7 +264,7 @@ class RigidbodyManager
 					}
 				}
 
-				if(!paused)
+				if(!pausedSim)
 					rigidBodies[i]->StepPhysics(deltaTime); //physics update
 					
 				rigidBodies[i]->Update(); //bookkeeping
@@ -280,6 +290,9 @@ class RigidbodyManager
 					{
 						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);		
 						broadphasePairs.push_back(RbPair(sphere1->owner, sphere2->owner));
+
+						if(autoPause)
+							pausedSim = true;
 					}
 				}
 			}
@@ -303,6 +316,9 @@ class RigidbodyManager
 					{
 						aabb1->colour = aabb2->colour = glm::vec4(1,0,0,1);
 						broadphasePairs.push_back(RbPair(aabb1->owner, aabb2->owner));
+
+						if(autoPause)
+							pausedSim = true;
 					}
 				}
 			}
@@ -329,6 +345,9 @@ class RigidbodyManager
 						{
 							ep->owner->colour = ep2->owner->colour = glm::vec4(1,0,0,1);
 							broadphasePairs.push_back(RbPair(ep->owner->owner, ep2->owner->owner));
+
+							if(autoPause)
+								pausedSim = true;
 						}
 					}
 

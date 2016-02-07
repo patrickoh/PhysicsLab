@@ -31,10 +31,8 @@ class RigidBody
 
 		Model* model;
 
-		#pragma region _
 		BoundingSphere* boundingSphere;
 		AABB* aabb;
-		#pragma endregion
 
 		int id;
 		
