@@ -102,6 +102,7 @@
   <ItemGroup>
     <ClInclude Include="AABB.h" />
     <ClInclude Include="BoundingSphere.h" />
+    <ClInclude Include="BroadphaseDemo.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="EPA.h" />

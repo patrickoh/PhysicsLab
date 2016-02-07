@@ -197,6 +197,9 @@
     <ClInclude Include="Integrator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BroadphaseDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\diffuse.ps">
