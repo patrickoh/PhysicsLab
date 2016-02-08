@@ -26,7 +26,7 @@ struct RbPair
 	}
 };
 
-enum BroadphaseMode { Sphere, BruteAABB, SAP1D };
+enum BroadphaseMode { Sphere, BruteAABB, SAP1D, SAP3D };
 
 #pragma region _
 enum DebugStage { Gjk, Epa };
@@ -51,6 +51,8 @@ class RigidbodyManager
 		bool pausedSim;
 		bool autoPause;
 
+		int bounceyEnclosureSize;
+
 		#pragma region _
 		ContactInfo cInfo;
 		bool bVisContacts;
@@ -74,6 +76,8 @@ class RigidbodyManager
 			
 			pausedSim = false;
 			autoPause = false;
+
+			bounceyEnclosureSize = 5;
 
 			#pragma region _
 			gjk = new GJK();
@@ -121,19 +125,25 @@ class RigidbodyManager
 			QueryPerformance::Start();
 			
 			if(mode == BroadphaseMode::BruteAABB)
+			{
 				BruteForceCheckAABBs();
+			}
 			else if (mode == BroadphaseMode::Sphere)
+			{
 				SphereCollisions();
+			}
 			else if (mode == BroadphaseMode::SAP1D)
 			{
 				SAP1D(Axis::X);
-
-				/*std::vector<Axis> axes;
+			}
+			/*else if(mode == BroadphaseMode::SAP3D)
+			{
+				std::vector<Axis> axes;
 				axes.push_back(Axis::X);
 				axes.push_back(Axis::Y);
 				axes.push_back(Axis::Z);
-				SAP(axes);*/
-			}
+				SAP(axes);
+			}*/
 	
 			QueryPerformance::Finish("Broadphase");
 		}
@@ -249,7 +259,8 @@ class RigidbodyManager
 				if(bounceyEnclosure)
 				{
 					glm::vec3 normal[] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
-					glm::vec3 plane[] = { glm::vec3(0,-5,0), glm::vec3(0,5,0), glm::vec3(-5,0,0), glm::vec3(5,0,0), glm::vec3(0,0,5), glm::vec3(0,0,-5) };
+					glm::vec3 plane[] = { glm::vec3(0,-bounceyEnclosureSize,0), glm::vec3(0,bounceyEnclosureSize,0), glm::vec3(-bounceyEnclosureSize,0,0), 
+						glm::vec3(bounceyEnclosureSize,0,0), glm::vec3(0,0,bounceyEnclosureSize), glm::vec3(0,0,-bounceyEnclosureSize) };
 
 					for(int j = 0; j < 6; j++)
 					{
@@ -355,7 +366,7 @@ class RigidbodyManager
 				}
 				else
 				{
-					activeList.erase(std::remove(activeList.begin(), activeList.end(), ep->partner), activeList.end());
+					activeList.erase(std::remove(activeList.begin(), activeList.end(), ep->partner), activeList.end()); //if it's the max, then remove its min partner
 				}
 			}
 		}
@@ -400,10 +411,24 @@ class RigidbodyManager
 				{
 					if (i == j) continue; 
 
-					if(pairs[i][j] == 3)
+					if(pairs[i][j] == a.size())
 					{
-						rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
-						broadphasePairs.push_back(RbPair(rigidBodies[i], rigidBodies[j]));
+						if(a.size() == 3)
+						{
+							rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
+							broadphasePairs.push_back(RbPair(rigidBodies[i], rigidBodies[j]));
+
+							if(autoPause)
+								pausedSim = true;
+						}
+						else if(rigidBodies[i]->aabb->collides(rigidBodies[j]->aabb))
+						{
+							rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
+							broadphasePairs.push_back(RbPair(rigidBodies[i], rigidBodies[j]));
+
+							if(autoPause)
+								pausedSim = true;
+						}
 					}
 				}
 			}

@@ -21,7 +21,7 @@ public:
 
 	BoundingSphere(const std::vector<glm::vec3>& v, RigidBody* p_owner);
 
-	//TODO - Fix this naive approach that doesn't even work!
+	//TODO - Make this better
 	void calculate(const std::vector<glm::vec3>& v)
 	{
 		glm::vec3 p1, p2;

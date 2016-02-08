@@ -92,7 +92,7 @@ public:
 
 		//if(!pausedSim)
 		//{
-			rigidBodyManager.Update(deltaTime);
+			rigidBodyManager.Update(deltaTime * simulationSpeed);
 			rigidBodyManager.Broadphase(broadphaseMode);
 		//}
 	
@@ -169,7 +169,7 @@ public:
 		MVP = projectionMatrix * viewMatrix;
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
-		glutWireCube(10);
+		glutWireCube(rigidBodyManager.bounceyEnclosureSize * 2);
 	}
 
 	void printouts()
@@ -231,22 +231,27 @@ public:
 	{
 		TwBar* bar = tweakBars["main"];
 
+		//
+
 		TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
 		TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
 
 		TwAddVarRW(bar, "Draw Bounding Spheres", TW_TYPE_BOOL8, &drawBoundingSpheres, "");
 		TwAddVarRW(bar, "Draw AABBs", TW_TYPE_BOOL8, &drawBoundingBoxes, "");
 
+		TwAddVarRW(bar, "Enclosure size", TW_TYPE_INT32, &rigidBodyManager.bounceyEnclosureSize, "");
+
 		TwAddSeparator(bar, "", ""); //=======================================================
 
+		//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, "");
 		TwAddVarRW(bar, "Pause simulation", TW_TYPE_BOOL8, &rigidBodyManager.pausedSim, "");
 		TwAddVarRW(bar, "Auto-pause", TW_TYPE_BOOL8, &rigidBodyManager.autoPause, "");
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
 		{
-			TwEnumVal broadphaseModeEV[3] = { {BroadphaseMode::SAP1D, "SAP1D"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"} };
-			TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 3);
+			TwEnumVal broadphaseModeEV[4] = { {BroadphaseMode::SAP1D, "SAP"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"} };
+			TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 4);
 			TwAddVarRW(bar, "BroadphaseMode", broadphaseType, &broadphaseMode, " keyIncr='<' keyDecr='>' help='Change broadphase mode.' ");
 		}
 
