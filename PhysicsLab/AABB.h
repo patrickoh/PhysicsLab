@@ -18,8 +18,8 @@ public:
 
 	struct EndPoint
 	{
-		float value; //ooor update the value
-		float global;
+		float value; //local
+		float global; //world
 
 		bool isMin;
 		Axis axis;

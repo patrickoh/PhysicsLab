@@ -18,6 +18,8 @@ private:
 	sint64 broadphaseResults;
 	float simulationSpeed;
 
+	int addAmount;
+
 	bool drawBoundingSpheres; 
 	bool drawBoundingBoxes;
 
@@ -48,6 +50,8 @@ public:
 
 		for(int i = 0; i < 5; i++)
 			AddBox(glm::vec3(0,0,0));
+
+		addAmount = 1;
 		
 		simulationSpeed = 1.0f;
 
@@ -72,8 +76,10 @@ public:
 	{
 		Model* m = new Model(position, glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"), false, false, true);
 		RigidBody* rb = new RigidBody(m);
-	
-		rb->velocity = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
+
+		glm::vec2 xz = glm::circularRand(glm::linearRand(-1.0f, 1.0f));
+		rb->velocity = glm::vec3(xz.x, glm::linearRand(-1.0f, 1.0f), xz.y);
+		//rb->velocity = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
 		rb->angularMomentum = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
 
 		rigidBodyManager.Add(rb);
@@ -148,12 +154,12 @@ public:
 			if(drawBoundingBoxes)
 			{
 				MVP = projectionMatrix * viewMatrix * 
-				glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
-					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale) 
+				glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) //translate in world space
+					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale) //scale to size of model
 					* rigidBodyManager[i]->model->globalInverseTransform 
-					* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->aabb->centre)
+					* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->aabb->centre) //translate to centre in model space
 					* glm::scale(glm::mat4(), glm::vec3(rigidBodyManager[i]->aabb->width, rigidBodyManager[i]->aabb->height, 
-														rigidBodyManager[i]->aabb->depth)); 
+														rigidBodyManager[i]->aabb->depth));
 		
 				ShaderManager::SetUniform(bounding, "mvpMatrix", MVP);
 				ShaderManager::SetUniform(bounding, "boundColour", rigidBodyManager[i]->aabb->colour);
@@ -203,6 +209,9 @@ public:
 		ss << " Query Performance - Broadphase (Avg.): " << broadphaseResults / ++broadphaseResultCounter;
 		printStream();
 
+		ss << "Rigid Bodies: " << rigidBodyManager.rigidBodies.size();
+		printStream();
+
 		currentLine = 0;
 	}
 
@@ -214,7 +223,8 @@ public:
 
 	void AddBoxButton()
 	{
-		AddBox(glm::vec3(0,0,0));
+		for(int i = 0; i < addAmount; i++)
+			AddBox(glm::vec3(0,0,0));
 	}
 
 	static void TW_CALL AddBoxButtonCB(void *clientData)
@@ -250,8 +260,8 @@ public:
 		TwAddSeparator(bar, "", ""); //=======================================================
 
 		{
-			TwEnumVal broadphaseModeEV[4] = { {BroadphaseMode::SAP1D, "SAP"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"} };
-			TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 4);
+			TwEnumVal broadphaseModeEV[3] = { {BroadphaseMode::SAP1D, "SAP"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"} };
+			TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 3);
 			TwAddVarRW(bar, "BroadphaseMode", broadphaseType, &broadphaseMode, " keyIncr='<' keyDecr='>' help='Change broadphase mode.' ");
 		}
 
@@ -259,6 +269,7 @@ public:
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
-		TwAddButton(bar, "Add Dude", AddBoxButtonCB, NULL, "");
+		TwAddVarRW(bar, "Add Amount", TW_TYPE_INT32, &addAmount, "");
+		TwAddButton(bar, "Add Box(es)", AddBoxButtonCB, NULL, "");
 	}
 };

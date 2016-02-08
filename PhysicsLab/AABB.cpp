@@ -25,7 +25,7 @@ AABB::AABB(const std::vector<glm::vec3>& vertices, RigidBody* p_owner)
 	max[Axis::Y] = new EndPoint(std::numeric_limits<float>::min(), false, Axis::Y, this);
 	max[Axis::Z] = new EndPoint(std::numeric_limits<float>::min(), false, Axis::Z, this);
 
-	min[Axis::X]->partner = max[Axis::X];
+	min[Axis::X]->partner = max[Axis::X]; //Need to be partnered for SAP algorithm
 	min[Axis::Y]->partner = max[Axis::Y];
 	min[Axis::Z]->partner = max[Axis::Z];
 
@@ -40,6 +40,8 @@ void AABB::Create(const std::vector<glm::vec3> &vertices)
 {
 	Calculate(vertices, true);
 
+	//'Cache' the resting BB verts, and use Calculate on rotated version of these in future
+	//instead of the whole model, to speed up calculation
 	restBBverts.push_back(glm::vec3(width*0.5, height*0.5, depth*0.5));
 	restBBverts.push_back(glm::vec3(width*0.5, height*0.5, -depth*0.5));
 	restBBverts.push_back(glm::vec3(width*0.5, -height*0.5, depth*0.5));
@@ -50,6 +52,7 @@ void AABB::Create(const std::vector<glm::vec3> &vertices)
 	restBBverts.push_back(glm::vec3(-width*0.5, -height*0.5, -depth*0.5));
 }
 
+//Calculate is called whenever the orientation of the model changes
 void AABB::Calculate(const std::vector<glm::vec3> &vertices, bool firstrun)
 {
 	min[Axis::X]->value = std::numeric_limits<float>::max();
@@ -60,6 +63,7 @@ void AABB::Calculate(const std::vector<glm::vec3> &vertices, bool firstrun)
 	max[Axis::Y]->value = std::numeric_limits<float>::min();
 	max[Axis::Z]->value = std::numeric_limits<float>::min();
 	
+	//Find min and max points for each axis
 	for (glm::vec3 point : vertices)
 	{
 		if (point.x < min[Axis::X]->value) min[Axis::X]->value = point.x;
