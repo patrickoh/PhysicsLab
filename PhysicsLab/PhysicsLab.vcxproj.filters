@@ -55,8 +55,11 @@
     <Filter Include="Header Files\CD - Broadphase">
       <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\SoftBody">
+    <Filter Include="Header Files\Physics\SoftBody">
       <UniqueIdentifier>{9c3ca589-f2d2-4df6-ae34-e9aa88ef1f59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics\Bullet">
+      <UniqueIdentifier>{c42ad6e7-a53b-4e4e-a2f1-bb81eea9f756}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -173,9 +176,6 @@
     <ClInclude Include="imgui.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuiImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -188,23 +188,29 @@
     <ClInclude Include="RigidBodyDemo.h">
       <Filter>Header Files\Demos</Filter>
     </ClInclude>
-    <ClInclude Include="RigidBody.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Inertia.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Integrator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BroadphaseDemo.h">
       <Filter>Header Files\Demos</Filter>
     </ClInclude>
-    <ClInclude Include="RigidbodyManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SoftBody.h">
-      <Filter>Header Files\SoftBody</Filter>
+      <Filter>Header Files\Physics\SoftBody</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftBodyDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidbodyManager.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Integrator.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Inertia.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

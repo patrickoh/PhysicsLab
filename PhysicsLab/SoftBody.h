@@ -3,9 +3,13 @@
 #include "Model.h"
 #include "AABB.h"
 
-struct SoftBodyParticle
+struct PointMass
 {
-
+	float mass;
+	glm::vec3 position;
+	glm::vec3 velocity;
+	
+	glm::vec3 forceNet;
 };
 
 class SoftBody
@@ -14,7 +18,9 @@ class SoftBody
 
 		glm::vec3 initialPosition;
 
-		glm::vec3 forceNet;
+		std::vector<PointMass> points;
+
+		//glm::vec3 forceNet;
 
 	public:
 
@@ -29,6 +35,13 @@ class SoftBody
 		void StepPhysics(double deltaTime);
 		void Update();
 
-		SoftBody(Model* model);
-		~SoftBody();
+		SoftBody(Model* model)
+		{
+
+		}
+
+		~SoftBody()
+		{
+
+		}
 };

@@ -53,7 +53,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\PhysicsLab\PhysicsLab\glmTools\include;$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\include;$(SolutionDir)\PhysicsLab\ImageMagick-6\Include;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\include;$(SolutionDir)\PhysicsLab\glew-1.10.0\include;$(SolutionDir)\PhysicsLab\freeglut\include;$(SolutionDir)\PhysicsLab\glm-0.9.5.4\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Patrick\Desktop\bullet3-2.83.7\bullet3-2.83.7\src;$(SolutionDir)\PhysicsLab\PhysicsLab\glmTools\include;$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\include;$(SolutionDir)\PhysicsLab\ImageMagick-6\Include;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\include;$(SolutionDir)\PhysicsLab\glew-1.10.0\include;$(SolutionDir)\PhysicsLab\freeglut\include;$(SolutionDir)\PhysicsLab\glm-0.9.5.4\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -73,7 +73,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\include;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\include;$(SolutionDir)\PhysicsLab\glew-1.10.0\include;$(SolutionDir)\PhysicsLab\freeglut\include;$(SolutionDir)\PhysicsLab\glm-0.9.5.4\glm;$(SolutionDir)\PhysicsLab\ImageMagick-6\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Patrick\Desktop\bullet3-2.83.7\bullet3-2.83.7\src;$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\include;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\include;$(SolutionDir)\PhysicsLab\glew-1.10.0\include;$(SolutionDir)\PhysicsLab\freeglut\include;$(SolutionDir)\PhysicsLab\glm-0.9.5.4\glm;$(SolutionDir)\PhysicsLab\ImageMagick-6\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +130,7 @@
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="SoftBody.h" />
+    <ClInclude Include="SoftBodyDemo.h" />
     <ClInclude Include="stb_rect_pack.h" />
     <ClInclude Include="stb_textedit.h" />
     <ClInclude Include="stb_truetype.h" />
@@ -142,6 +144,20 @@
     <None Include="Shaders\diffuse.vs" />
     <None Include="Shaders\particle.ps" />
     <None Include="Shaders\particle.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\bullet3-2.83.7\bullet3-2.83.7\build3\vs2010\BulletCollision.vcxproj">
+      <Project>{c820c059-b397-804e-bf90-9987407188f6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\bullet3-2.83.7\bullet3-2.83.7\build3\vs2010\BulletDynamics.vcxproj">
+      <Project>{8743b14a-a2b3-0142-bb84-9c3cfd464a1c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\bullet3-2.83.7\bullet3-2.83.7\build3\vs2010\BulletSoftBody.vcxproj">
+      <Project>{1795562e-1284-f741-a575-68195e80b9a0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\bullet3-2.83.7\bullet3-2.83.7\build3\vs2010\LinearMath.vcxproj">
+      <Project>{766fe868-1d09-9741-b0ff-96e05ac9e1c1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
