@@ -217,7 +217,7 @@ public:
 		btTransform trans;
 		fallRigidBody->getMotionState()->getWorldTransform(trans);
 
-		//std::cout << "sphere height: " << trans.getOrigin().getY() << std::endl;
+		std::cout << "sphere height: " << trans.getOrigin().getY() << std::endl;
 		
 		Draw();
 	}
@@ -243,7 +243,7 @@ public:
 
 		//glm::mat4 transform = glm::value_ptr(matrix);
 
-		cout << "something";
+		//cout << "something";
 
 
 		/*glm::mat4 transformationMat;
