@@ -12,6 +12,8 @@
 #include <BulletSoftBody/btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 
+#include "SoftBody.h"
+
 #define MAX_PROXIES 32766
 
 class SoftBodyDemo : public GLProgram
@@ -22,11 +24,11 @@ private:
 	btCollisionDispatcher* dispatcher;
 	btBroadphaseInterface* broadphase;
 	btSequentialImpulseConstraintSolver* solver;
-	//btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
-	btDefaultCollisionConfiguration* collisionConfiguration;
+	btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
+	//btDefaultCollisionConfiguration* collisionConfiguration;
 	btSoftBodySolver* softBodySolver;
-	//btSoftRigidDynamicsWorld* dynamicsWorld;
-	btDiscreteDynamicsWorld* dynamicsWorld;
+	btSoftRigidDynamicsWorld* dynamicsWorld;
+	//btDiscreteDynamicsWorld* dynamicsWorld;
 
 	//Hello sphere
 	btRigidBody* groundRigidBody;
@@ -34,6 +36,10 @@ private:
 
 	std::vector<RigidBody*> rigidBodies;
 	float simulationSpeed;
+
+	btSoftBodyWorldInfo softBodyWorldInfo;
+
+	SoftBody* blob;
 
 public:
 
@@ -83,26 +89,42 @@ public:
 
 		//BULLET
 		broadphase = new btDbvtBroadphase();
-		//btVector3 worldAabbMin(-1000,-1000,-1000);
-		//btVector3 worldAabbMax(1000,1000,1000);
-		//broadphase = new btAxisSweep3(worldAabbMin,worldAabbMax, MAX_PROXIES);
+		btVector3 worldAabbMin(-1000,-1000,-1000);
+		btVector3 worldAabbMax(1000,1000,1000);
+		broadphase = new btAxisSweep3(worldAabbMin,worldAabbMax, MAX_PROXIES);
 
-		collisionConfiguration = new btDefaultCollisionConfiguration();
-		//collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration(); //register some softbody collision algorithms on top of the default btDefaultCollisionConfiguration
+		//collisionConfiguration = new btDefaultCollisionConfiguration();
+		collisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration(); //register some softbody collision algorithms on top of the default btDefaultCollisionConfiguration
 
 		dispatcher = new btCollisionDispatcher(collisionConfiguration);
 		solver = new btSequentialImpulseConstraintSolver;
-		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+		//dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
-		//softBodySolver = new btDefaultSoftBodySolver();
-		//dynamicsWorld = new btSoftRigidDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration, softBodySolver);
+		softBodySolver = new btDefaultSoftBodySolver();
+		dynamicsWorld = new btSoftRigidDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration, softBodySolver);
 
 		dynamicsWorld->setGravity(btVector3(0, -10, 0));
 
+		softBodyWorldInfo.m_broadphase = broadphase;
+		softBodyWorldInfo.m_dispatcher = dispatcher;
+		softBodyWorldInfo.m_gravity.setValue(0, -10, 0);
+
+		softBodyWorldInfo.m_sparsesdf.Initialize();
+
+		softBodyWorldInfo.air_density =	(btScalar)1.2;
+		softBodyWorldInfo.water_density	= 0;
+		softBodyWorldInfo.water_offset = 0;
+		softBodyWorldInfo.water_normal = btVector3(0,0,0);
+
+		blob = new SoftBody(&softBodyWorldInfo);
+		dynamicsWorld->addSoftBody(blob->softbody);
+
 		#pragma region HELLO SPHERE
 		//Make a floor
-		btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 1);
+		btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), -4.5f);
+		
 		btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
+		
 		btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
 		groundRigidBody = new btRigidBody(groundRigidBodyCI);
 
@@ -122,32 +144,30 @@ public:
 		dynamicsWorld->addRigidBody(fallRigidBody);
 		#pragma endregion
 
-		#pragma region SOFT Body stuff
 		//world->setInternalTickCallback(pickingPreTickCallback, this, true);
 		//m_dynamicsWorld->getDispatchInfo().m_enableSPU = true;
 		//m_guiHelper->createPhysicsDebugDrawer(world);
 
-		/*btSoftBodyWorldInfo softBodyWorldInfo; //Can just make a local variable for this methinks
-		softBodyWorldInfo.m_broadphase = broadphase;
-		softBodyWorldInfo.m_dispatcher = dispatcher;
-		softBodyWorldInfo.m_gravity.setValue(0, -10, 0);
 		softBodyWorldInfo.air_density		=	(btScalar)1.2;
 		softBodyWorldInfo.water_density	=	0;
 		softBodyWorldInfo.water_offset		=	0;
-		softBodyWorldInfo.water_normal		=	btVector3(0,0,0);*/
-
-		//world->world
-
-		/*btSoftBody* softBody = btSoftBodyHelpers::CreateEllipsoid(world->getWorldInfo(), btVector3(35,25,0),
-			btVector3(1,1,1)*3, 512);
-		softBody->m_cfg.viterations = 50;
-		softBody->m_cfg.piterations = 50;
-		softBody->m_cfg.kPR=1000;
-		softBody->setTotalMass(3.0);
-		softBody->setMass(0,0);
-		world->addSoftBody(softBody);
+		softBodyWorldInfo.water_normal		=	btVector3(0,0,0);
+		softBodyWorldInfo.m_gravity.setValue(0,-10,0);
 
 
+		//btSoftBody* softBody = btSoftBodyHelpers::CreateEllipsoid(softBodyWorldInfo, btVector3(35,25,0),btVector3(1,1,1)*3, 512);
+		//dynamicsWorld->addSoftBody(softBody);
+
+		//softBody->m_cfg.viterations = 50;
+		//softBody->m_cfg.piterations = 50;
+		//softBody->m_cfg.kPR=1000;
+		//softBody->setTotalMass(3.0);
+		//softBody->setMass(0,0);
+		
+
+		//softBody->m_nodes.size();
+
+		/*
 		btTransform t;
 		t.setIdentity();
 		t.setOrigin(btVector3(0,0,0));
@@ -165,8 +185,7 @@ public:
 
 		//btCollisionShape* groundShape = 0;
 		*/
-		#pragma endregion
-
+	
 		tweakBars["main"] = TwNewBar("Main");
 		TwDefine(" Main size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
 
@@ -214,10 +233,13 @@ public:
 		}
 
 		dynamicsWorld->stepSimulation(1 / 60.f, 10);
-		btTransform trans;
-		fallRigidBody->getMotionState()->getWorldTransform(trans);
 
-		std::cout << "sphere height: " << trans.getOrigin().getY() << std::endl;
+		blob->Update();
+		
+		//btTransform trans;
+		//fallRigidBody->getMotionState()->getWorldTransform(trans);
+
+		//std::cout << "sphere height: " << trans.getOrigin().getY() << std::endl;
 		
 		Draw();
 	}
@@ -234,6 +256,9 @@ public:
 
 		DrawModels();
 		DrawBounceyEnclosure(MVP);
+
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+		blob->Render();
 
 		btTransform trans;
 		fallRigidBody->getMotionState()->getWorldTransform(trans);

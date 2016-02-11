@@ -46,12 +46,6 @@
     <Filter Include="Header Files\Physics">
       <UniqueIdentifier>{f850a68d-414f-4005-9d86-119a9f15dc1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Physics\Collision Response">
-      <UniqueIdentifier>{a93a90e1-dcad-4af1-9f93-09d2bcb295ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Physics\CD - Narrowphase">
-      <UniqueIdentifier>{a2a3cd8d-1806-412f-ae10-80507c78cc51}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\CD - Broadphase">
       <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
     </Filter>
@@ -60,6 +54,9 @@
     </Filter>
     <Filter Include="Header Files\Physics\Bullet">
       <UniqueIdentifier>{c42ad6e7-a53b-4e4e-a2f1-bb81eea9f756}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics\CD / CR">
+      <UniqueIdentifier>{a2a3cd8d-1806-412f-ae10-80507c78cc51}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,13 +135,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GJK.h">
-      <Filter>Header Files\Physics\CD - Narrowphase</Filter>
-    </ClInclude>
-    <ClInclude Include="Support.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="EPA.h">
-      <Filter>Header Files\Physics\Collision Response</Filter>
+      <Filter>Header Files\Physics\CD / CR</Filter>
     </ClInclude>
     <ClInclude Include="Line.h">
       <Filter>Header Files\Primitives</Filter>
@@ -206,11 +197,17 @@
     <ClInclude Include="Inertia.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>Header Files\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="EPA.h">
+      <Filter>Header Files\Physics\CD / CR</Filter>
+    </ClInclude>
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="RigidBody.h">
-      <Filter>Header Files\Physics</Filter>
+    <ClInclude Include="Support.h">
+      <Filter>Header Files\Physics\CD / CR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
