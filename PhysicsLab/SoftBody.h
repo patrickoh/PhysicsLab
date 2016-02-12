@@ -17,6 +17,7 @@ class SoftBody
 		GLuint vao;
 		GLuint *VBOs; 
 
+		std::vector<glm::vec3> vertices;
 		std::vector<int> indices;
 
 	public:
@@ -42,12 +43,9 @@ class SoftBody
 			std::cout << softbody->m_nodes.size();
 
 			//btSoftBody::tNodeArray& nodes(softbody->m_nodes);
-			std::vector<glm::vec3> vertices;
-			for(int i=0; i < softbody->m_nodes.size(); ++i)
-			{
-				vertices.push_back(glm::vec3(softbody->m_nodes[i].m_x.getX(), softbody->m_nodes[i].m_x.getY(), 
-					softbody->m_nodes[i].m_x.getZ()));
-			}
+			
+			//for(int i=0; i < softbody->m_nodes.size(); ++i)
+				//vertices.push_back(convertBtVector3(softbody->m_nodes[i].m_x));
 			
 			/*btSoftBody::tFaceArray& faces(softbody->m_faces);
 
@@ -61,6 +59,14 @@ class SoftBody
 				indices.push_back(int(node_1-&softbody->m_nodes[0]));
 				indices.push_back(int(node_2-&softbody->m_nodes[0]));
 			}*/
+
+			for(int i=0;i<softbody->m_faces.size();++i)
+			{
+				const btSoftBody::Face&	f=softbody->m_faces[i];
+				vertices.push_back(convertBtVector3(&f.m_n[0]->m_x));
+				vertices.push_back(convertBtVector3(&f.m_n[1]->m_x));
+				vertices.push_back(convertBtVector3(&f.m_n[2]->m_x));
+			}
 
 			glGenVertexArrays (1, &vao);
 			VBOs = new GLuint [1];
@@ -88,11 +94,13 @@ class SoftBody
 
 		void Update()
 		{
-			std::vector<glm::vec3> vertices;
-			for(int i=0; i < softbody->m_nodes.size(); ++i)
+			vertices.clear();
+			for(int i=0;i<softbody->m_faces.size();++i)
 			{
-				vertices.push_back(glm::vec3(softbody->m_nodes[i].m_x.getX(), softbody->m_nodes[i].m_x.getY(), 
-					softbody->m_nodes[i].m_x.getZ()));
+				const btSoftBody::Face&	f=softbody->m_faces[i];
+				vertices.push_back(convertBtVector3(&f.m_n[0]->m_x));
+				vertices.push_back(convertBtVector3(&f.m_n[1]->m_x));
+				vertices.push_back(convertBtVector3(&f.m_n[2]->m_x));
 			}
 
 			glBindBuffer( GL_ARRAY_BUFFER, VBOs[0] );
@@ -102,16 +110,20 @@ class SoftBody
 
 		void Render()
 		{
-			glBindVertexArray(vao);
-			//glDrawArrays(GL_TRIANGLES, 0, softbody->m_nodes.size());
+			glPolygonMode(GL_FRONT, GL_LINE); 
 
-			glPointSize(2.2f);
-			glDrawArrays(GL_POINTS, 0, softbody->m_nodes.size());
+			glBindVertexArray(vao);
+			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+			//glPointSize(2.2f);
+			//glDrawArrays(GL_POINTS, 0, softbody->m_nodes.size());
 			glBindVertexArray(0);
 
 			//glBindVertexArray(vao);
 			//glDrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_BYTE, 0);
 			//glBindVertexArray(0);
+
+			glPolygonMode(GL_FRONT, GL_FILL); 
 		}
 };
 

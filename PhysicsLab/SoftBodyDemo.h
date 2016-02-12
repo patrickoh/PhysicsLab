@@ -232,7 +232,7 @@ public:
 			rigidBodies[i]->Update(); //bookkeeping
 		}
 
-		dynamicsWorld->stepSimulation(1 / 60.f, 10);
+		dynamicsWorld->stepSimulation(deltaTime*.001f, 10);
 
 		blob->Update();
 		

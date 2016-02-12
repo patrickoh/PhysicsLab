@@ -52,9 +52,6 @@
     <Filter Include="Header Files\Physics\SoftBody">
       <UniqueIdentifier>{9c3ca589-f2d2-4df6-ae34-e9aa88ef1f59}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Physics\Bullet">
-      <UniqueIdentifier>{c42ad6e7-a53b-4e4e-a2f1-bb81eea9f756}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Physics\CD / CR">
       <UniqueIdentifier>{a2a3cd8d-1806-412f-ae10-80507c78cc51}</UniqueIdentifier>
     </Filter>
