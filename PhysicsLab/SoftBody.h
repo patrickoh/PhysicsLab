@@ -10,6 +10,8 @@
 #include <BulletSoftBody/btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 
+#include "BunnyMesh.h"
+
 class SoftBody
 {
 	private:
@@ -24,13 +26,20 @@ class SoftBody
 
 		btSoftBody* softbody;
 
-		SoftBody(btSoftBodyWorldInfo* softBodyWorldInfo)
+		SoftBody(btSoftBody* p_softBody)  //btSoftBodyWorldInfo* softBodyWorldInfo)
 		{
-			softbody = btSoftBodyHelpers::CreateEllipsoid(*softBodyWorldInfo, btVector3(0,0,0), btVector3(1,1,1)*3, 512);
+			softbody = p_softBody;
+
+			/*int* triangles = new int[BUNNY_NUM_INDICES];
+			for(int i = 0; i < BUNNY_NUM_TRIANGLES; i++)
+			{
+				triangle gIndicesBunny
+			}
+			softbody = btSoftBodyHelpers::CreateFromTriMesh(*softBodyWorldInfo, gVerticesBunny, gIndicesBunny, BUNNY_NUM_TRIANGLES);*/
 	
 			softbody->m_materials[0]->m_kLST	=	0.1;
 			softbody->m_cfg.kDF				=	1;
-			softbody->m_cfg.kDP				=	0.001; // fun factor...
+			softbody->m_cfg.kDP				=	0.001;
 			softbody->m_cfg.kPR				=	2500;
 			softbody->setTotalMass(30,true);
 			//softbody->setMass(0,0);
@@ -67,6 +76,8 @@ class SoftBody
 				vertices.push_back(convertBtVector3(&f.m_n[1]->m_x));
 				vertices.push_back(convertBtVector3(&f.m_n[2]->m_x));
 			}
+
+			softbody->updateNormals();
 
 			glGenVertexArrays (1, &vao);
 			VBOs = new GLuint [1];

@@ -206,6 +206,9 @@
     <ClInclude Include="Support.h">
       <Filter>Header Files\Physics\CD / CR</Filter>
     </ClInclude>
+    <ClInclude Include="BunnyMesh.h">
+      <Filter>Header Files\Physics\SoftBody</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\diffuse.ps">

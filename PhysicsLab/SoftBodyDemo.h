@@ -83,7 +83,7 @@ public:
 
 		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
 
-		AddABox(glm::vec3(0,0,0));
+		//AddABox(glm::vec3(0,0,0));
 
 		simulationSpeed = 1.0f;
 
@@ -116,10 +116,9 @@ public:
 		softBodyWorldInfo.water_offset = 0;
 		softBodyWorldInfo.water_normal = btVector3(0,0,0);
 
-		blob = new SoftBody(&softBodyWorldInfo);
+		blob = new SoftBody(btSoftBodyHelpers::CreateEllipsoid(softBodyWorldInfo, btVector3(0,0,0), btVector3(1,1,1)*3, 512));
 		dynamicsWorld->addSoftBody(blob->softbody);
 
-		#pragma region HELLO SPHERE
 		//Make a floor
 		btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), -4.5f);
 		
@@ -132,40 +131,20 @@ public:
 
 		
 		//Make a ball 
-		btCollisionShape* fallShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));//new btSphereShape(1);
-		btDefaultMotionState* fallMotionState =
-				new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 50, 0)));
-		btScalar mass = 1;
-		btVector3 fallInertia(0, 0, 0);
-		fallShape->calculateLocalInertia(mass, fallInertia);
-		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
-		fallRigidBody = new btRigidBody(fallRigidBodyCI);
-		
-		dynamicsWorld->addRigidBody(fallRigidBody);
-		#pragma endregion
+		//btCollisionShape* fallShape = new btBoxShape(btVector3(1.0f, 1.0f, 1.0f));//new btSphereShape(1);
+		//btDefaultMotionState* fallMotionState =
+		//		new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 50, 0)));
+		//btScalar mass = 1;
+		//btVector3 fallInertia(0, 0, 0);
+		//fallShape->calculateLocalInertia(mass, fallInertia);
+		//btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
+		//fallRigidBody = new btRigidBody(fallRigidBodyCI);
+		//
+		//dynamicsWorld->addRigidBody(fallRigidBody);
 
 		//world->setInternalTickCallback(pickingPreTickCallback, this, true);
 		//m_dynamicsWorld->getDispatchInfo().m_enableSPU = true;
 		//m_guiHelper->createPhysicsDebugDrawer(world);
-
-		softBodyWorldInfo.air_density		=	(btScalar)1.2;
-		softBodyWorldInfo.water_density	=	0;
-		softBodyWorldInfo.water_offset		=	0;
-		softBodyWorldInfo.water_normal		=	btVector3(0,0,0);
-		softBodyWorldInfo.m_gravity.setValue(0,-10,0);
-
-
-		//btSoftBody* softBody = btSoftBodyHelpers::CreateEllipsoid(softBodyWorldInfo, btVector3(35,25,0),btVector3(1,1,1)*3, 512);
-		//dynamicsWorld->addSoftBody(softBody);
-
-		//softBody->m_cfg.viterations = 50;
-		//softBody->m_cfg.piterations = 50;
-		//softBody->m_cfg.kPR=1000;
-		//softBody->setTotalMass(3.0);
-		//softBody->setMass(0,0);
-		
-
-		//softBody->m_nodes.size();
 
 		/*
 		btTransform t;
@@ -260,11 +239,10 @@ public:
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
 		blob->Render();
 
-		btTransform trans;
-		fallRigidBody->getMotionState()->getWorldTransform(trans);
-
-		float* matrix = new float[16];
-		trans.getOpenGLMatrix(matrix);
+		//btTransform trans;
+		//fallRigidBody->getMotionState()->getWorldTransform(trans);
+		//float* matrix = new float[16];
+		//trans.getOpenGLMatrix(matrix);
 
 		//glm::mat4 transform = glm::value_ptr(matrix);
 
@@ -333,9 +311,19 @@ public:
 	{
 		TwBar* bar = tweakBars["main"];
 	
-		TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
-		TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
+		//TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
+		//TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
+
+		TwAddVarRW(bar, "Dynamic friction coefficient [0,1]", TW_TYPE_FLOAT, &blob->softbody->m_cfg.kDF, "min=0.0 max=1.0 step=0.1");
+		TwAddVarRW(bar, "Pressure coefficient [-inf,+inf]", TW_TYPE_FLOAT, &blob->softbody->m_cfg.kPR, "");
+		TwAddVarRW(bar, "Damping coefficient [0,1]", TW_TYPE_FLOAT, &blob->softbody->m_cfg.kDP, "min=0.0 max=1.0 step=0.1");
+		TwAddVarRW(bar, "Linear stiffness coefficient [0,1]", TW_TYPE_FLOAT, &blob->softbody->m_materials[0], "min=0.0 max=1.0 step=0.1");
+
+		//btScalar				m_kAST;			// Area/Angular stiffness coefficient [0,1]
+		//btScalar				m_kVST;			// Volume stiffness coefficient [0,1]
 
 		TwAddSeparator(bar, "", "");
+
+
 	}
 };
