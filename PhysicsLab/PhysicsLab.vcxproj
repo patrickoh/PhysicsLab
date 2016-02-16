@@ -60,7 +60,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\lib;$(SolutionDir)\PhysicsLab\ImageMagick-6\Lib;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\PhysicsLab\freeglut\lib;$(SolutionDir)\PhysicsLab\glew-1.10.0\lib\Release\Win32;$(SolutionDir)\PhysicsLab\bullet3-2.83.7\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_DB_Magick++_.lib;AntTweakBar.lib;BulletCollision_vs2010_debug.lib;BulletDynamics_vs2010_debug.lib;BulletSoftBody_vs2010_debug.lib;LinearMath_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_DB_Magick++_.lib;AntTweakBar.lib;BulletCollision_debug.lib;BulletDynamics_debug.lib;BulletSoftBody_debug.lib;LinearMath_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -82,7 +82,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\lib;$(SolutionDir)\PhysicsLab\ImageMagick-6\Lib;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\PhysicsLab\freeglut\lib;$(SolutionDir)\PhysicsLab\glew-1.10.0\lib\Release\Win32;$(SolutionDir)\PhysicsLab\bullet3-2.83.7\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_RL_Magick++_.lib;AntTweakBar.lib;BulletCollision_vs2010.lib;BulletDynamics_vs2010.lib;BulletSoftBody_vs2010.lib;LinearMath_vs2010.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_RL_Magick++_.lib;AntTweakBar.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;LinearMath.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
