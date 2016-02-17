@@ -117,6 +117,7 @@
     <ClInclude Include="Inertia.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Integrator.h" />
+    <ClInclude Include="NarrowphaseDemo.h" />
     <ClInclude Include="ParticleDemo.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="QueryPerformance.h" />

@@ -209,6 +209,9 @@
     <ClInclude Include="BunnyMesh.h">
       <Filter>Header Files\Physics\SoftBody</Filter>
     </ClInclude>
+    <ClInclude Include="NarrowphaseDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\diffuse.ps">
