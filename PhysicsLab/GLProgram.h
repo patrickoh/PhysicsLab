@@ -59,6 +59,9 @@ public:
 
 	static GLProgram* Instance;
 
+	static glm::vec3 normal[]; 
+	static glm::vec3 plane[]; 
+
 	GLProgram()
 	{
 		currentLine = 0;
@@ -152,6 +155,9 @@ public:
 		}
 
 		HandleInput();
+		
+		if(Input::wasKeyPressed)
+			Input::wasKeyPressed = false;
 	
 		camera->Update(deltaTime);
 	}
@@ -190,9 +196,9 @@ public:
 				}
 			}
 
-			Input::wasKeyPressed = false;
+			
 		}
-	
+
 		camera->ProcessKeyboardContinuous(Input::keyStates, deltaTime);
 	}
 

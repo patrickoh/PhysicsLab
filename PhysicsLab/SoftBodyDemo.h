@@ -45,9 +45,6 @@ public:
 
 	static SoftBodyDemo* Instance;
 
-	static glm::vec3 normal[]; 
-	static glm::vec3 plane[]; 
-
 	SoftBodyDemo()
 	{
 		Instance = this;
@@ -236,6 +233,10 @@ public:
 		DrawModels();
 		DrawBounceyEnclosure(MVP);
 
+		MVP = projectionMatrix * viewMatrix;
+
+		shaderManager.SetShaderProgram("bounding");
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
 		blob->Render();
 
@@ -304,11 +305,6 @@ public:
 
 	void SetUpTweakBars()
 	{
-		SetUpMainTweakBar();
-	}
-
-	void SetUpMainTweakBar()
-	{
 		TwBar* bar = tweakBars["main"];
 	
 		//TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
@@ -323,7 +319,5 @@ public:
 		//btScalar				m_kVST;			// Volume stiffness coefficient [0,1]
 
 		TwAddSeparator(bar, "", "");
-
-
 	}
 };

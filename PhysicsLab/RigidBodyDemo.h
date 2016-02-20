@@ -14,9 +14,6 @@ private:
 	vector<RigidBody*> rigidBodies;
 
 	float mass;
-
-	static glm::vec3 normal[]; 
-	static glm::vec3 plane[]; 
 	
 	bool bClickImpulse;
 
@@ -200,48 +197,16 @@ public:
 		RigidBodyDemo::Instance->ResetRB();
 	}
 
-	void HandleInput() override //TODO - Improve OO here
+	void HandleInput() override
 	{
-		if(!freeMouse)
-		{
-			if(Input::mouseMoved)
-			{
-				camera->MouseRotate(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, deltaTime); 
-				Input::mouseMoved = false;
-			}
-
-			glutWarpPointer(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
-		}
+		GLProgram::HandleInput();
 
 		if(Input::wasKeyPressed)
 		{
-			camera->ProcessKeyboardOnce(Input::keyPress); 
-
-			if(Input::keyPress == KEY::KEY_h || Input::keyPress == KEY::KEY_H) 
-				printText = !printText;
-
-			if(Input::keyPress == KEY::KEY_SPACE || Input::keyPress == KEY::KEY_ESCAPE) 
-			{
-				if(!freeMouse)
-				{
-					freeMouse = true;
-					glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
-				}
-				else
-				{
-					freeMouse = false;
-					glutSetCursor(GLUT_CURSOR_NONE);
-				}
-			}
-
 			if(Input::keyPress == KEY::KEY_K ||
 				Input::keyPress == KEY::KEY_k)
 				bClickImpulse = !bClickImpulse;
-
-			Input::wasKeyPressed = false;
 		}
-	
-		camera->ProcessKeyboardContinuous(Input::keyStates, deltaTime);
 	}
 
 	void printouts()
@@ -277,14 +242,7 @@ public:
 
 	void SetUpTweakBars()
 	{
-		SetUpMainTweakBar();
-	}
-
-	void SetUpMainTweakBar()
-	{
 		TwBar* bar = tweakBars["main"];
-
-		//ASSIGNMENT 2 - RIGID BODY UI
 	
 		TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
 		TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
@@ -296,6 +254,7 @@ public:
 		TwAddSeparator(bar, "", "");
 
 		TwAddVarRW(bar, "Impulse Force", TW_TYPE_FLOAT, &forcePush, "");
+		TwAddVarRW(bar, "bClick to Impulse", TW_TYPE_BOOL8, &bClickImpulse, "");
 
 		TwAddSeparator(bar, "", "");
 

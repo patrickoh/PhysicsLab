@@ -5,6 +5,10 @@
 #include "RigidbodyManager.h"
 #include "Inertia.h"
 
+#include "Tetrahedron.h"
+#include "Line.h"
+#include "Triangle.h"
+
 class NarrowphaseDemo : public GLProgram
 {
 
@@ -13,6 +17,11 @@ private:
 	RigidbodyManager rigidBodyManager;
 
 	BroadphaseMode broadphaseMode;
+
+	glm::vec3 cursorWorldSpace;
+	float mass;
+	float forcePush;
+	bool bClickImpulse;
 	
 	float simulationSpeed;
 
@@ -21,7 +30,12 @@ private:
 	bool drawBoundingSpheres; 
 	bool drawBoundingBoxes;
 
-	bool bBroadphase;
+	//Debug drawing variables
+	Point* origin;
+	Tetrahedron* gjkTetra;
+	std::vector<Point*> minkowskiDifferencePoints;
+
+	int rbIdx;
 
 public:
 	
@@ -46,10 +60,17 @@ public:
 		shaderManager.CreateShaderProgram("diffuse", "Shaders/diffuse.vs", "Shaders/diffuse.ps");
 		shaderManager.CreateShaderProgram("bounding", "Shaders/diffuse.vs", "Shaders/bounding.ps");
 
-		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), glm::vec3(.0001), "Models/jumbo.dae", shaderManager.GetShaderProgramID("diffuse")));
+		modelList.push_back(new Model(glm::vec3(0, 0, 10), glm::quat(), 
+			glm::vec3(.0001), "Models/jumbo.dae", 
+			shaderManager.GetShaderProgramID("diffuse")));
 
-		for(int i = 0; i < 2; i++)
+		for(int i = 0; i < 1; i++)
 			AddBox(glm::vec3(0,0,0));
+
+		bClickImpulse = false;
+
+		mass = 1;
+		forcePush = 1.0f;
 
 		addAmount = 1;
 		
@@ -57,10 +78,24 @@ public:
 
 		broadphaseMode = BroadphaseMode::SAP1D;
 
-		drawBoundingSpheres = true;
+		drawBoundingSpheres = false;
 		drawBoundingBoxes = true;
 
-		bBroadphase = true;
+		origin = new Point(glm::vec3(0));
+
+		glm::vec3 v1 = glm::vec3(0,8,0);
+		glm::vec3 v2 = glm::vec3(1,0,1);
+		glm::vec3 v3 = glm::vec3(0,0,1);
+		glm::vec3 v4 = glm::vec3(1,0,0);
+		std::vector<glm::vec3> vec;
+		vec.push_back(v1);
+		vec.push_back(v2);
+		vec.push_back(v3);
+		vec.push_back(v4);
+
+		gjkTetra = new Tetrahedron(vec);
+
+		rbIdx = 0;
 
 		tweakBars["main"] = TwNewBar("Main");
 		TwDefine(" Main size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
@@ -72,11 +107,6 @@ public:
 	{
 		Model* m = new Model(position, glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"), false, false, true);
 		RigidBody* rb = new RigidBody(m);
-
-		glm::vec2 xz = glm::circularRand(glm::linearRand(-1.0f, 1.0f));
-		rb->velocity = glm::vec3(xz.x, glm::linearRand(-1.0f, 1.0f), xz.y);
-		rb->angularMomentum = glm::vec3(glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f), glm::linearRand(-1.0f,1.0f));
-
 		rigidBodyManager.Add(rb);
 		modelList.push_back(m);
 	}
@@ -91,12 +121,12 @@ public:
 	{
 		GLProgram::update();
 
-		rigidBodyManager.Update(deltaTime * simulationSpeed);
+		if(Input::leftClick && bClickImpulse)
+			rigidBodyManager.rigidBodies[rbIdx]->ApplyImpulse(cursorWorldSpace, camera->viewProperties.forward * forcePush);
 
-		if(bBroadphase)
-			rigidBodyManager.Broadphase(broadphaseMode); //Make them always be potentially colliding for purposes of demo		
-		
-		//rigidBodyManager.Narrowphase(deltaTime);
+		rigidBodyManager.Update(deltaTime * simulationSpeed);
+		rigidBodyManager.Broadphase(broadphaseMode); //Make them always be potentially colliding for purposes of demo		
+		rigidBodyManager.Narrowphase(deltaTime);
 	
 		Draw();
 	}
@@ -108,12 +138,22 @@ public:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		viewMatrix = camera->GetViewMatrix();
-
+		
 		glm::mat4 MVP;
 
 		DrawModels();
 		DrawBounceyEnclosure(MVP);
+		DrawMouse(MVP);
 		DrawBoundings();
+
+		//Draw origin
+		MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
+		shaderManager.SetShaderProgram("bounding");
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,1,1));
+		origin->Render(5.0f);
+		
+		DrawGJK();
 
 		if(printText)
 			printouts();
@@ -121,6 +161,53 @@ public:
 		TwDraw(); // Draw tweak bars
 
 		glutSwapBuffers();
+	}
+
+	void DrawGJK()
+	{
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+		for(SupportPoint p : rigidBodyManager.gjk->simplex)
+		{
+			Point p(p.AB);
+			p.Render(5.0f);
+		}
+
+		int simplexSize = rigidBodyManager.gjk->simplex.size();
+	
+		if(simplexSize == 2)
+		{
+			Line l(rigidBodyManager.gjk->simplex[0].AB, rigidBodyManager.gjk->simplex[1].AB);
+			l.Render();
+		}
+		else if(simplexSize == 3)
+		{	
+			Triangle t(rigidBodyManager.gjk->simplex[0].AB, 
+				rigidBodyManager.gjk->simplex[1].AB, rigidBodyManager.gjk->simplex[2].AB);
+			
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
+			t.Render();
+
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+			t.Render(true);
+
+		}
+		else if(simplexSize == 4)
+		{
+			gjkTetra->Update(rigidBodyManager.gjk->simplex);
+
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
+			gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), false);
+		
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+			gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), true);
+		}
+
+		/*ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
+		for(int i = 0; i < rigidBodyManager.currentMinkowski.size(); i++)
+		{
+			Point p(rigidBodyManager.currentMinkowski[i]);
+			p.Render(7.5f);
+		}*/
 	}
 
 	//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
@@ -151,7 +238,7 @@ public:
 			{
 				MVP = projectionMatrix * viewMatrix * 
 				glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) //translate in world space
-					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale) //scale to size of model
+					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale * 1.001f) //scale to size of model
 					* rigidBodyManager[i]->model->globalInverseTransform 
 					* glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->aabb->centre) //translate to centre in model space
 					* glm::scale(glm::mat4(), glm::vec3(rigidBodyManager[i]->aabb->width, rigidBodyManager[i]->aabb->height, 
@@ -208,14 +295,92 @@ public:
 		ss << "Rigid Bodies: " << rigidBodyManager.rigidBodies.size();
 		printStream();
 
+		ss << "gjk->simplex.size(): " << rigidBodyManager.gjk->simplex.size();
+		printStream();
+
+		ss << "gjk steps: " << rigidBodyManager.gjk->steps;
+		printStream();
+
+		ss << "bClickImpulse: " << bClickImpulse;
+		printStream();
+
+		ss << "rbIdx: " << rbIdx;
+		printStream();
+
 		currentLine = 0;
 	}
 
-	/*static void TW_CALL ResetPerformanceCounterCB(void *clientData)
+	void HandleInput() override
 	{
-		BroadphaseDemo::Instance->broadphaseResults = 0;
-		BroadphaseDemo::Instance->broadphaseResultCounter = 0;
-	}*/
+		GLProgram::HandleInput();
+
+		if(Input::wasKeyPressed)
+		{
+			if(Input::keyPress == KEY::KEY_G ||
+				Input::keyPress == KEY::KEY_g)
+				rigidBodyManager.stepDebug = true;
+
+			if(Input::keyPress == KEY::KEY_TAB)
+			{
+				rbIdx = (rbIdx + 1) % rigidBodyManager.rigidBodies.size();
+				TwRemoveVar(tweakBars["main"], "selected RB");
+				TwAddVarRW(tweakBars["main"], "selected RB", TW_TYPE_DIR3F, 
+					&rigidBodyManager.rigidBodies[rbIdx]->model->worldProperties.translation,
+					"");
+
+				rigidBodyManager[(rbIdx-1) % rigidBodyManager.rigidBodies.size()]->model->colour = glm::vec4(0.5,0.5,0.5,1.0);
+				rigidBodyManager[rbIdx]->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
+			}
+
+			if(Input::keyPress == KEY::KEY_K ||
+				Input::keyPress == KEY::KEY_k)
+				bClickImpulse = !bClickImpulse;
+
+			if(Input::keyPress == KEY::KEY_P ||
+				Input::keyPress == KEY::KEY_p)
+				rigidBodyManager.pausedSim = !rigidBodyManager.pausedSim;
+		}
+	}
+
+	//ImpulseVisualiser
+	void DrawMouse(glm::mat4 MVP)
+	{
+		cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
+		shaderManager.SetShaderProgram("bounding");
+		MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), cursorWorldSpace);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));	
+		glutSolidSphere(.05, 25, 25);
+	}
+
+	void CalculateNewTensors()
+	{
+		for(RigidBody* rb : rigidBodyManager.rigidBodies)
+		{
+			rb->mass = mass;
+			rb->inertialTensor = Inertia::Compute2(rb->model, rb->mass);
+		}
+	}
+
+	static void TW_CALL CalculateNewTensorsCB(void *clientData)
+	{
+		NarrowphaseDemo::Instance->CalculateNewTensors();
+	}
+
+	void ResetRB()
+	{
+		/*for(RigidBody* rb : rigidBodyManager.rigidBodies)
+		{
+			rb->Reset();
+		}*/
+
+		rigidBodyManager[rbIdx]->Reset();
+	}
+
+	static void TW_CALL ResetRBCB(void *clientData)
+	{
+		NarrowphaseDemo::Instance->ResetRB();
+	}
 
 	void AddBoxButton()
 	{
@@ -230,14 +395,7 @@ public:
 
 	void SetUpTweakBars()
 	{
-		SetUpMainTweakBar();
-	}
-
-	void SetUpMainTweakBar()
-	{
 		TwBar* bar = tweakBars["main"];
-
-		//
 
 		TwAddVarRW(bar, "Angular", TW_TYPE_BOOL8, &RigidBody::angular, "");
 		TwAddVarRW(bar, "Linear", TW_TYPE_BOOL8, &RigidBody::linear, "");
@@ -256,8 +414,9 @@ public:
 		TwAddSeparator(bar, "", ""); //=======================================================
 
 		{
-			TwEnumVal broadphaseModeEV[3] = { {BroadphaseMode::SAP1D, "SAP"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"} };
-			TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 3);
+			TwEnumVal broadphaseModeEV[4] = { {BroadphaseMode::SAP1D, "SAP"}, {BroadphaseMode::BruteAABB, "BruteAABB"}, {BroadphaseMode::Sphere, "Sphere"},
+				{BroadphaseMode::Skip, "Skip"} };
+			TwType broadphaseType = TwDefineEnum("IntegratorType", broadphaseModeEV, 4);
 			TwAddVarRW(bar, "BroadphaseMode", broadphaseType, &broadphaseMode, " keyIncr='<' keyDecr='>' help='Change broadphase mode.' ");
 		}
 
@@ -265,7 +424,20 @@ public:
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
+		TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &mass, "");
+		TwAddButton(bar, "Recalculate Tensors", CalculateNewTensorsCB, NULL, "");
+		TwAddButton(bar, "Reset", ResetRBCB, NULL, "");
+		TwAddVarRW(bar, "Impulse Force", TW_TYPE_FLOAT, &forcePush, "");
+		TwAddVarRW(bar, "bClick to Impulse", TW_TYPE_BOOL8, &bClickImpulse, "");
+
+		TwAddSeparator(bar, "", "");
+
 		TwAddVarRW(bar, "Add Amount", TW_TYPE_INT32, &addAmount, "");
 		TwAddButton(bar, "Add Box(es)", AddBoxButtonCB, NULL, "");
+
+		TwAddSeparator(bar, "", ""); //=======================================================
+
+		TwAddVarRW(bar, "Debug GJK", TW_TYPE_BOOL8, &rigidBodyManager.debugGJK, "");
+		TwAddVarRW(bar, "selected RB", TW_TYPE_DIR3F, &rigidBodyManager.rigidBodies[rbIdx]->model->worldProperties.translation, "");
 	}
 };

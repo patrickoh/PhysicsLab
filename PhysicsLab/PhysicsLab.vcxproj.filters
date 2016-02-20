@@ -28,9 +28,6 @@
     <Filter Include="Header Files\Primitives">
       <UniqueIdentifier>{c316707e-60b7-4e34-a859-67028f83291a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\ImGui">
-      <UniqueIdentifier>{2e7ed85a-3522-4de7-beaa-5f440ec237bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\ImGui">
       <UniqueIdentifier>{ba5a4782-f136-4c7a-a06d-a8d0259e4720}</UniqueIdentifier>
     </Filter>
@@ -46,14 +43,17 @@
     <Filter Include="Header Files\Physics">
       <UniqueIdentifier>{f850a68d-414f-4005-9d86-119a9f15dc1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\CD - Broadphase">
-      <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Physics\SoftBody">
       <UniqueIdentifier>{9c3ca589-f2d2-4df6-ae34-e9aa88ef1f59}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Physics\CD / CR">
+    <Filter Include="Header Files\Physics\Broadphase">
+      <UniqueIdentifier>{81b0a424-b7a1-4069-bfa2-5601df4f1215}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Physics\Narrowphase">
       <UniqueIdentifier>{a2a3cd8d-1806-412f-ae10-80507c78cc51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui">
+      <UniqueIdentifier>{2e7ed85a-3522-4de7-beaa-5f440ec237bf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,10 +120,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AABB.h">
-      <Filter>Header Files\CD - Broadphase</Filter>
+      <Filter>Header Files\Physics\Broadphase</Filter>
     </ClInclude>
     <ClInclude Include="BoundingSphere.h">
-      <Filter>Header Files\CD - Broadphase</Filter>
+      <Filter>Header Files\Physics\Broadphase</Filter>
     </ClInclude>
     <ClInclude Include="QueryPerformance.h">
       <Filter>Header Files</Filter>
@@ -132,7 +132,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GJK.h">
-      <Filter>Header Files\Physics\CD / CR</Filter>
+      <Filter>Header Files\Physics\Narrowphase</Filter>
     </ClInclude>
     <ClInclude Include="Line.h">
       <Filter>Header Files\Primitives</Filter>
@@ -198,13 +198,13 @@
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="EPA.h">
-      <Filter>Header Files\Physics\CD / CR</Filter>
+      <Filter>Header Files\Physics\Narrowphase</Filter>
     </ClInclude>
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
     <ClInclude Include="Support.h">
-      <Filter>Header Files\Physics\CD / CR</Filter>
+      <Filter>Header Files\Physics\Narrowphase</Filter>
     </ClInclude>
     <ClInclude Include="BunnyMesh.h">
       <Filter>Header Files\Physics\SoftBody</Filter>
