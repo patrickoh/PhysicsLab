@@ -15,7 +15,7 @@ AABB::AABB(const std::vector<glm::vec3>& vertices, RigidBody* p_owner)
 {
 	owner = p_owner;
 
-	colour = glm::vec4(0,0,1,1);
+	colour = glm::vec4(1,0,0,1);
 
 	min[Axis::X] = new EndPoint(std::numeric_limits<float>::max(), true, Axis::X, this);
 	min[Axis::Y] = new EndPoint(std::numeric_limits<float>::max(), true, Axis::Y, this);

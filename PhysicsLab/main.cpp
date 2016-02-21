@@ -27,21 +27,28 @@ int main(int argc, char** argv)
 {
 	GLProgram* demo;
 
+	std::cout << "1. Particle System" << std::endl;
+	std::cout << "2. Unconstrained Rigid Body" << std::endl;
+	std::cout << "3. Broadphase" << std::endl;
+	std::cout << "4. Soft Body (Side Project)" << std::endl;
+	std::cout << "5. Narrowphase" << std::endl;
+	std::cout << ">";
+
 	int demoIndex = -1;
 	do {
 		std::cin >> demoIndex;
 	}
-	while(demoIndex < 0 || demoIndex > 4);
+	while(demoIndex < 1 || demoIndex > 5);
 
-	if(demoIndex == 0)
+	if(demoIndex == 1)
 		demo = new ParticleDemo();	
-	else if(demoIndex == 1)
-		demo = new RigidBodyDemo();
 	else if(demoIndex == 2)
-		demo = new BroadphaseDemo();
+		demo = new RigidBodyDemo();
 	else if(demoIndex == 3)
-		demo = new SoftBodyDemo();
+		demo = new BroadphaseDemo();
 	else if(demoIndex == 4)
+		demo = new SoftBodyDemo();
+	else if(demoIndex == 5)
 		demo = new NarrowphaseDemo();
 
 	demo->Init(argc, argv);

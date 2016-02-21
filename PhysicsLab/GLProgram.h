@@ -217,10 +217,15 @@ public:
 					ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "boundColour", modelList[i]->colour);
 
 				modelList.at(i)->Render(shaderManager.GetCurrentShaderProgramID());
+
+				if(modelList.at(i)->isColliding)
+					modelList[i]->wireframeColour = glm::vec4(0,0,1,1);
+				else
+					modelList[i]->wireframeColour = glm::vec4(1,1,1,1);
 	
 				shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("bounding"));
 				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
+				ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", modelList[i]->wireframeColour);
 				modelList.at(i)->Render(shaderManager.GetShaderProgramID("bounding"), true);
 			}
 		}	

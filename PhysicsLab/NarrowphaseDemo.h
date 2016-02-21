@@ -96,9 +96,16 @@ public:
 		gjkTetra = new Tetrahedron(vec);
 
 		rbIdx = 0;
+		rigidBodyManager[rbIdx]->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
 
 		tweakBars["main"] = TwNewBar("Main");
 		TwDefine(" Main size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
+
+		tweakBars["selection"] = TwNewBar("Selection");
+		TwDefine(" Selection size='250 220' position='1000 450' color='125 125 125' ");
+
+		//tweakBars["gjk"] = TwNewBar("GJK");
+		//TwDefine(" GJK size='250 200' position='1000 500' color='125 125 125' ");
 
 		SetUpTweakBars();
 	}
@@ -124,7 +131,21 @@ public:
 		if(Input::leftClick && bClickImpulse)
 			rigidBodyManager.rigidBodies[rbIdx]->ApplyImpulse(cursorWorldSpace, camera->viewProperties.forward * forcePush);
 
-		rigidBodyManager.Update(deltaTime * simulationSpeed);
+		if(rigidBodyManager.gjkMode == GJK::Mode::Step 
+			&& rigidBodyManager.gjkDebugger->finished
+			&& rigidBodyManager.nextStep)
+		{
+			rigidBodyManager.nextStep = false;
+			rigidBodyManager.pausedSim = false;
+			rigidBodyManager.gjkDebugger->Reset();
+		}
+		else if(rigidBodyManager.gjkMode == GJK::Mode::Draw)
+		{
+			if(rigidBodyManager.gjkDebugger->finished)
+				rigidBodyManager.gjkDebugger->Reset();
+		}
+
+		rigidBodyManager.Update(deltaTime * simulationSpeed);	
 		rigidBodyManager.Broadphase(broadphaseMode); //Make them always be potentially colliding for purposes of demo		
 		rigidBodyManager.Narrowphase(deltaTime);
 	
@@ -166,23 +187,23 @@ public:
 	void DrawGJK()
 	{
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
-		for(SupportPoint p : rigidBodyManager.gjk->simplex)
+		for(SupportPoint p : rigidBodyManager.gjkDebugger->simplex)
 		{
 			Point p(p.AB);
 			p.Render(5.0f);
 		}
 
-		int simplexSize = rigidBodyManager.gjk->simplex.size();
+		int simplexSize = rigidBodyManager.gjkDebugger->simplex.size();
 	
 		if(simplexSize == 2)
 		{
-			Line l(rigidBodyManager.gjk->simplex[0].AB, rigidBodyManager.gjk->simplex[1].AB);
+			Line l(rigidBodyManager.gjkDebugger->simplex[0].AB, rigidBodyManager.gjkDebugger->simplex[1].AB);
 			l.Render();
 		}
 		else if(simplexSize == 3)
 		{	
-			Triangle t(rigidBodyManager.gjk->simplex[0].AB, 
-				rigidBodyManager.gjk->simplex[1].AB, rigidBodyManager.gjk->simplex[2].AB);
+			Triangle t(rigidBodyManager.gjkDebugger->simplex[0].AB, 
+				rigidBodyManager.gjkDebugger->simplex[1].AB, rigidBodyManager.gjkDebugger->simplex[2].AB);
 			
 			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
 			t.Render();
@@ -193,7 +214,7 @@ public:
 		}
 		else if(simplexSize == 4)
 		{
-			gjkTetra->Update(rigidBodyManager.gjk->simplex);
+			gjkTetra->Update(rigidBodyManager.gjkDebugger->simplex);
 
 			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
 			gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), false);
@@ -295,13 +316,13 @@ public:
 		ss << "Rigid Bodies: " << rigidBodyManager.rigidBodies.size();
 		printStream();
 
-		ss << "gjk->simplex.size(): " << rigidBodyManager.gjk->simplex.size();
+		/*ss << "gjk->simplex.size(): " << rigidBodyManager.gjk->simplex.size();
 		printStream();
 
 		ss << "gjk steps: " << rigidBodyManager.gjk->steps;
-		printStream();
+		printStream();*/
 
-		ss << "bClickImpulse: " << bClickImpulse;
+		ss << "bClickImpulse: " << bClickImpulse << " (PRESS K)";
 		printStream();
 
 		ss << "rbIdx: " << rbIdx;
@@ -318,13 +339,13 @@ public:
 		{
 			if(Input::keyPress == KEY::KEY_G ||
 				Input::keyPress == KEY::KEY_g)
-				rigidBodyManager.stepDebug = true;
+				rigidBodyManager.nextStep = true;
 
 			if(Input::keyPress == KEY::KEY_TAB)
 			{
 				rbIdx = (rbIdx + 1) % rigidBodyManager.rigidBodies.size();
-				TwRemoveVar(tweakBars["main"], "selected RB");
-				TwAddVarRW(tweakBars["main"], "selected RB", TW_TYPE_DIR3F, 
+				TwRemoveVar(tweakBars["selection"], "selected RB");
+				TwAddVarRW(tweakBars["selection"], "selected RB", TW_TYPE_DIR3F, 
 					&rigidBodyManager.rigidBodies[rbIdx]->model->worldProperties.translation,
 					"");
 
@@ -353,27 +374,20 @@ public:
 		glutSolidSphere(.05, 25, 25);
 	}
 
-	void CalculateNewTensors()
+	void CalculateNewTensor()
 	{
-		for(RigidBody* rb : rigidBodyManager.rigidBodies)
-		{
-			rb->mass = mass;
-			rb->inertialTensor = Inertia::Compute2(rb->model, rb->mass);
-		}
+		RigidBody* rb = rigidBodyManager[rbIdx];
+		rb->mass = mass;
+		rb->inertialTensor = Inertia::Compute2(rb->model, rb->mass);
 	}
 
-	static void TW_CALL CalculateNewTensorsCB(void *clientData)
+	static void TW_CALL CalculateNewTensorCB(void *clientData)
 	{
-		NarrowphaseDemo::Instance->CalculateNewTensors();
+		NarrowphaseDemo::Instance->CalculateNewTensor();
 	}
 
 	void ResetRB()
 	{
-		/*for(RigidBody* rb : rigidBodyManager.rigidBodies)
-		{
-			rb->Reset();
-		}*/
-
 		rigidBodyManager[rbIdx]->Reset();
 	}
 
@@ -408,8 +422,8 @@ public:
 		TwAddSeparator(bar, "", ""); //=======================================================
 
 		//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, "");
-		TwAddVarRW(bar, "Pause simulation", TW_TYPE_BOOL8, &rigidBodyManager.pausedSim, "");
-		TwAddVarRW(bar, "Auto-pause", TW_TYPE_BOOL8, &rigidBodyManager.autoPause, "");
+		TwAddVarRW(bar, "(P)ause simulation", TW_TYPE_BOOL8, &rigidBodyManager.pausedSim, "");
+		TwAddVarRW(bar, "Auto-pause (Broad)", TW_TYPE_BOOL8, &rigidBodyManager.bpAutoPause, "");
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
@@ -424,11 +438,15 @@ public:
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
-		TwAddVarRW(bar, "Mass", TW_TYPE_FLOAT, &mass, "");
-		TwAddButton(bar, "Recalculate Tensors", CalculateNewTensorsCB, NULL, "");
-		TwAddButton(bar, "Reset", ResetRBCB, NULL, "");
+		{
+			TwEnumVal gjkModeEV[3] = { {GJK::Mode::Draw, "Draw"}, {GJK::Mode::Step, "Step"}, {GJK::Mode::Normal, "Normal"} };
+			TwType gjkType = TwDefineEnum("I", gjkModeEV, 3);
+			TwAddVarRW(bar, "GJK Mode", gjkType, &rigidBodyManager.gjkMode, " keyIncr='<' keyDecr='>' help='Change broadphase mode.' ");
+		}
+
+		TwAddSeparator(bar, "", ""); //=======================================================
+		
 		TwAddVarRW(bar, "Impulse Force", TW_TYPE_FLOAT, &forcePush, "");
-		TwAddVarRW(bar, "bClick to Impulse", TW_TYPE_BOOL8, &bClickImpulse, "");
 
 		TwAddSeparator(bar, "", "");
 
@@ -437,7 +455,10 @@ public:
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
-		TwAddVarRW(bar, "Debug GJK", TW_TYPE_BOOL8, &rigidBodyManager.debugGJK, "");
+		bar = tweakBars["selection"];
 		TwAddVarRW(bar, "selected RB", TW_TYPE_DIR3F, &rigidBodyManager.rigidBodies[rbIdx]->model->worldProperties.translation, "");
+		TwAddButton(bar, "Reset", ResetRBCB, NULL, "");
+		TwAddVarRW(bar, "New Mass", TW_TYPE_FLOAT, &mass, "");
+		TwAddButton(bar, "Recalculate Tensor", CalculateNewTensorCB, NULL, "");
 	}
 };

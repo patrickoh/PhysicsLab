@@ -107,7 +107,6 @@
     <ClInclude Include="BunnyMesh.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="GLProgram.h" />
     <ClInclude Include="imconfig.h" />

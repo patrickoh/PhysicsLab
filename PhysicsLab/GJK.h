@@ -5,80 +5,6 @@
 #include "Support.h"
 #include "Point.h"
 
-struct GJKStepper
-{
-	bool firstrun;
-	int steps;
-	std::vector<SupportPoint> simplex;  //a simplex is simply a list of points that form an n-dimensional construct
-	glm::vec3 dir; //now a member variable for debug purposes
-
-	GJKStepper()
-	{
-		firstrun = true;
-		steps = 0;
-	}
-
-	~GJKStepper()
-	{
-
-	}
-
-	bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplexForEPA, bool &finished, bool debug = false)
-	{
-		if(!debug || firstrun)
-		{
-			simplex.clear();
-			dir = glm::vec3(1,0,0); //arbitrary starting direction to get the ball rolling
-			SupportPoint sp = Support(dir, model1, model2); //Go as far as possible in search direction
-			simplex.push_back(sp); 
-
-			dir = -sp.AB; //Go in opposite direction (far side of origin)
-			//= glm::normalize(dir); 
-
-			firstrun = false;
-		}
-
-		while(steps < 50)
-		{
-			SupportPoint A = Support(dir, model1, model2);
-
-			if(glm::dot(A.AB, dir) < 0)  //Didn't reach the origin i.e. no intersection (can't enclose the origin)
-			{
-				Reset();
-				finished = true;
-				return false;
-			}
-
-			simplex.push_back(A);
-
-			if (GJK::ContainsOrigin(simplex, dir))  //Returns true if the new point results in a simplex which encloses the origin
-			{
-				simplexForEPA = simplex;
-				Reset();
-				finished = true;
-				return true;
-			}
-
-			steps++;
-				
-			if(debug)
-			{
-				finished = false;
-				return false;
-			}
-		}
-
-		finished = true;
-		return false;
-	}
-
-	void Reset()
-	{
-		firstrun = true;
-		steps = 0;
-	}
-};
-
 //Gilbert Johnson Keerthi algorithm for determining whether or 
 //not two convex solids intersect
 
@@ -86,6 +12,8 @@ struct GJKStepper
 class GJK
 {
 	public:
+
+		enum Mode { Draw, Step, Normal };
 
 		static bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplexForEPA)
 		{
@@ -298,5 +226,78 @@ class GJK
 
 			return true; //The origin is INSIDE the tetrahedron
 		}
+
+		struct Debugger
+		{
+			bool firstrun;
+			int steps;
+			bool finished;
+
+			std::vector<SupportPoint> simplex;  //a simplex is simply a list of points that form an n-dimensional construct
+			glm::vec3 dir; //now a member variable for debug purposes
+
+			Debugger()
+			{
+				Reset();
+			}
+
+			~Debugger()
+			{
+
+			}
+
+			void Reset()
+			{
+				firstrun = true;
+				steps = 0;
+				finished = false;
+				simplex.clear();
+			}
+
+			bool Intersects(Model* model1, Model* model2, std::vector<SupportPoint> &simplexForEPA)
+			{
+				if(firstrun)
+				{
+					simplex.clear();
+					dir = glm::vec3(1,0,0); //arbitrary starting direction to get the ball rolling
+					SupportPoint sp = Support(dir, model1, model2); //Go as far as possible in search direction
+					simplex.push_back(sp); 
+
+					dir = -sp.AB; //Go in opposite direction (far side of origin)
+					//= glm::normalize(dir); 
+
+					firstrun = false;
+				}
+
+				while(steps < 50)
+				{
+					SupportPoint A = Support(dir, model1, model2);
+
+					if(glm::dot(A.AB, dir) < 0)  //Didn't reach the origin i.e. no intersection (can't enclose the origin)
+					{
+						finished = true;
+						return false;
+					}
+
+					simplex.push_back(A);
+
+					if (GJK::ContainsOrigin(simplex, dir))  //Returns true if the new point results in a simplex which encloses the origin
+					{
+						simplexForEPA = simplex;
+						finished = true;
+						return true;
+					}
+
+					steps++;
+				
+					finished = false;
+					return false;
+					
+				}
+
+				finished = true;
+				return false;
+			}
+		};
 };
 

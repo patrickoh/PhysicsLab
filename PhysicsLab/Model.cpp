@@ -21,6 +21,7 @@ Model::Model(glm::vec3 position, glm::quat orientation, glm::vec3 scale, const c
 
 	renderColour = bRenderColour;
 	colour = p_colour;
+	wireframeColour = glm::vec4(1,1,1,1);
 }
 
 Model::~Model()

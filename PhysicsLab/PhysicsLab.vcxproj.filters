@@ -167,9 +167,6 @@
     <ClInclude Include="ImGuiImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GLProgram.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleDemo.h">
       <Filter>Header Files\Demos</Filter>
     </ClInclude>
@@ -197,9 +194,6 @@
     <ClInclude Include="RigidBody.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="EPA.h">
-      <Filter>Header Files\Physics\Narrowphase</Filter>
-    </ClInclude>
     <ClInclude Include="ParticleSystem.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
@@ -210,6 +204,9 @@
       <Filter>Header Files\Physics\SoftBody</Filter>
     </ClInclude>
     <ClInclude Include="NarrowphaseDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="GLProgram.h">
       <Filter>Header Files\Demos</Filter>
     </ClInclude>
   </ItemGroup>

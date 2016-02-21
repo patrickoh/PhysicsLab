@@ -1,18 +1,14 @@
 ﻿#pragma once
 
-#include "RigidBody.h"
-#include <vector>
 #include <glm\glm.hpp>
-#include <map>
 
+#include <vector>
+#include <map>
 #include <algorithm> 
 
 #include "QueryPerformance.h"
-
-#pragma region _
 #include "GJK.h"
-#include "EPA.h"
-#pragma endregion
+#include "RigidBody.h"
 
 struct RbPair
 {
@@ -27,8 +23,6 @@ struct RbPair
 };
 
 enum BroadphaseMode { Sphere, BruteAABB, SAP1D, SAP3D, Skip };
-
-//enum DebugStage { Gjk, Epa };
 
 class RigidbodyManager
 { 
@@ -47,48 +41,35 @@ class RigidbodyManager
 		bool bounceyEnclosure;
 		
 		bool pausedSim;
-		bool autoPause;
+		bool bpAutoPause;
 
 		int bounceyEnclosureSize;
 
-		ContactInfo cInfo;
-		bool bVisContacts;
-
-		std::queue<GJKStepper*> gjkSteppers;
-		//EPA epa;
-
-		bool debugGJK, debugEPA, stepDebug;
-		//DebugStage debugStage;
-
-		bool CR;
-
+		//GJK
+		//std::queue<GJK::gjk*> gjks;
+		GJK::Debugger* gjkDebugger; //TODO: Support for multiple gjkDebuggers?
+		bool nextStep;
 		std::vector<glm::vec3> currentMinkowski;
-
-		glm::vec3 J;
+		GJK::Mode gjkMode;
 
 		RigidbodyManager()
 		{
 			bounceyEnclosure = true;
 			
 			pausedSim = false;
-			autoPause = false;
+			bpAutoPause = false;
 
 			bounceyEnclosureSize = 5;
 
-			gjk = new GJK();
-			epa = EPA();
-
-			CR = false;
-
-			debugGJK = false; //Are we debug drawing GJK?
-			//debugEPA = false; //Are we debug drawing EPA?
-			stepDebug = false; //Has the step button been pressed to do an iteration?
-			debugStage = DebugStage::Gjk; //Which narrowphase stage are we at?
-
-			bVisContacts = false;
+			nextStep = false; //Has the step button been pressed to do an iteration?
+			gjkDebugger = new GJK::Debugger();
+			gjkMode = GJK::Mode::Normal;
 		}
 
-		~RigidbodyManager(){}
+		~RigidbodyManager()
+		{
+			delete gjkDebugger;
+		}
 
 		RigidBody* operator [](int i) const    { return rigidBodies[i]; }
 		RigidBody* & operator [](int i) { return rigidBodies[i]; }
@@ -167,95 +148,48 @@ class RigidbodyManager
 				//currentMinkowski = gjk->MinkowskiDifference(rb1->model->GetTransformedVertices(), rb2->model->GetTransformedVertices());
 				//currentMinkowski = getConvexHull(currentMinkowski);
 
-				/*if(debugGJK && debugStage == DebugStage::Gjk)
+				bool intersecting;
+
+				if(gjkMode == GJK::Mode::Draw)
+				{	
+					while(!gjkDebugger->finished)
+						intersecting = gjkDebugger->Intersects(rb1->model, rb2->model, simplexForEPA);
+				}
+				else if(gjkMode == GJK::Mode::Step)
 				{
 					pausedSim = true;
-					if(!stepDebug)
+
+					if(!nextStep)
 						continue;
 					else
-						stepDebug = false;	
-				}*/
-				
+						nextStep = false;
+
+					intersecting = gjkDebugger->Intersects(rb1->model, rb2->model, simplexForEPA);
+				}
+				else
+				{
+					intersecting = GJK::Intersects(rb1->model, rb2->model, simplexForEPA);
+				}
+
+
 				//bool gjkFinished = false;
-				bool intersecting = GJK::Intersects(rb1->model, rb2->model, simplexForEPA);
+
+				if(intersecting)
+				{
+					rb1->model->isColliding = true;
+					rb2->model->isColliding = true;
+					//rigidBodyManager[(rbIdx-1) % rigidBodyManager.rigidBodies.size()]->model->colour = glm::vec4(0.5,0.5,0.5,1.0);
+					//rb1->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
+					//rb2->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
+				}
 
 				///* debug stuff --> */ gjkFinished, (debugGJK && debugStage == DebugStage::Gjk)
 
 				//if(gjkFinished)
 					//pausedSim = false; //If it was in gjk Debug, simulation may resume
-					
-				#pragma region _
-				//if((!debugGJK || gjkFinished) && intersecting) //GJK is finished, and found an intersection
-				//{
-				//	rb1->model->isColliding = rb2->model->isColliding = true; //vis
-				//	debugStage = DebugStage::Epa;
-
-				//	if(debugEPA)
-				//	{
-				//		pausedSim = true;
-				//		if(!stepDebug)
-				//			continue;
-				//		else
-				//			stepDebug = false;
-				//	}
-
-				//	bool epaFinished = false;
-				//	cInfo = epa.getContactInfo(rb1->model, rb2->model, simplexForEPA, /* debug stuff --> */ epaFinished, debugEPA);
-
-				//	if(epaFinished)
-				//	{
-				//		debugStage = DebugStage::Gjk; //Put it back to the default
-				//		gjk->simplex.clear(); //Can now clear the original gjk simplex which we were using for vis
-				//		pausedSim = false; // resume simulation (in case was paused for debugging)
-				//			
-				//		bVisContacts = true; //visualise contacts
-				//	}
-
-				//	//Collision Response
-				//	if(CR)
-				//	{
-				//		float j = CalculateImpulse(rb2, rb1, cInfo.c1, cInfo.c2, cInfo.normal); 
-				//			
-				//		////𝑱=𝑗 𝒏
-				//		J = j * cInfo.normal;
-
-				//		////Δ𝑷=𝑱
-				//		rb1->momentum -= J;
-				//		rb2->momentum += J;
-
-				//		////Δ𝑳=(𝒓×𝑱)
-				//		rb1->angularMomentum -= glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
-				//
-				//		rb2->angularMomentum += glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
-				//	}	
-				//}
-				#pragma endregion
 			}
 
 			broadphasePairs.clear();
-		}
-
-		float CalculateImpulse(RigidBody* rb1, RigidBody* rb2, glm::vec3 c1, glm::vec3 c2, glm::vec3 normal, float e = 1.0f)
-		{
-			//vec3 rA = (contact pt of A) - xA (centre of mass position of A)
-			glm::vec3 rA = c1 - rb1->model->worldProperties.translation; //Don't bother with com for the moment
-			glm::vec3 rB = c2 - rb2->model->worldProperties.translation;
-
-			float t1 = 1.0f / rb1->mass;
-			float t2 = 1.0f / rb2->mass;
-			float t3 = glm::dot(normal, glm::cross(rb1->getIntertialTensor() * glm::cross(rA, normal), rA));
-			float t4 = glm::dot(normal, glm::cross(rb2->getIntertialTensor() * glm::cross(rB, normal), rB));
-
-			glm::vec3 pA = rb1->velocity + glm::cross(rb1->angularVelocity, rA);
-			glm::vec3 pB = rb2->velocity + glm::cross(rb2->angularVelocity, rB);
-
-			float vrel = glm::dot(normal, pA - pB);
-	
-			float j = 0.0f;
-			if(vrel < 0.0f) 
-				j = std::max(0.0f, (-(1 + e) * vrel) / (t1 + t2 + t3 + t4) );
-
-			return j;
 		}
 
 		void Update(double deltaTime)
@@ -294,7 +228,7 @@ class RigidbodyManager
 		void SphereCollisions()
 		{
 			for(RigidBody* rb : rigidBodies)
-				rb->boundingSphere->colour = glm::vec4(0,0,1,1);
+				rb->boundingSphere->colour = glm::vec4(0,1,0,1);
 
 			for (int i = 0; i < rigidBodies.size(); i++)
 			{
@@ -310,7 +244,7 @@ class RigidbodyManager
 						sphere1->colour = sphere2->colour = glm::vec4(1,0,0,1);		
 						broadphasePairs.push_back(RbPair(sphere1->owner, sphere2->owner));
 
-						if(autoPause)
+						if(bpAutoPause)
 							pausedSim = true;
 					}
 				}
@@ -336,7 +270,7 @@ class RigidbodyManager
 						aabb1->colour = aabb2->colour = glm::vec4(1,0,0,1);
 						broadphasePairs.push_back(RbPair(aabb1->owner, aabb2->owner));
 
-						if(autoPause)
+						if(bpAutoPause)
 							pausedSim = true;
 					}
 				}
@@ -365,7 +299,7 @@ class RigidbodyManager
 							ep->owner->colour = ep2->owner->colour = glm::vec4(1,0,0,1);
 							broadphasePairs.push_back(RbPair(ep->owner->owner, ep2->owner->owner));
 
-							if(autoPause)
+							if(bpAutoPause)
 								pausedSim = true;
 						}
 					}
@@ -426,7 +360,7 @@ class RigidbodyManager
 							rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
 							broadphasePairs.push_back(RbPair(rigidBodies[i], rigidBodies[j]));
 
-							if(autoPause)
+							if(bpAutoPause)
 								pausedSim = true;
 						}
 						else if(rigidBodies[i]->aabb->collides(rigidBodies[j]->aabb))
@@ -434,7 +368,7 @@ class RigidbodyManager
 							rigidBodies[i]->aabb->colour = rigidBodies[j]->aabb->colour = glm::vec4(1,0,0,1);
 							broadphasePairs.push_back(RbPair(rigidBodies[i], rigidBodies[j]));
 
-							if(autoPause)
+							if(bpAutoPause)
 								pausedSim = true;
 						}
 					}

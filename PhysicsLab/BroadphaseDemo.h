@@ -50,21 +50,15 @@ public:
 
 		for(int i = 0; i < 5; i++)
 			AddBox(glm::vec3(0,0,0));
-
 		addAmount = 1;
 		
 		simulationSpeed = 1.0f;
 
 		broadphaseMode = BroadphaseMode::SAP1D;
-
 		broadphaseResultCounter = 0;
 		broadphaseResults = 0;
-
-		drawBoundingSpheres = true;
+		drawBoundingSpheres = false;
 		drawBoundingBoxes = true;
-
-		//autoPause = false;
-		//pausedSim = false;
 
 		tweakBars["main"] = TwNewBar("Main");
 		TwDefine(" Main size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
@@ -255,7 +249,7 @@ public:
 
 		//TwAddVarRW(bar, "Simulation Speed", TW_TYPE_FLOAT, &simulationSpeed, "");
 		TwAddVarRW(bar, "Pause simulation", TW_TYPE_BOOL8, &rigidBodyManager.pausedSim, "");
-		TwAddVarRW(bar, "Auto-pause", TW_TYPE_BOOL8, &rigidBodyManager.autoPause, "");
+		TwAddVarRW(bar, "Auto-pause", TW_TYPE_BOOL8, &rigidBodyManager.bpAutoPause, "");
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 

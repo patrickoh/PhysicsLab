@@ -87,6 +87,7 @@ class Model
 
 		bool renderColour;
 		glm::vec4 colour;
+		glm::vec4 wireframeColour;
 
 		vector<glm::vec3> vertices;
 
