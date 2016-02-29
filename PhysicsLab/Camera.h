@@ -56,6 +56,8 @@ class Camera
 
 		static Camera* Instance;
 
+		glm::mat4 projectionMatrix;
+
 		Camera(glm::vec3 position, CameraMode p_mode, float p_turnSpeed = 0.0002f, float p_moveSpeed = 0.01f)
 		{
 			Instance = this;

@@ -3,6 +3,7 @@
 #include "BroadphaseDemo.h"
 #include "SoftBodyDemo.h"
 #include "NarrowphaseDemo.h"
+#include "ResponseDemo.h"
 #include "GLProgram.h"
 #include "QueryPerformance.h"
 
@@ -17,6 +18,7 @@ RigidBodyDemo* RigidBodyDemo::Instance;
 BroadphaseDemo* BroadphaseDemo::Instance;
 SoftBodyDemo* SoftBodyDemo::Instance;
 NarrowphaseDemo* NarrowphaseDemo::Instance;
+ResponseDemo* ResponseDemo::Instance;
 
 Camera* Camera::Instance;
 
@@ -32,13 +34,14 @@ int main(int argc, char** argv)
 	std::cout << "3. Broadphase" << std::endl;
 	std::cout << "4. Soft Body (Side Project)" << std::endl;
 	std::cout << "5. Narrowphase" << std::endl;
+	std::cout << "6. Response" << std::endl;
 	std::cout << ">";
 
 	int demoIndex = -1;
 	do {
 		std::cin >> demoIndex;
 	}
-	while(demoIndex < 1 || demoIndex > 5);
+	while(demoIndex < 1 || demoIndex > 6);
 
 	if(demoIndex == 1)
 		demo = new ParticleDemo();	
@@ -50,6 +53,8 @@ int main(int argc, char** argv)
 		demo = new SoftBodyDemo();
 	else if(demoIndex == 5)
 		demo = new NarrowphaseDemo();
+	else if(demoIndex == 6)
+		demo = new ResponseDemo();
 
 	demo->Init(argc, argv);
 	demo->Run();

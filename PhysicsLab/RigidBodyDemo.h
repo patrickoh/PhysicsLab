@@ -134,7 +134,7 @@ public:
 	//before finally binding the VAO and drawing with verts or indices
 	void Draw()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		viewMatrix = camera->GetViewMatrix();
 
@@ -156,7 +156,7 @@ public:
 	void DrawBounceyEnclosure(glm::mat4 MVP)
 	{
 		shaderManager.SetShaderProgram("bounding");
-		MVP = projectionMatrix * viewMatrix;
+		MVP = camera->Instance->projectionMatrix * viewMatrix;
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
 		glutWireCube(10);
@@ -165,9 +165,9 @@ public:
 	//ImpulseVisualiser
 	void DrawMouse(glm::mat4 MVP)
 	{
-		cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
+		cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, camera->Instance->projectionMatrix);
 		shaderManager.SetShaderProgram("bounding");
-		MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), cursorWorldSpace);
+		MVP = camera->Instance->projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), cursorWorldSpace);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));	
 		glutSolidSphere(.05, 25, 25);
@@ -249,6 +249,7 @@ public:
 
 		TwAddSeparator(bar, "", "");
 
+		TwAddVarRW(bar, "Linear Momentum", TW_TYPE_DIR3F, &rigidBodies[0]->momentum, "");
 		TwAddVarRW(bar, "Angular Momentum", TW_TYPE_DIR3F, &rigidBodies[0]->angularMomentum, "");
 		
 		TwAddSeparator(bar, "", "");

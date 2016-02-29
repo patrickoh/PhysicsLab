@@ -15,7 +15,19 @@ class RigidBody
 		glm::vec3 torqueNet;
 		glm::vec3 forceNet;
 
+		struct Environment
+		{
+			float gravity;
+			glm::vec3 wind;
+			float windScalar;
+			float fluidDensity;
+		} env;
+
+		float radius, surfaceArea, dragCoefficient; //Drag stuff
+		
 	public:
+
+		bool immovable;
 
 		glm::vec3 velocity;
 		glm::vec3 momentum;
@@ -39,6 +51,10 @@ class RigidBody
 		static bool angular;
 		static bool linear;
 
+		static bool gravity;
+		static bool wind;
+		static bool drag;
+
 		static bool bDriftCorrection;
 
 		void StepPhysics(double deltaTime);
@@ -47,6 +63,7 @@ class RigidBody
 		RigidBody(Model* model);
 		~RigidBody();
 
+		glm::vec3 FNet(glm::vec3 pos, glm::vec3 vel);
 		void ApplyImpulse(glm::vec3 p, glm::vec3 force);
 		void Reset();
 
@@ -62,5 +79,35 @@ class RigidBody
 		{
 			return glm::transpose(glm::toMat3(model->worldProperties.orientation))
 				* glm::inverse(inertialTensor) * glm::toMat3(model->worldProperties.orientation);
+		}
+
+		glm::vec3 fNet(glm::vec3 vel, float mass)
+		{
+			glm::vec3 fNet = glm::vec3(0);
+
+			if(gravity)
+				fNet += Gravity(mass);
+			if(drag)
+				if(wind)
+					fNet += PressureDrag(vel, true);
+				else
+					fNet += PressureDrag(vel, false);
+
+			return fNet;
+		}
+
+		glm::vec3 Gravity(float mass)
+		{
+			return mass * env.gravity * glm::vec3(0,-1,0);
+		}
+
+		glm::vec3 PressureDrag(glm::vec3 vel, bool wind)
+		{
+			if(wind) 
+			return 0.5f * env.fluidDensity * surfaceArea * dragCoefficient 
+				* (vel - (env.wind * env.windScalar)).length() * -(vel - (env.wind * env.windScalar));
+			else
+			return 0.5f * env.fluidDensity * surfaceArea * dragCoefficient 
+				* vel.length() * -vel;
 		}
 };

@@ -101,7 +101,7 @@ public:
 	//before finally binding the VAO and drawing with verts or indices
 	void Draw()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		viewMatrix = camera->GetViewMatrix();
 
@@ -112,7 +112,7 @@ public:
 		{
 			shaderManager.SetShaderProgram("bounding");
 			
-			MVP = projectionMatrix * viewMatrix *  
+			MVP = camera->Instance->projectionMatrix * viewMatrix *  
 				glm::translate(glm::mat4(1.0f), particleSystem->emitter.centre)
 				* glm::scale(glm::mat4(1.0f), 2.0f * particleSystem->emitter.variance);
 			
@@ -137,7 +137,7 @@ public:
 		shaderManager.SetShaderProgram(particleShader);
 
 		ShaderManager::SetUniform(particleShader, "view", viewMatrix);
-		ShaderManager::SetUniform(particleShader, "proj", projectionMatrix);
+		ShaderManager::SetUniform(particleShader, "proj", camera->Instance->projectionMatrix);
 		ShaderManager::SetUniform(particleShader, "size", particleSystem->pointSize);
 	
 		particleSystem->Render();

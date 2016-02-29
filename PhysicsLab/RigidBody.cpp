@@ -5,6 +5,9 @@
 //Model* RigidBody::impulseVisualiser;
 bool RigidBody::angular = true; 
 bool RigidBody::linear = true; 
+bool RigidBody::gravity = false;
+bool RigidBody::drag = false;
+bool RigidBody::wind = false;
 bool RigidBody::bDriftCorrection = true;
 
 RigidBody::RigidBody(Model* model)
@@ -31,6 +34,17 @@ RigidBody::RigidBody(Model* model)
 
 	boundingSphere = new BoundingSphere(model->vertices, this);
 	aabb = new AABB(model->vertices, this);
+
+	env.fluidDensity = 1.225f;
+	env.wind = glm::vec3(1, 0, 0);
+	env.windScalar = 1000.0f;
+	env.gravity = 9.81f;
+
+	dragCoefficient = 0.47f; //sphere  
+	radius = 0.05f;
+	surfaceArea = 3.14159265 * glm::pow(radius, 2.0f); //sphere
+
+	immovable = false;
 }
 
 RigidBody::~RigidBody()
@@ -56,17 +70,19 @@ void RigidBody::StepPhysics(double deltaTime)
 	//POSITION UPDATE
 	if(RigidBody::linear)
 	{
+		forceNet += fNet(velocity, mass);
+
 		//P = mv
 		//v = P/m
 
 		//Momentum method
-		//model->worldProperties.translation += velocity * timestep;
-		//velocity = momentum / mass; //equals is bad :P
-		//momentum += forceNet * timestep;
+		model->worldProperties.translation += velocity * timestep;
+		velocity = momentum / mass;
+		momentum += forceNet * timestep;
 		
 		//Acceleration method
-		model->worldProperties.translation += velocity * timestep;
-		velocity += (mass * forceNet)/mass * timestep;
+		/*model->worldProperties.translation += velocity * timestep;
+		velocity += (mass * forceNet)/mass * timestep;*/
 	}
 
 	if(RigidBody::angular)
@@ -161,3 +177,4 @@ glm::vec3 RigidBody::CalculateCentreOfMass(Model* model)
 
 	return com;
 }
+

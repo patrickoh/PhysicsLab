@@ -9,6 +9,12 @@
 #include "QueryPerformance.h"
 #include "GJK.h"
 #include "RigidBody.h"
+#include "EPA.h"
+
+#include "Line.h"
+#include "Point.h"
+#include "Triangle.h"
+#include "Tetrahedron.h"
 
 struct RbPair
 {
@@ -33,6 +39,8 @@ class RigidbodyManager
 
 		vector<RigidBody*> rigidBodies;
 
+		//Integrator integrator;
+
 		vector<AABB::EndPoint*> activeList; //List of potentially colliding pairs / active list
 		std::vector<std::vector<int>> pairs; //2d container for tracking no. of axis collisions between aabbs (max 3)
 
@@ -45,12 +53,11 @@ class RigidbodyManager
 
 		int bounceyEnclosureSize;
 
-		//GJK
-		//std::queue<GJK::gjk*> gjks;
-		GJK::Debugger* gjkDebugger; //TODO: Support for multiple gjkDebuggers?
-		bool nextStep;
-		std::vector<glm::vec3> currentMinkowski;
-		GJK::Mode gjkMode;
+		bool bResponse;
+
+		//std::vector<glm::vec3> currentMinkowski;
+		bool bDrawGJK;
+		bool bDrawEPA;
 
 		RigidbodyManager()
 		{
@@ -61,14 +68,16 @@ class RigidbodyManager
 
 			bounceyEnclosureSize = 5;
 
-			nextStep = false; //Has the step button been pressed to do an iteration?
-			gjkDebugger = new GJK::Debugger();
-			gjkMode = GJK::Mode::Normal;
+			bResponse = false;
+
+			bDrawEPA = false;
+			bDrawGJK = false;
+
+			//integrator = Integrator();
 		}
 
 		~RigidbodyManager()
 		{
-			delete gjkDebugger;
 		}
 
 		RigidBody* operator [](int i) const    { return rigidBodies[i]; }
@@ -144,49 +153,41 @@ class RigidbodyManager
 				RigidBody* rb1 = broadphasePairs[i].rb1;
 				RigidBody* rb2 = broadphasePairs[i].rb2;
 
-				//For visualisation
-				//currentMinkowski = gjk->MinkowskiDifference(rb1->model->GetTransformedVertices(), rb2->model->GetTransformedVertices());
-				//currentMinkowski = getConvexHull(currentMinkowski);
-
-				bool intersecting;
-
-				if(gjkMode == GJK::Mode::Draw)
-				{	
-					while(!gjkDebugger->finished)
-						intersecting = gjkDebugger->Intersects(rb1->model, rb2->model, simplexForEPA);
-				}
-				else if(gjkMode == GJK::Mode::Step)
-				{
-					pausedSim = true;
-
-					if(!nextStep)
-						continue;
-					else
-						nextStep = false;
-
-					intersecting = gjkDebugger->Intersects(rb1->model, rb2->model, simplexForEPA);
-				}
-				else
-				{
-					intersecting = GJK::Intersects(rb1->model, rb2->model, simplexForEPA);
-				}
-
-
-				//bool gjkFinished = false;
+				bool intersecting = GJK::Intersects(rb1->model, rb2->model, simplexForEPA);
 
 				if(intersecting)
 				{
-					rb1->model->isColliding = true;
-					rb2->model->isColliding = true;
-					//rigidBodyManager[(rbIdx-1) % rigidBodyManager.rigidBodies.size()]->model->colour = glm::vec4(0.5,0.5,0.5,1.0);
-					//rb1->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
-					//rb2->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
+					if(bDrawGJK)
+						DrawGJK(simplexForEPA);
+
+					rb1->model->isColliding = rb2->model->isColliding = true;
+
+					ContactInfo cInfo = EPA::GetContactInfo(rb1->model, rb2->model, simplexForEPA);
+
+					if(bDrawEPA)
+						DrawEPA(cInfo);
+
+					if(bResponse)
+					{
+						float j = CalculateImpulse(rb2, rb1, cInfo.c1, cInfo.c2, cInfo.normal); 
+
+						std::stringstream ss;
+						toStringStream(cInfo.normal, ss);
+						std::cout << ss.str() << "\n";
+							
+						////𝑱=𝑗 𝒏
+						glm::vec3 J = j * cInfo.normal;
+
+						////Δ𝑷=𝑱
+						rb1->momentum -= J;
+						rb2->momentum += J;
+
+						////Δ𝑳=(𝒓×𝑱)
+						rb1->angularMomentum -= glm::cross(cInfo.c1 - rb1->model->worldProperties.translation, J); //don't bother with com for the moment (As cube com is 0,0,0)
+				
+						rb2->angularMomentum += glm::cross(cInfo.c2 - rb2->model->worldProperties.translation, J);
+					}
 				}
-
-				///* debug stuff --> */ gjkFinished, (debugGJK && debugStage == DebugStage::Gjk)
-
-				//if(gjkFinished)
-					//pausedSim = false; //If it was in gjk Debug, simulation may resume
 			}
 
 			broadphasePairs.clear();
@@ -210,19 +211,21 @@ class RigidbodyManager
 								&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
 						{
 							rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
-							rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+							rigidBodies[i]->momentum += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->momentum * normal[j]) * normal[j];
 
 							//velocity.y = -velocity.y;
 						}
 					}
 				}
 
-				if(!pausedSim)
+				if(!pausedSim && !rigidBodies[i]->immovable)
 					rigidBodies[i]->StepPhysics(deltaTime); //physics update
 					
 				rigidBodies[i]->Update(); //bookkeeping
 			}
 		}
+
+	private:
 
 		//Brute force check spheres
 		void SphereCollisions()
@@ -380,6 +383,30 @@ class RigidbodyManager
 					pairs[i][j] = 0;
 		}
 
+		float CalculateImpulse(RigidBody* rb1, RigidBody* rb2, glm::vec3 c1, glm::vec3 c2, glm::vec3 normal, float e = 1.0f)
+		{
+			//vec3 rA = (contact pt of A) - xA (centre of mass position of A)
+			glm::vec3 rA = c1 - rb1->model->worldProperties.translation; //Don't bother with com for the moment
+			glm::vec3 rB = c2 - rb2->model->worldProperties.translation;
+
+			float t1 = 1.0f / rb1->mass;
+			float t2 = 1.0f / rb2->mass;
+			float t3 = glm::dot(normal, glm::cross(rb1->getIntertialTensor() * glm::cross(rA, normal), rA));
+			float t4 = glm::dot(normal, glm::cross(rb2->getIntertialTensor() * glm::cross(rB, normal), rB));
+
+			glm::vec3 pA = rb1->velocity + glm::cross(rb1->angularVelocity, rA);
+			glm::vec3 pB = rb2->velocity + glm::cross(rb2->angularVelocity, rB);
+
+			float vrel = glm::dot(normal, pA - pB);
+	
+			float j = 0.0f;
+			if(vrel < 0.0f) 
+				j = std::max(0.0f, (-(1 + e) * vrel) / (t1 + t2 + t3 + t4) );
+
+			return j;
+		}
+
+
 		void insertionSort (vector<AABB::EndPoint*> &data) 
 		{
 			int i, j;
@@ -399,5 +426,64 @@ class RigidbodyManager
 
 				data[j] = tmp;
 			}
+		}
+
+		void DrawGJK(std::vector<SupportPoint> simplex)
+		{
+			GLuint shaderID = ShaderManager::Instance->GetShaderProgramID("bounding");
+			glm::mat4 MVP = Camera::Instance->projectionMatrix *
+				Camera::Instance->GetViewMatrix();
+			ShaderManager::Instance->SetShaderProgram(shaderID);
+			ShaderManager::SetUniform(shaderID, "mvpMatrix", MVP);
+			ShaderManager::SetUniform(shaderID, "boundColour", glm::vec4(1,1,1,1));
+			for(SupportPoint p : simplex)
+			{
+				Point p(p.AB);
+				p.Render(5.0f);
+			}
+
+			int simplexSize = simplex.size();
+	
+			if(simplexSize == 2)
+			{
+				Line l(simplex[0].AB, simplex[1].AB);
+				l.Render();
+			}
+			else if(simplexSize == 3)
+			{	
+				Triangle t(simplex[0].AB, simplex[1].AB, simplex[2].AB);
+				ShaderManager::SetUniform(shaderID, "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
+				t.Render();
+				ShaderManager::SetUniform(shaderID, "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+				t.Render(true);
+			}
+			else if(simplexSize == 4)
+			{
+				std::vector<glm::vec3> vec;
+				for(int i = 0; i < simplex.size(); i++)
+					vec.push_back(simplex[i].AB);
+				Tetrahedron gjkTetra(vec);
+				ShaderManager::SetUniform(shaderID, "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
+				gjkTetra.Render(shaderID, false);
+				ShaderManager::SetUniform(shaderID, "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
+				gjkTetra.Render(shaderID, true);
+			}
+		}
+
+		void DrawEPA(ContactInfo cInfo)
+		{
+			GLuint shaderID = ShaderManager::Instance->GetShaderProgramID("bounding");
+			ShaderManager::Instance->SetShaderProgram(shaderID);	
+			glm::mat4 MVP = Camera::Instance->projectionMatrix *
+				Camera::Instance->GetViewMatrix();
+			ShaderManager::SetUniform(shaderID, "mvpMatrix", MVP);
+			Point c1(cInfo.c1);
+			Point c2(cInfo.c2);
+			ShaderManager::SetUniform(shaderID, "boundColour", glm::vec4(1,1,1,1));
+			c1.Render(10.0f);
+			c2.Render(10.0f);
+			Line depth(cInfo.c1, cInfo.c2);
+			depth.Render();
+			ShaderManager::Instance->SetShaderProgram(0);
 		}
 };

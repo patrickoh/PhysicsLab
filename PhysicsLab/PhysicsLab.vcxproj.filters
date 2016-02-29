@@ -55,6 +55,9 @@
     <Filter Include="Header Files\ImGui">
       <UniqueIdentifier>{2e7ed85a-3522-4de7-beaa-5f440ec237bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics\Response">
+      <UniqueIdentifier>{cac41a96-5fb8-414f-a554-b739c3eb3d22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -185,9 +188,6 @@
     <ClInclude Include="RigidbodyManager.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Integrator.h">
-      <Filter>Header Files\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Inertia.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
@@ -208,6 +208,12 @@
     </ClInclude>
     <ClInclude Include="GLProgram.h">
       <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="ResponseDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="EPA.h">
+      <Filter>Header Files\Physics\Response</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

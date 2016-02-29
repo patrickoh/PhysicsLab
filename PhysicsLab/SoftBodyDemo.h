@@ -224,7 +224,7 @@ public:
 	//before finally binding the VAO and drawing with verts or indices
 	void Draw()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		viewMatrix = camera->GetViewMatrix();
 
@@ -233,7 +233,7 @@ public:
 		DrawModels();
 		DrawBounceyEnclosure(MVP);
 
-		MVP = projectionMatrix * viewMatrix;
+		MVP = camera->Instance->projectionMatrix * viewMatrix;
 
 		shaderManager.SetShaderProgram("bounding");
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
@@ -272,7 +272,7 @@ public:
 	void DrawBounceyEnclosure(glm::mat4 MVP)
 	{
 		shaderManager.SetShaderProgram("bounding");
-		MVP = projectionMatrix * viewMatrix;
+		MVP = camera->Instance->projectionMatrix * viewMatrix;
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
 		glutWireCube(10);

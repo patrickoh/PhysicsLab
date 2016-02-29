@@ -32,7 +32,6 @@ public:
 
 	Camera* camera;
 
-	glm::mat4 projectionMatrix; // Store the projection matrix
 	glm::mat4 viewMatrix;
 
 	bool freeMouse;
@@ -125,9 +124,9 @@ public:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable( GL_BLEND );
 
-		projectionMatrix = glm::perspective(60.0f, (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); // Create our perspective projection matrix
-
 		camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f), CameraMode::tp);
+		camera->projectionMatrix = glm::perspective(60.0f, 
+			(float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f /*near plane*/, 100.f /*far plane*/); 
 
 		shaderManager.Init(); //TODO - constructor for shader
 	}
@@ -140,6 +139,8 @@ public:
 	// GLUT CALLBACK FUNCTIONS
 	virtual void update()
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 		//Calculate deltaTime
 		int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
 		deltaTime = timeSinceStart - oldTimeSinceStart;
@@ -208,7 +209,7 @@ public:
 		{
 			if (modelList[i]->drawMe)
 			{
-				glm::mat4 MVP = projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
+				glm::mat4 MVP = camera->Instance->projectionMatrix * viewMatrix * modelList.at(i)->GetModelMatrix(); //TODO - move these calculations to the graphics card?
 			
 				shaderManager.SetShaderProgram(modelList[i]->GetShaderProgramID());
 				ShaderManager::SetUniform(modelList[i]->GetShaderProgramID(), "mvpMatrix", MVP);

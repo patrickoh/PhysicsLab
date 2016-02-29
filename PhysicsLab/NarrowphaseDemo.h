@@ -32,8 +32,7 @@ private:
 
 	//Debug drawing variables
 	Point* origin;
-	Tetrahedron* gjkTetra;
-	std::vector<Point*> minkowskiDifferencePoints;
+	//std::vector<Point*> minkowskiDifferencePoints;
 
 	int rbIdx;
 
@@ -83,18 +82,6 @@ public:
 
 		origin = new Point(glm::vec3(0));
 
-		glm::vec3 v1 = glm::vec3(0,8,0);
-		glm::vec3 v2 = glm::vec3(1,0,1);
-		glm::vec3 v3 = glm::vec3(0,0,1);
-		glm::vec3 v4 = glm::vec3(1,0,0);
-		std::vector<glm::vec3> vec;
-		vec.push_back(v1);
-		vec.push_back(v2);
-		vec.push_back(v3);
-		vec.push_back(v4);
-
-		gjkTetra = new Tetrahedron(vec);
-
 		rbIdx = 0;
 		rigidBodyManager[rbIdx]->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
 
@@ -103,9 +90,6 @@ public:
 
 		tweakBars["selection"] = TwNewBar("Selection");
 		TwDefine(" Selection size='250 220' position='1000 450' color='125 125 125' ");
-
-		//tweakBars["gjk"] = TwNewBar("GJK");
-		//TwDefine(" GJK size='250 200' position='1000 500' color='125 125 125' ");
 
 		SetUpTweakBars();
 	}
@@ -131,20 +115,6 @@ public:
 		if(Input::leftClick && bClickImpulse)
 			rigidBodyManager.rigidBodies[rbIdx]->ApplyImpulse(cursorWorldSpace, camera->viewProperties.forward * forcePush);
 
-		if(rigidBodyManager.gjkMode == GJK::Mode::Step 
-			&& rigidBodyManager.gjkDebugger->finished
-			&& rigidBodyManager.nextStep)
-		{
-			rigidBodyManager.nextStep = false;
-			rigidBodyManager.pausedSim = false;
-			rigidBodyManager.gjkDebugger->Reset();
-		}
-		else if(rigidBodyManager.gjkMode == GJK::Mode::Draw)
-		{
-			if(rigidBodyManager.gjkDebugger->finished)
-				rigidBodyManager.gjkDebugger->Reset();
-		}
-
 		rigidBodyManager.Update(deltaTime * simulationSpeed);	
 		rigidBodyManager.Broadphase(broadphaseMode); //Make them always be potentially colliding for purposes of demo		
 		rigidBodyManager.Narrowphase(deltaTime);
@@ -156,7 +126,7 @@ public:
 	//before finally binding the VAO and drawing with verts or indices
 	void Draw()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		viewMatrix = camera->GetViewMatrix();
 		
@@ -168,13 +138,11 @@ public:
 		DrawBoundings();
 
 		//Draw origin
-		MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
+		MVP = camera->Instance->projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(0));
 		shaderManager.SetShaderProgram("bounding");
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,1,1));
 		origin->Render(5.0f);
-		
-		DrawGJK();
 
 		if(printText)
 			printouts();
@@ -182,53 +150,6 @@ public:
 		TwDraw(); // Draw tweak bars
 
 		glutSwapBuffers();
-	}
-
-	void DrawGJK()
-	{
-		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
-		for(SupportPoint p : rigidBodyManager.gjkDebugger->simplex)
-		{
-			Point p(p.AB);
-			p.Render(5.0f);
-		}
-
-		int simplexSize = rigidBodyManager.gjkDebugger->simplex.size();
-	
-		if(simplexSize == 2)
-		{
-			Line l(rigidBodyManager.gjkDebugger->simplex[0].AB, rigidBodyManager.gjkDebugger->simplex[1].AB);
-			l.Render();
-		}
-		else if(simplexSize == 3)
-		{	
-			Triangle t(rigidBodyManager.gjkDebugger->simplex[0].AB, 
-				rigidBodyManager.gjkDebugger->simplex[1].AB, rigidBodyManager.gjkDebugger->simplex[2].AB);
-			
-			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
-			t.Render();
-
-			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
-			t.Render(true);
-
-		}
-		else if(simplexSize == 4)
-		{
-			gjkTetra->Update(rigidBodyManager.gjkDebugger->simplex);
-
-			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0.1f,0.9f,0.1f,0.2f));
-			gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), false);
-		
-			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1.0f,1.0f,1.0f,1.0f));
-			gjkTetra->Render(shaderManager.GetCurrentShaderProgramID(), true);
-		}
-
-		/*ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,0,1));
-		for(int i = 0; i < rigidBodyManager.currentMinkowski.size(); i++)
-		{
-			Point p(rigidBodyManager.currentMinkowski[i]);
-			p.Render(7.5f);
-		}*/
 	}
 
 	//GLint loc = glGetUniformLocation(bounding, "boundColour"); //check if -1
@@ -243,7 +164,7 @@ public:
 
 			if(drawBoundingSpheres)
 			{
-				MVP = projectionMatrix * viewMatrix *  
+				MVP = camera->Instance->projectionMatrix * viewMatrix *  
 					glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) 
 						* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale)
 						* rigidBodyManager[i]->model->globalInverseTransform
@@ -257,7 +178,7 @@ public:
 
 			if(drawBoundingBoxes)
 			{
-				MVP = projectionMatrix * viewMatrix * 
+				MVP = camera->Instance->projectionMatrix * viewMatrix * 
 				glm::translate(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.translation) //translate in world space
 					* glm::scale(glm::mat4(1.0f), rigidBodyManager[i]->model->worldProperties.scale * 1.001f) //scale to size of model
 					* rigidBodyManager[i]->model->globalInverseTransform 
@@ -276,7 +197,7 @@ public:
 	void DrawBounceyEnclosure(glm::mat4 MVP)
 	{
 		shaderManager.SetShaderProgram("bounding");
-		MVP = projectionMatrix * viewMatrix;
+		MVP = camera->Instance->projectionMatrix * viewMatrix;
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
 		glutWireCube(rigidBodyManager.bounceyEnclosureSize * 2);
@@ -316,12 +237,6 @@ public:
 		ss << "Rigid Bodies: " << rigidBodyManager.rigidBodies.size();
 		printStream();
 
-		/*ss << "gjk->simplex.size(): " << rigidBodyManager.gjk->simplex.size();
-		printStream();
-
-		ss << "gjk steps: " << rigidBodyManager.gjk->steps;
-		printStream();*/
-
 		ss << "bClickImpulse: " << bClickImpulse << " (PRESS K)";
 		printStream();
 
@@ -337,10 +252,6 @@ public:
 
 		if(Input::wasKeyPressed)
 		{
-			if(Input::keyPress == KEY::KEY_G ||
-				Input::keyPress == KEY::KEY_g)
-				rigidBodyManager.nextStep = true;
-
 			if(Input::keyPress == KEY::KEY_TAB)
 			{
 				rbIdx = (rbIdx + 1) % rigidBodyManager.rigidBodies.size();
@@ -366,9 +277,9 @@ public:
 	//ImpulseVisualiser
 	void DrawMouse(glm::mat4 MVP)
 	{
-		cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, projectionMatrix);
+		cursorWorldSpace = GetOGLPos(Input::mouseX, Input::mouseY, WINDOW_WIDTH, WINDOW_HEIGHT, viewMatrix, camera->Instance->projectionMatrix);
 		shaderManager.SetShaderProgram("bounding");
-		MVP = projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), cursorWorldSpace);
+		MVP = camera->Instance->projectionMatrix * viewMatrix * glm::translate(glm::mat4(1.0f), cursorWorldSpace);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));	
 		glutSolidSphere(.05, 25, 25);
@@ -438,11 +349,7 @@ public:
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
-		{
-			TwEnumVal gjkModeEV[3] = { {GJK::Mode::Draw, "Draw"}, {GJK::Mode::Step, "Step"}, {GJK::Mode::Normal, "Normal"} };
-			TwType gjkType = TwDefineEnum("I", gjkModeEV, 3);
-			TwAddVarRW(bar, "GJK Mode", gjkType, &rigidBodyManager.gjkMode, " keyIncr='<' keyDecr='>' help='Change broadphase mode.' ");
-		}
+		TwAddVarRW(bar, "bDrawGJK", TW_TYPE_BOOL8, &rigidBodyManager.bDrawGJK, "");
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 		
