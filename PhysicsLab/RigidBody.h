@@ -6,6 +6,27 @@
 #include "BoundingSphere.h"
 #include "AABB.h"
 
+struct RBEnvironment
+{
+	float gravity;
+	glm::vec3 wind;
+	float windScalar;
+	float fluidDensity;
+
+	//Environment(float p_gravity, glm::vec3 p_wind, float p_windScalar, float p_fluidDensity)
+	//{
+	//	//TODO
+	//}
+
+	RBEnvironment()
+	{
+		fluidDensity = 1.225f;
+		wind = glm::vec3(1, 0, 0);
+		windScalar = 1000.0f;
+		gravity = 9.81f;
+	}
+};
+
 class RigidBody
 {
 	private:
@@ -14,14 +35,6 @@ class RigidBody
 
 		glm::vec3 torqueNet;
 		glm::vec3 forceNet;
-
-		struct Environment
-		{
-			float gravity;
-			glm::vec3 wind;
-			float windScalar;
-			float fluidDensity;
-		} env;
 
 		float radius, surfaceArea, dragCoefficient; //Drag stuff
 		
@@ -56,6 +69,8 @@ class RigidBody
 		static bool drag;
 
 		static bool bDriftCorrection;
+
+		static RBEnvironment env;
 
 		void StepPhysics(double deltaTime);
 		void Update();
@@ -104,10 +119,10 @@ class RigidBody
 		glm::vec3 PressureDrag(glm::vec3 vel, bool wind)
 		{
 			if(wind) 
-			return 0.5f * env.fluidDensity * surfaceArea * dragCoefficient 
-				* (vel - (env.wind * env.windScalar)).length() * -(vel - (env.wind * env.windScalar));
+				return 0.5f * env.fluidDensity * surfaceArea * dragCoefficient 
+					* (vel - (env.wind * env.windScalar)).length() * -(vel - (env.wind * env.windScalar));
 			else
-			return 0.5f * env.fluidDensity * surfaceArea * dragCoefficient 
-				* vel.length() * -vel;
+				return 0.5f * env.fluidDensity * surfaceArea * dragCoefficient 
+					* vel.length() * -vel;
 		}
 };

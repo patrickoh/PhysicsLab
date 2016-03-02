@@ -72,8 +72,6 @@ class RigidbodyManager
 
 			bDrawEPA = false;
 			bDrawGJK = false;
-
-			//integrator = Integrator();
 		}
 
 		~RigidbodyManager()
@@ -393,6 +391,11 @@ class RigidbodyManager
 			float t2 = 1.0f / rb2->mass;
 			float t3 = glm::dot(normal, glm::cross(rb1->getIntertialTensor() * glm::cross(rA, normal), rA));
 			float t4 = glm::dot(normal, glm::cross(rb2->getIntertialTensor() * glm::cross(rB, normal), rB));
+
+			if(rb1->immovable)
+				t1 = t3 = 0;
+			if(rb2->immovable)
+				t2 = t4 = 0;
 
 			glm::vec3 pA = rb1->velocity + glm::cross(rb1->angularVelocity, rA);
 			glm::vec3 pB = rb2->velocity + glm::cross(rb2->angularVelocity, rB);

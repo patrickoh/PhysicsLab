@@ -149,8 +149,11 @@ public:
 				//Slightly above zero to avoid as an approximation is okay for a CSO with a high resolution
 
 				//calculatue barycentric coords of the closest tri with respect to proj of the origin onto the face
-				glm::vec3 bary = barycentric(glm::vec3(0), closest.a.AB, closest.b.AB, closest.c.AB); 
-
+				glm::vec3 bary;
+				
+				bary = barycentric(glm::vec3(0), closest.a.AB, closest.b.AB, closest.c.AB); 
+				//bary = barycentric(closest.n * closest.getDistance(glm::vec3(0)), closest.a.AB, closest.b.AB, closest.c.AB); 
+				
 				cInfo.depth = d; //the penetration depth is the distance between the closest minkowski facet and the origin
 				cInfo.normal = closest.n; // the normal of the contact is the normal of the closest minkowski facet
 

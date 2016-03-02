@@ -91,7 +91,7 @@ public:
 						&& glm::dot(normal[j], rigidBodies[i]->velocity) < 0.01f)
 				{
 					rigidBodies[i]->model->worldProperties.translation += -glm::dot(rigidBodies[i]->model->worldProperties.translation - plane[j], normal[j]) * normal[j]; //post processing method
-					rigidBodies[i]->velocity += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->velocity * normal[j]) * normal[j];
+					rigidBodies[i]->momentum += (1 + 1.0f/*coefficient of restitution*/) * -(rigidBodies[i]->momentum * normal[j]) * normal[j];
 
 					//velocity.y = -velocity.y;
 				}

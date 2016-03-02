@@ -10,6 +10,8 @@ bool RigidBody::drag = false;
 bool RigidBody::wind = false;
 bool RigidBody::bDriftCorrection = true;
 
+RBEnvironment RigidBody::env = RBEnvironment();
+
 RigidBody::RigidBody(Model* model)
 {
 	this->model = model;
@@ -34,11 +36,6 @@ RigidBody::RigidBody(Model* model)
 
 	boundingSphere = new BoundingSphere(model->vertices, this);
 	aabb = new AABB(model->vertices, this);
-
-	env.fluidDensity = 1.225f;
-	env.wind = glm::vec3(1, 0, 0);
-	env.windScalar = 1000.0f;
-	env.gravity = 9.81f;
 
 	dragCoefficient = 0.47f; //sphere  
 	radius = 0.05f;

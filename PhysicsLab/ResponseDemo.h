@@ -36,6 +36,8 @@ private:
 
 	int rbIdx;
 
+	bool bDrawFwd;
+
 public:
 	
 	static ResponseDemo* Instance;
@@ -92,14 +94,23 @@ public:
 		TwDefine(" Selection size='250 220' position='1000 450' color='125 125 125' ");
 
 		//rigidBodyManager.bResponse = true;
+		bDrawFwd = false;
 
 		SetUpTweakBars();
 	}
 
 	void AddBox(glm::vec3 position)
 	{
-		Model* m = new Model(position, glm::quat(), glm::vec3(.1), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"), false, false, true);
+		//TODO
+		/*glm::vec3 scale = glm::vec3(
+			glm::linearRand(0.01f, 1.0f),
+			glm::linearRand(0.01f, 1.0f),
+			glm::linearRand(0.01f, 1.0f));*/
+
+		Model* m = new Model(position, glm::quat(), glm::vec3(0.1f), "Models/cubeTri.obj", shaderManager.GetShaderProgramID("bounding"), false, false, true);
 		RigidBody* rb = new RigidBody(m);
+
+		m->colour = glm::vec4(0.5,0.5,0.5,0.5);
 
 		glm::vec2 xz = glm::circularRand(glm::linearRand(-1.0f, 1.0f));
 		rb->momentum = glm::vec3(xz.x, glm::linearRand(-1.0f, 1.0f), xz.y);
@@ -148,6 +159,18 @@ public:
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
 		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(0,0,1,1));
 		origin->Render(5.0f);
+
+		if(rigidBodyManager.rigidBodies.size() > 0 && bDrawFwd)
+		{
+			Line fwd(glm::vec3(0), glm::vec3(0,0,1));
+			MVP = camera->Instance->projectionMatrix * viewMatrix * 
+				glm::translate(glm::mat4(1), 
+				rigidBodyManager[rbIdx]->model->worldProperties.translation);
+			shaderManager.SetShaderProgram("bounding");
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,1,1,1));
+			fwd.Render();
+		}
 
 		if(printText)
 			printouts();
@@ -268,7 +291,7 @@ public:
 					&rigidBodyManager.rigidBodies[rbIdx]->model->worldProperties.translation,
 					"");
 
-				rigidBodyManager[(rbIdx-1) % rigidBodyManager.rigidBodies.size()]->model->colour = glm::vec4(0.5,0.5,0.5,1.0);
+				rigidBodyManager[(rbIdx-1) % rigidBodyManager.rigidBodies.size()]->model->colour = glm::vec4(0.5,0.5,0.5,0.5);
 				rigidBodyManager[rbIdx]->model->colour = glm::vec4(0.7f,0.2f, 0.2f,0.5);
 			}
 
@@ -279,6 +302,26 @@ public:
 			if(Input::keyPress == KEY::KEY_P ||
 				Input::keyPress == KEY::KEY_p)
 				rigidBodyManager.pausedSim = !rigidBodyManager.pausedSim;
+		}
+
+		if(rigidBodyManager.rigidBodies.size() > 0)
+		{
+			RigidBody* rb = rigidBodyManager.rigidBodies[rbIdx];
+
+			if(Input::keyStates[KEY::KEY_q] || Input::keyStates[KEY::KEY_Q])
+				rb->ApplyImpulse(rb->model->worldProperties.translation, glm::vec3(0,-1,0));
+			if(Input::keyStates[KEY::KEY_e] || Input::keyStates[KEY::KEY_E])
+				rb->ApplyImpulse(rb->model->worldProperties.translation, glm::vec3(0,1,0));
+
+			if(Input::keyStates[KEY::KEY_w] || Input::keyStates[KEY::KEY_W])
+				rb->ApplyImpulse(rb->model->worldProperties.translation, glm::vec3(0,0,1));
+			if(Input::keyStates[KEY::KEY_s] || Input::keyStates[KEY::KEY_S])
+				rb->ApplyImpulse(rb->model->worldProperties.translation, glm::vec3(0,0,-1));
+
+			if(Input::keyStates[KEY::KEY_a] || Input::keyStates[KEY::KEY_A])
+				rb->ApplyImpulse(rb->model->worldProperties.translation, glm::vec3(1,0,0));
+			if(Input::keyStates[KEY::KEY_d] || Input::keyStates[KEY::KEY_D])
+				rb->ApplyImpulse(rb->model->worldProperties.translation, glm::vec3(-1,0,0));
 		}
 	}
 
@@ -337,8 +380,10 @@ public:
 		TwAddSeparator(bar, "", ""); //=======================================================
 
 		TwAddVarRW(bar, "Gravity", TW_TYPE_BOOL8, &RigidBody::gravity, "");
-		TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &RigidBody::drag, "");
 		TwAddVarRW(bar, "Wind", TW_TYPE_BOOL8, &RigidBody::wind, "");
+
+		TwAddVarRW(bar, "Drag", TW_TYPE_BOOL8, &RigidBody::drag, "");
+		TwAddVarRW(bar, "Fluid Density", TW_TYPE_FLOAT, &RigidBody::env.fluidDensity, " label='Fluid Density' group='Drag Settings'");
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 
@@ -374,6 +419,7 @@ public:
 		TwAddSeparator(bar, "", ""); //=======================================================
 
 		TwAddVarRW(bar, "bResponse", TW_TYPE_BOOL8, &rigidBodyManager.bResponse, "");
+		TwAddVarRW(bar, "bDrawFwd", TW_TYPE_BOOL8, &bDrawFwd, "");
 
 		TwAddSeparator(bar, "", ""); //=======================================================
 		
@@ -391,5 +437,7 @@ public:
 		TwAddButton(bar, "Reset", ResetRBCB, NULL, "");
 		TwAddVarRW(bar, "New Mass", TW_TYPE_FLOAT, &mass, "");
 		TwAddButton(bar, "Recalculate Tensor", CalculateNewTensorCB, NULL, "");
+
+
 	}
 };
