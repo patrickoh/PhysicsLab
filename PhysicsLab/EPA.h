@@ -122,8 +122,6 @@ public:
 		polytope.push_back(TriangleEPA(A,D,B));
 		polytope.push_back(TriangleEPA(B,D,C));
 
-		std::vector<Edge> edges;
-
 		ContactInfo cInfo(glm::vec3(0), glm::vec3(0), 0.0f, glm::vec3(0,0,1)); //tmp
 		TriangleEPA closest;
 
@@ -169,7 +167,7 @@ public:
 				return cInfo;
 			}
 					
-			ExpandPolytope(newSupportPoint, polytope, edges);
+			ExpandPolytope(newSupportPoint, polytope);
 		}
 
 		return cInfo;
@@ -179,9 +177,10 @@ private:
 
 	//Remove faces from the polytope that can be "seen" by the new support point
 	//Add new faces that cover up the hole. The new faces all share the new support point as a common vertex.
-	static void ExpandPolytope(SupportPoint newSupportPoint, std::vector<TriangleEPA> &polytope,
-		std::vector<Edge> &edges)
+	static void ExpandPolytope(SupportPoint newSupportPoint, std::vector<TriangleEPA> &polytope)
 	{
+		std::vector<Edge> edges;
+
 		for (int i = polytope.size() - 1; i >= 0 ; i--)
 		{
 			TriangleEPA triangle = polytope[i];
