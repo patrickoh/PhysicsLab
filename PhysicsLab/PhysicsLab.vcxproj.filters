@@ -58,6 +58,12 @@
     <Filter Include="Header Files\Physics\Response">
       <UniqueIdentifier>{cac41a96-5fb8-414f-a554-b739c3eb3d22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Bounce">
+      <UniqueIdentifier>{18042fd7-28e7-446c-ab2d-552b9543e2e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Bounce">
+      <UniqueIdentifier>{ebbfc177-d256-4906-a3a0-ddec57dbbd80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -98,6 +104,66 @@
     </ClCompile>
     <ClCompile Include="RigidBody.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\b3BroadPhase.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\b3DynamicAABBTree.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\b3SAT.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\Shapes\b3Hull.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\Shapes\b3Polyhedron.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision\Shapes\b3Shape.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\b3Settings.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\b3Time.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Memory\b3BlockAllocator.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Memory\b3StackAllocator.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\b3Body.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\b3Island.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\b3World.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Joints\b3JointGraph.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Joints\b3JointSolver.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Joints\b3MouseJoint.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Joints\b3RevoluteJoint.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Joints\b3SphericalJoint.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Contacts\b3ContactGraph.cpp">
+      <Filter>Source Files\Bounce</Filter>
+    </ClCompile>
+    <ClCompile Include="Dynamics\Contacts\b3ContactSolver.cpp">
+      <Filter>Source Files\Bounce</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +280,105 @@
     </ClInclude>
     <ClInclude Include="EPA.h">
       <Filter>Header Files\Physics\Response</Filter>
+    </ClInclude>
+    <ClInclude Include="SolverDemo.h">
+      <Filter>Header Files\Demos</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\b3AABB.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\b3BroadPhase.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\b3Collision.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\b3DynamicAABBTree.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\b3SAT.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\Shapes\b3Hull.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\Shapes\b3Polyhedron.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision\Shapes\b3Shape.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\b3Draw.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\b3Settings.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\b3Time.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Math\b3Mat33.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Math\b3Math.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Math\b3Quaternion.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Math\b3Vec3.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Memory\b3ArrayPOD.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Memory\b3BlockAllocator.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Memory\b3StackAllocator.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Memory\b3Array.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\b3Island.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\b3World.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\b3WorldListeners.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\b3Body.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Joints\b3MouseJoint.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Joints\b3RevoluteJoint.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Joints\b3SphericalJoint.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Joints\b3Joint.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Joints\b3JointGraph.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Joints\b3JointSolver.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Contacts\b3Contact.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Contacts\b3ContactGraph.h">
+      <Filter>Header Files\Bounce</Filter>
+    </ClInclude>
+    <ClInclude Include="Dynamics\Contacts\b3ContactSolver.h">
+      <Filter>Header Files\Bounce</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
