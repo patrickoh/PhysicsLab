@@ -4,6 +4,7 @@
 #include "RigidBody.h"
 #include "RigidbodyManager.h"
 #include "Inertia.h"
+
 #include "Bounce.h"
 
 class SolverDemo : public GLProgram
@@ -20,6 +21,8 @@ public:
 	b3TimeStep m_step;
 
 	static SolverDemo* Instance;
+
+	DebugDrawer debugDrawer;
 
 	SolverDemo()
 	{
@@ -63,7 +66,7 @@ public:
 		AddABox(b3Vec3(0,10,0), e_dynamicBody, b3Vec3(1,1,1));
 		AddABox(b3Vec3(0,11,0), e_dynamicBody, b3Vec3(1,1,1));
 		AddABox(b3Vec3(0,12,0), e_dynamicBody, b3Vec3(1,1,1));
-		AddABox(b3Vec3(0,13,0), e_dynamicBody, b3Vec3(1,1,1));
+		AddABox(b3Vec3(0.5f,13,0), e_dynamicBody, b3Vec3(1,1,1));
 		//float gs = m_body->GetGravityScale();
 		//m_world->SetGravityDirection(b3Vec3(0.0f, -10.0f, 0.0f));
 		
@@ -132,6 +135,10 @@ public:
 		DrawModels();
 		DrawBounceyEnclosure(MVP);
 
+		shaderManager.SetShaderProgram("bounding");
+		m_world->Draw(&debugDrawer, b3Draw::b3DrawFlags::e_contactsFlag);
+		shaderManager.SetShaderProgram(0);
+
 		for(auto body : rigidBodies)
 		{
 			glm::vec3 translation = glm::vec3(body->m_worldCenter.x,
@@ -145,16 +152,24 @@ public:
 			* glm::translate(glm::mat4(1), translation)
 						  * glm::toMat4(orientation)
 						  * glm::scale(glm::mat4(1.0f), scale*2.0f);
+			
 			shaderManager.SetShaderProgram("bounding");
 			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
 				"mvpMatrix", MVP);
 			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
 				"boundColour", glm::vec4(1,1,1,1));
 			glutWireCube(1);
+			shaderManager.SetShaderProgram(0);
 		}
-
+		
 		if(printText)
+		{
+			shaderManager.SetShaderProgram("bounding");
+			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
+				"boundColour", glm::vec4(1,1,1,1));
 			printouts();
+			shaderManager.SetShaderProgram(0);
+		}
 
 		TwDraw(); // Draw tweak bars
 
@@ -165,15 +180,17 @@ public:
 	{
 		shaderManager.SetShaderProgram("bounding");
 		MVP = camera->Instance->projectionMatrix * viewMatrix;
-		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "mvpMatrix", MVP);
-		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), "boundColour", glm::vec4(1,0,0,1));
-		glutWireCube(10);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
+			"mvpMatrix", MVP);
+		ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
+			"boundColour", glm::vec4(1,0,0,1));
+		glutWireCube(100);
+		shaderManager.SetShaderProgram(0);
 	}
 
 	void printouts()
 	{
-		shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
-
+		//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
 		ss << " Press 'spacebar' or 'esc' to toggle camera/cursor";
 		printStream();
 
