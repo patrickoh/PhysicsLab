@@ -160,6 +160,11 @@ public :
 	// Set the angular velocity of the body. If is a non-zero velocity then the body awakes.
 	// The body must be dynamic or kinematic.
 	void SetAngularVelocity(const b3Vec3& angularVelocity);
+
+	b3Vec3 m_worldCenter;
+	b3Quaternion m_orientation;
+	b3Vec3 m_scale;
+
 protected :
 	friend class b3World;
 	friend class b3Island;
@@ -230,8 +235,6 @@ protected :
 	b3Vec3 m_linearVelocity;
 	b3Vec3 m_angularVelocity;
 	b3Vec3 m_localCenter;
-	b3Vec3 m_worldCenter;
-	b3Quaternion m_orientation;
 	
 	// The body transform.
 	b3Transform m_transform;
