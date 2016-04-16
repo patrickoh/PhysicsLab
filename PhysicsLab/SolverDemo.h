@@ -101,7 +101,6 @@ public:
 			*/
 			b3ShapeDef* shapeDef = new b3ShapeDef; 
 			shapeDef->shape = polyhedron;
-			
 			shapeDef->friction = 0.5f;
 			shapeDef->restitution = 0.0f;
 			shapeDef->density = 0.5f;
@@ -132,6 +131,10 @@ public:
 	void update()
 	{
 		GLProgram::update();
+
+		//rigidBodyManager.Update(deltaTime * simulationSpeed);	
+		//rigidBodyManager.Broadphase(broadphaseMode); //Make them always be potentially colliding for purposes of demo		
+		//rigidBodyManager.Narrowphase(deltaTime);
 
 		m_step.dt = deltaTime*.001f;
 		m_world->Step(m_step);

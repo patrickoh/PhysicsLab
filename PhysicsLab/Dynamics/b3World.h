@@ -23,7 +23,7 @@
 #include "..\Common\Memory\b3BlockAllocator.h"
 #include "..\Common\b3Time.h"
 #include "Contacts\b3ContactGraph.h"
-#include "Joints\b3JointGraph.h"
+//#include "Joints\b3JointGraph.h"
 
 struct b3BodyDef;
 class b3Body;
@@ -45,10 +45,10 @@ public :
 	void DestroyBody(b3Body* body);
 	
 	// Allocate a new joint and insert it into the world.
-	b3Joint* CreateJoint(const b3JointDef& def);
+	//b3Joint* CreateJoint(const b3JointDef& def);
 
 	// Remove a joint from the world and deallocate it from the memory.
-	void DestroyJoint(b3Joint* joint);
+	//void DestroyJoint(b3Joint* joint);
 
 	// Set the gravity direction (usually y-down (0, -1, 0)).
 	void SetGravityDirection(const b3Vec3& direction);
@@ -101,7 +101,7 @@ protected :
 	b3StackAllocator m_stackAllocator;
 	b3BlockAllocator m_blockAllocator;
 	b3ContactGraph m_contactGraph;
-	b3JointGraph m_jointGraph;
+	//b3JointGraph m_jointGraph;
 	u32 m_flags;
 	b3Vec3 m_gravityDir;
 	b3Body* m_bodyList;
@@ -125,9 +125,9 @@ inline u32 b3World::GetBodyCount() const {
 	return m_bodyCount;
 }
 
-inline u32 b3World::GetJointCount() const {
-	return m_jointGraph.m_jointCount;
-}
+//inline u32 b3World::GetJointCount() const {
+//	return m_jointGraph.m_jointCount;
+//}
 
 inline u32 b3World::GetContactCount() const {
 	return m_contactGraph.m_contactCount;

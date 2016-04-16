@@ -26,7 +26,7 @@ class b3World;
 class b3Shape;
 struct b3ShapeDef;
 struct b3ContactEdge;
-struct b3JointEdge;
+//struct b3JointEdge;
 
 // Static bodies have zero mass and velocity, and therefore they can't move.
 // Dynamic bodies have non-zero mass and can move due to internal and external forces.
@@ -79,7 +79,7 @@ public :
 	void DestroyContacts();
 
 	// Remove all joints connected to the body.
-	void DestroyJoints();
+	//void DestroyJoints();
 
 	// Remove all shapes associated with the body.
 	// Remove this if you want to recycle the body, but (physically) doesn't make
@@ -213,7 +213,7 @@ protected :
 	b3ContactEdge* m_contactList;
 
 	// The body holds a list of neighbour contacts.
-	b3JointEdge* m_jointList;
+	//b3JointEdge* m_jointList;
 
 	// The shapes attached to this body.
 	b3Shape* m_shapeList;

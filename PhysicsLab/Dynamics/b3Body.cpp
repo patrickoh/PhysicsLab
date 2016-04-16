@@ -20,7 +20,7 @@
 #include "b3World.h"
 #include "..\Collision\Shapes\b3Polyhedron.h"
 #include "Contacts\b3Contact.h"
-#include "Joints\b3Joint.h"
+//#include "Joints\b3Joint.h"
 
 b3Body::b3Body(const b3BodyDef& def, b3World* world) {
 	m_world = world;
@@ -60,7 +60,7 @@ b3Body::b3Body(const b3BodyDef& def, b3World* world) {
 	m_shapeList = nullptr;
 	m_shapeCount = 0;
 	m_contactList = nullptr;
-	m_jointList = nullptr;
+	//m_jointList = nullptr;
 	m_sleepTime = B3_ZERO;
 }
 
@@ -130,16 +130,16 @@ void b3Body::DestroyContacts() {
 	m_contactList = nullptr;
 }
 
-void b3Body::DestroyJoints() {
-	// Quick function to remove all joints connected with this body.
-	b3JointEdge* je = m_jointList;
-	while (je) {
-		b3JointEdge* je0 = je;
-		je = je->next;
-		m_world->m_jointGraph.DestroyJoint(je0->joint);
-	}
-	m_jointList = nullptr;
-}
+//void b3Body::DestroyJoints() {
+//	// Quick function to remove all joints connected with this body.
+//	b3JointEdge* je = m_jointList;
+//	while (je) {
+//		b3JointEdge* je0 = je;
+//		je = je->next;
+//		m_world->m_jointGraph.DestroyJoint(je0->joint);
+//	}
+//	m_jointList = nullptr;
+//}
 
 void b3Body::DestroyContacts(const b3Shape* shape) {
 	// Quick function to remove all contacts associated with a shape.

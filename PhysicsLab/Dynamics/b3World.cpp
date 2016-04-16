@@ -21,13 +21,13 @@
 #include "b3Island.h"
 #include "b3WorldListeners.h"
 #include "Contacts\b3Contact.h"
-#include "Joints\b3Joint.h"
+//#include "Joints\b3Joint.h"
 #include "..\Collision\Shapes\b3Shape.h"
 #include "..\Common\b3Draw.h"
 
 b3World::b3World() {
 	m_contactGraph.m_blockAllocator = &m_blockAllocator;
-	m_jointGraph.m_blockAllocator = &m_blockAllocator;
+	//m_jointGraph.m_blockAllocator = &m_blockAllocator;
 	m_flags = 0;
 	m_flags |= e_clearForcesFlag;
 	m_bodyList = nullptr;
@@ -44,7 +44,7 @@ b3World::~b3World() {
 	b3Body* b = m_bodyList;
 	while (b) {
 		b->DestroyShapes();
-		b->DestroyJoints();
+		//b->DestroyJoints();
 		b = b->m_next;
 	}
 }
@@ -72,7 +72,7 @@ void b3World::DestroyBody(b3Body* b) {
 
 	// Remove the contacts, joints, and shapes from the body.
 	b->DestroyContacts();
-	b->DestroyJoints();
+	//b->DestroyJoints();
 	b->DestroyShapes();
 
 	// Remove from the world's body list.
@@ -93,13 +93,13 @@ void b3World::DestroyBody(b3Body* b) {
 	m_blockAllocator.Free(b, sizeof(b3Body));
 }
 
-b3Joint* b3World::CreateJoint(const b3JointDef& def) {
-	return m_jointGraph.CreateJoint(&def);
-}
-
-void b3World::DestroyJoint(b3Joint* joint) {
-	m_jointGraph.DestroyJoint(joint);
-}
+//b3Joint* b3World::CreateJoint(const b3JointDef& def) {
+//	return m_jointGraph.CreateJoint(&def);
+//}
+//
+//void b3World::DestroyJoint(b3Joint* joint) {
+//	m_jointGraph.DestroyJoint(joint);
+//}
 
 void b3World::Solve(const b3TimeStep& step) {
 	// Clear all the island flags for the current step.
@@ -111,9 +111,9 @@ void b3World::Solve(const b3TimeStep& step) {
 		c->m_flags &= ~b3Contact::e_islandFlag;
 	}
 	
-	for (b3Joint* j = m_jointGraph.m_jointList; j; j = j->m_next) {
+	/*for (b3Joint* j = m_jointGraph.m_jointList; j; j = j->m_next) {
 		j->m_onIsland = false;
-	}
+	}*/
 
 	// Build and simulate awake islands.
 	
@@ -123,7 +123,7 @@ void b3World::Solve(const b3TimeStep& step) {
 	islandDef.allocator = &m_stackAllocator;
 	islandDef.bodyCapacity = m_bodyCount;
 	islandDef.contactCapacity = m_contactGraph.m_contactCount;
-	islandDef.jointCapacity = m_jointGraph.m_jointCount;
+	//islandDef.jointCapacity = m_jointGraph.m_jointCount;
 	islandDef.velocityIterations = step.velocityIterations;
 
 	b3Island island(islandDef);
@@ -204,30 +204,30 @@ void b3World::Solve(const b3TimeStep& step) {
 			}
 
 			// Get all joints connected with the body.
-			for (b3JointEdge* je = b->m_jointList; je; je = je->next) {
-				b3Joint* joint = je->joint;
+			//for (b3JointEdge* je = b->m_jointList; je; je = je->next) {
+			//	b3Joint* joint = je->joint;
 
-				// Skip the joint is already on the island.
-				if (joint->m_onIsland) {
-					continue;
-				}
+			//	// Skip the joint is already on the island.
+			//	if (joint->m_onIsland) {
+			//		continue;
+			//	}
 
-				// Add joint to the island and flag it.
-				island.Add(joint);
-				joint->m_onIsland = true;
+			//	// Add joint to the island and flag it.
+			//	island.Add(joint);
+			//	joint->m_onIsland = true;
 
-				b3Body* other = je->other;
+			//	b3Body* other = je->other;
 
-				// Skip next propagation if the other body is already on the island.
-				if (other->m_flags & b3Body::e_islandFlag) {
-					continue;
-				}
+			//	// Skip next propagation if the other body is already on the island.
+			//	if (other->m_flags & b3Body::e_islandFlag) {
+			//		continue;
+			//	}
 
-				// Push the other body onto the stack and mark it.
-				b3Assert(stackCount < stackSize);
-				stack[stackCount++] = other;
-				other->m_flags |= b3Body::e_islandFlag;
-			}
+			//	// Push the other body onto the stack and mark it.
+			//	b3Assert(stackCount < stackSize);
+			//	stack[stackCount++] = other;
+			//	other->m_flags |= b3Body::e_islandFlag;
+			//}
 		}
 
 		// Integrate velocities, solve velocity constraints, integrate positions.

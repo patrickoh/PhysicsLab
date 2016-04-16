@@ -103,11 +103,6 @@
     <ClCompile Include="Dynamics\b3World.cpp" />
     <ClCompile Include="Dynamics\Contacts\b3ContactGraph.cpp" />
     <ClCompile Include="Dynamics\Contacts\b3ContactSolver.cpp" />
-    <ClCompile Include="Dynamics\Joints\b3JointGraph.cpp" />
-    <ClCompile Include="Dynamics\Joints\b3JointSolver.cpp" />
-    <ClCompile Include="Dynamics\Joints\b3MouseJoint.cpp" />
-    <ClCompile Include="Dynamics\Joints\b3RevoluteJoint.cpp" />
-    <ClCompile Include="Dynamics\Joints\b3SphericalJoint.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImGuiImpl.cpp" />
@@ -153,12 +148,6 @@
     <ClInclude Include="Dynamics\Contacts\b3Contact.h" />
     <ClInclude Include="Dynamics\Contacts\b3ContactGraph.h" />
     <ClInclude Include="Dynamics\Contacts\b3ContactSolver.h" />
-    <ClInclude Include="Dynamics\Joints\b3Joint.h" />
-    <ClInclude Include="Dynamics\Joints\b3JointGraph.h" />
-    <ClInclude Include="Dynamics\Joints\b3JointSolver.h" />
-    <ClInclude Include="Dynamics\Joints\b3MouseJoint.h" />
-    <ClInclude Include="Dynamics\Joints\b3RevoluteJoint.h" />
-    <ClInclude Include="Dynamics\Joints\b3SphericalJoint.h" />
     <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="GLProgram.h" />

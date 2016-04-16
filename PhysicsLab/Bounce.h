@@ -33,8 +33,8 @@
 #include "Dynamics\b3WorldListeners.h"
 #include "Dynamics\b3Body.h"
 #include "Dynamics\Contacts\b3Contact.h"
-#include "Dynamics\Joints\b3MouseJoint.h"
-#include "Dynamics\Joints\b3SphericalJoint.h"
-#include "Dynamics\Joints\b3RevoluteJoint.h"
+//#include "Dynamics\Joints\b3MouseJoint.h"
+//#include "Dynamics\Joints\b3SphericalJoint.h"
+//#include "Dynamics\Joints\b3RevoluteJoint.h"
 
 #endif

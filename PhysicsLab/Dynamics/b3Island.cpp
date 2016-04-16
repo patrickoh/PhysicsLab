@@ -18,8 +18,8 @@
 
 #include "b3Island.h"
 #include "b3Body.h"
-#include "Joints\b3Joint.h"
-#include "Joints\b3JointSolver.h"
+//#include "Joints\b3Joint.h"
+//#include "Joints\b3JointSolver.h"
 #include "Contacts\b3Contact.h"
 #include "Contacts\b3ContactSolver.h"
 #include "..\Common\Memory\b3StackAllocator.h"
@@ -116,15 +116,15 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 		positions[i].q = q;
 	}
 
-	b3JointSolverDef jointSolverDef;
+	/*b3JointSolverDef jointSolverDef;
 	jointSolverDef.dt = h;
 	jointSolverDef.joints = joints;
 	jointSolverDef.count = jointCount;
 	jointSolverDef.positions = positions;
-	jointSolverDef.velocities = velocities;
+	jointSolverDef.velocities = velocities;*/
 
-	b3JointSolver jointSolver(&jointSolverDef);
-	jointSolver.InitializeVelocityConstraints();
+	//b3JointSolver jointSolver(&jointSolverDef);
+	//jointSolver.InitializeVelocityConstraints();
 
 	b3ContactSolverDef contactSolverDef;
 	contactSolverDef.dt = h;
@@ -137,12 +137,12 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 	b3ContactSolver contactSolver(&contactSolverDef);
 	contactSolver.InitializeVelocityConstraints();
 	
-	jointSolver.WarmStart();
+	//jointSolver.WarmStart();
 	contactSolver.WarmStart();
 	
 	// Solve velocity constraints.
 	for (u32 i = 0; i < velocityIterations; ++i) {
-		jointSolver.SolveVelocityConstraints();
+		//jointSolver.SolveVelocityConstraints();
 		contactSolver.SolveVelocityConstraints();
 	}
 
