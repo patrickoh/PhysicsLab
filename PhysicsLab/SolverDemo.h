@@ -31,11 +31,7 @@ public:
 
 	~SolverDemo()
 	{		
-		for(auto body : rigidBodies)
-		{
-			body->DestroyShapes();
-			delete body;
-		}
+		ClearBoxes();
 		delete m_world;
 	}
 
@@ -58,15 +54,10 @@ public:
 
 		//BOUNCE
 		m_world = new b3World();
-		m_step.dt = 1.0 / 60.0f;
 		m_step.velocityIterations = 10;
-		//m_step.sleeping = true;
 
-		AddABox(b3Vec3(0,0,0), e_staticBody, b3Vec3(10,1,10));
-		AddABox(b3Vec3(0,10,0), e_dynamicBody, b3Vec3(1,1,1));
-		AddABox(b3Vec3(0,11,0), e_dynamicBody, b3Vec3(1,1,1));
-		AddABox(b3Vec3(0,12,0), e_dynamicBody, b3Vec3(1,1,1));
-		AddABox(b3Vec3(0.5f,13,0), e_dynamicBody, b3Vec3(1,1,1));
+		Stack1(NULL);
+		
 		//float gs = m_body->GetGravityScale();
 		//m_world->SetGravityDirection(b3Vec3(0.0f, -10.0f, 0.0f));
 		
@@ -91,15 +82,45 @@ public:
 		
 		//Give it a shape
 		{
+			scale = b3Vec3(scale.x / 2.0f, scale.y / 2.0f,
+				scale.z / 2.0f);
 			b3Hull* hull = new b3Hull;
 			hull->SetAsBox(scale);
 			b3Polyhedron* polyhedron = new b3Polyhedron;
 			polyhedron->SetHull(hull);
+
+			//polyhedron->ComputeMass(
+
+			/*shape->m_body = this;
+			shape->m_userData = def.userData;
+			shape->m_local = def.local;
+			shape->m_density = def.density;
+			shape->m_friction = def.friction;
+			shape->m_restitution = def.restitution;
+			shape->m_isSensor = def.sensor;
+			*/
 			b3ShapeDef* shapeDef = new b3ShapeDef; 
 			shapeDef->shape = polyhedron;
+			
+			shapeDef->friction = 0.5f;
+			shapeDef->restitution = 0.0f;
+			shapeDef->density = 0.5f;
+
 			rigidBodies[rigidBodies.size()-1]->CreateShape(*shapeDef);
 			rigidBodies[rigidBodies.size()-1]->m_scale = scale;
 		}
+	}
+
+	void ClearBoxes()
+	{
+		//for(auto body : rigidBodies)
+		for(int i = rigidBodies.size()-1; i >= 0; i--)
+		{
+			m_world->DestroyBody(rigidBodies[i]);
+			//body->DestroyShapes();
+			//delete body;
+		}
+		rigidBodies.clear();
 	}
 
 	static void updateCB()
@@ -112,11 +133,7 @@ public:
 	{
 		GLProgram::update();
 
-		//m_body->ApplyAngularImpulse(b3Vec3(1,.2,.6), false);
-		//m_body->ApplyForce(b3Vec3(1,.2,.7), b3Vec3(-1,3,8), true);
-
-		//m_body->SetAngularVelocity(b3Vec3(0,1,0));
-
+		m_step.dt = deltaTime*.001f;
 		m_world->Step(m_step);
 		
 		Draw();
@@ -143,9 +160,9 @@ public:
 		{
 			glm::vec3 translation = glm::vec3(body->m_worldCenter.x,
 				body->m_worldCenter.y, body->m_worldCenter.z);
-			glm::quat orientation = glm::quat(body->m_orientation.a,
-				body->m_orientation.b, body->m_orientation.c, 
-				body->m_orientation.d);
+			glm::quat orientation = glm::quat(body->m_orientation.d,
+				body->m_orientation.a, body->m_orientation.b, 
+				body->m_orientation.c);
 			glm::vec3 scale = glm::vec3(body->m_scale.x,
 				body->m_scale.y, body->m_scale.z);
 			MVP = camera->Instance->projectionMatrix * viewMatrix
@@ -212,9 +229,116 @@ public:
 		currentLine = 0;
 	}
 
+	void HandleInput() override
+	{
+		GLProgram::HandleInput();
+
+		if(Input::wasKeyPressed)
+		{
+			if(Input::keyPress == KEY::KEY_S ||
+				Input::keyPress == KEY::KEY_s)
+				Shoot();
+		}
+	}
+
+	static void Shoot()
+	{
+		SolverDemo::Instance->AddABox(
+			b3Vec3(Camera::Instance->viewProperties.position.x,
+				   Camera::Instance->viewProperties.position.y, 
+				   Camera::Instance->viewProperties.position.z),
+			e_dynamicBody, b3Vec3(1,1,1));
+		SolverDemo::Instance->rigidBodies[
+			SolverDemo::Instance->rigidBodies.size()-1]->SetLinearVelocity(
+				b3Vec3(
+					Camera::Instance->viewProperties.forward.x*2.0f,
+					Camera::Instance->viewProperties.forward.y*2.0f,
+					Camera::Instance->viewProperties.forward.z*2.0f)
+				);
+	}
+
+	static void TW_CALL Stack1(void *clientData)
+	{
+		SolverDemo::Instance->ClearBoxes();
+
+		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,30,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+	}
+
+	static void TW_CALL Stack2(void *clientData)
+	{
+		SolverDemo::Instance->ClearBoxes();
+
+		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+	}
+
+	static void TW_CALL Stack3(void *clientData)
+	{
+		SolverDemo::Instance->ClearBoxes();
+		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(5.2f,30,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+	}
+
+	static void TW_CALL Stack4(void *clientData)
+	{
+		SolverDemo::Instance->ClearBoxes();
+		
+		SolverDemo::Instance->AddABox(b3Vec3(-0.5,0,-0.5), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+
+		for(int i = -3; i < 3; i++)
+			for(int j = -3; j < 3; j++)
+				for(int k = 1; k < 7; k++)
+					SolverDemo::Instance->AddABox(b3Vec3(i,k*2,j), e_dynamicBody, 
+						b3Vec3(1,1,1));
+	
+		/*SolverDemo::Instance->AddABox(b3Vec3(0.5f,30,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0.8f), e_dynamicBody, 
+			b3Vec3(1,1,1));*/
+	}
+
 	void SetUpTweakBars()
 	{
 		TwBar* bar = tweakBars["main"];
+
+		TwAddVarRW(bar, "Sleeping", TW_TYPE_BOOL8, &m_step.sleeping, "");
+		TwAddVarRW(bar, "Velocity Iterations", TW_TYPE_UINT32, 
+			&m_step.velocityIterations, "");
+		/*TwAddVarRW(bar, "Friction coefficient", TW_TYPE_FLOAT, 
+			&, "min=0.0 max=1.0 step=0.1");*/
+
+		TwAddButton(bar, "Stack 1", 
+			Stack1, NULL, "group='Stacks'");
+		TwAddButton(bar, "Stack 2", 
+			Stack2, NULL, "group='Stacks'");
+		TwAddButton(bar, "Stack 3", 
+			Stack3, NULL, "group='Stacks'");
+		TwAddButton(bar, "Stack 4", 
+			Stack4, NULL, "group='Stacks'");
 
 		TwAddSeparator(bar, "", "");
 	}
