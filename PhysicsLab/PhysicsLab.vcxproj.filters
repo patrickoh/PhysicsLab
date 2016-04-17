@@ -350,9 +350,6 @@
     <ClInclude Include="Dynamics\Contacts\b3ContactSolver.h">
       <Filter>Header Files\Bounce\Dynamics\Contacts</Filter>
     </ClInclude>
-    <ClInclude Include="Dynamics\b3WorldListeners.h">
-      <Filter>Header Files\Bounce\Dynamics</Filter>
-    </ClInclude>
     <ClInclude Include="Dynamics\b3World.h">
       <Filter>Header Files\Bounce\Dynamics</Filter>
     </ClInclude>

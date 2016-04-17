@@ -26,7 +26,7 @@
 b3ContactSolver::b3ContactSolver(const b3ContactSolverDef* def) {
 	m_allocator = def->allocator;
 	m_contacts = def->contacts;
-	m_count = def->count;
+	m_count = def->count; //the amount of contacts
 	m_invDt = def->dt > B3_ZERO ? B3_ONE / def->dt : B3_ZERO;
 	m_positions = def->positions;
 	m_velocities = def->velocities;
@@ -183,7 +183,8 @@ void b3ContactSolver::WarmStart() {
 }
 
 void b3ContactSolver::SolveVelocityConstraints() {
-	for (u32 i = 0; i < m_count; ++i) {
+	for (u32 i = 0; i < m_count; ++i) //For every contact
+	{ 
 		b3ContactVelocityConstraint* vc = m_velocityConstraints + i;
 
 		b3Vec3 normal = vc->normal;
@@ -193,7 +194,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 		b3Mat33 iB = vc->invIB;
 		u32 indexA = vc->indexA;
 		u32 indexB = vc->indexB;
-		u32 pointCount = vc->pointCount;
+		u32 pointCount = vc->pointCount; //amount of contact points
 
 		b3Vec3 vA = m_velocities[indexA].v;
 		b3Vec3 wA = m_velocities[indexA].w;
@@ -201,7 +202,10 @@ void b3ContactSolver::SolveVelocityConstraints() {
 		b3Vec3 wB = m_velocities[indexB].w;
 
 		for (u32 j = 0; j < pointCount; ++j) {
+			
 			b3VelocityConstraintPoint* vcp = vc->points + j;
+			
+			//NON-PENETRATION CONSTRAINT
 			{
 				// Compute J * u.
 				b3Vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
@@ -223,7 +227,9 @@ void b3ContactSolver::SolveVelocityConstraints() {
 				wB += iB * b3Cross(vcp->rB, deltaImpulse);
 			}
 
-			for (u32 k = 0; k < 2; ++k) {
+			//FRICTION CONSTRAINTS
+			for (u32 k = 0; k < 2; ++k) 
+			{
 				// Compute tangential impulse.
 				r32 hi = vc->friction * vcp->normalImpulse;
 				r32 lo = -hi;

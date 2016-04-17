@@ -19,7 +19,7 @@
 #include "b3ContactGraph.h"
 #include "b3Contact.h"
 #include "..\b3Body.h"
-#include "..\b3WorldListeners.h"
+//#include "..\b3WorldListeners.h"
 #include "..\..\Common\Memory\b3BlockAllocator.h"
 #include "..\..\Collision\Shapes\b3Shape.h"
 #include "..\..\Collision\b3SAT.h"
@@ -28,7 +28,7 @@ b3ContactGraph::b3ContactGraph() {
 	m_blockAllocator = nullptr;
 	m_contactList = nullptr;
 	m_contactCount = 0;
-	m_contactListener = nullptr;
+	//m_contactListener = nullptr;
 }
 
 void b3ContactGraph::AddPair(void* data1, void* data2) {
@@ -110,11 +110,11 @@ void b3ContactGraph::AddPair(void* data1, void* data2) {
 
 void b3ContactGraph::DestroyContact(b3Contact* c) {
 	// Report to the contact listener that the contact will be destroyed.
-	if (m_contactListener) {
+	/*if (m_contactListener) {
 		if (c->IsTouching()) {
 			m_contactListener->EndContact(c);
 		}
-	}
+	}*/
 
 	b3Body* bodyA = c->m_shapeA->m_body;
 	b3Body* bodyB = c->m_shapeB->m_body;
@@ -215,23 +215,23 @@ void b3ContactGraph::UpdateContacts() {
 			typedef void(*b3DistanceQuery) (b3Manifold&, const b3Transform&, const b3Shape*, const b3Transform&, const b3Shape*);
 
 			// Simply, register the collision routines here.
-			static b3DistanceQuery queryMatrix[e_maxShapes][e_maxShapes] = {
-				{ &b3HullHullShapeContact },
-			};
+			//static b3DistanceQuery queryMatrix[e_maxShapes][e_maxShapes] = {
+			//	{ &b3HullHullShapeContact }, //Narrowphase routine
+			//};
 
 			b3ShapeType typeA = shapeA->GetType();
 			b3ShapeType typeB = shapeB->GetType();
 
 			b3Assert(typeA <= typeB);
-			b3DistanceQuery Query = queryMatrix[typeA][typeB];
-			b3Assert(Query);
+			/*b3DistanceQuery Query = queryMatrix[typeA][typeB];
+			b3Assert(Query);*/
 
 			// Copy the old manifold so we can compare the new contact points with it.
 			b3Manifold oldManifold = c->m_manifold;
 
 			// Compute the a new contact manifold.
 			c->m_manifold.pointCount = 0;
-			Query(c->m_manifold, bodyA->m_transform * shapeA->m_local, shapeA, bodyB->m_transform * shapeB->m_local, shapeB);
+			b3HullHullShapeContact(c->m_manifold, bodyA->m_transform * shapeA->m_local, shapeA, bodyB->m_transform * shapeB->m_local, shapeB);
 
 			isTouching = c->m_manifold.pointCount > 0;
 
@@ -311,7 +311,7 @@ void b3ContactGraph::UpdateContacts() {
 		}
 
 		// Notify the contact listener the contact state.
-		if (m_contactListener) {
+		/*if (m_contactListener) {
 			if (!wasTouching && isTouching) {
 				m_contactListener->BeginContact(c);
 			}
@@ -321,7 +321,7 @@ void b3ContactGraph::UpdateContacts() {
 			if (!isSensorContact && isTouching) {
 				m_contactListener->Persisting(c);
 			}
-		}
+		}*/
 		// Go to the next contact.
 		c = c->m_next;
 	}

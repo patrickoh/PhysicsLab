@@ -32,16 +32,16 @@ struct b3Pair {
 	i32 proxy2;
 };
 
-struct b3RayCastInput {
-	b3Vec3 p1;
-	b3Vec3 p2;
-	r32 maxFraction;
-};
-
-struct b3RayCastOutput {
-	r32 fraction;
-	b3Vec3 normal;
-};
+//struct b3RayCastInput {
+//	b3Vec3 p1;
+//	b3Vec3 p2;
+//	r32 maxFraction;
+//};
+//
+//struct b3RayCastOutput {
+//	r32 fraction;
+//	b3Vec3 normal;
+//};
 
 #define NULL_EDGE 0xff
 

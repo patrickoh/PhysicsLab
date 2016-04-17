@@ -32,7 +32,7 @@ public :
 
 	virtual void ComputeMass(b3MassData* massData, r32 density) const;
 	virtual void ComputeAabb(b3AABB& output, const b3Transform& transform) const;
-	virtual bool RayCast(const b3RayCastInput& input, b3RayCastOutput& output, const b3Transform& transform) const;
+	//virtual bool RayCast(const b3RayCastInput& input, b3RayCastOutput& output, const b3Transform& transform) const;
 
 	//@warning A hull can be shared therefore a pointer to it is kept instead of an instance.
 	const b3Hull* GetHull() const;	

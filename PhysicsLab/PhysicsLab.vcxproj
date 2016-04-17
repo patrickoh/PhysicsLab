@@ -144,7 +144,6 @@
     <ClInclude Include="Dynamics\b3Body.h" />
     <ClInclude Include="Dynamics\b3Island.h" />
     <ClInclude Include="Dynamics\b3World.h" />
-    <ClInclude Include="Dynamics\b3WorldListeners.h" />
     <ClInclude Include="Dynamics\Contacts\b3Contact.h" />
     <ClInclude Include="Dynamics\Contacts\b3ContactGraph.h" />
     <ClInclude Include="Dynamics\Contacts\b3ContactSolver.h" />

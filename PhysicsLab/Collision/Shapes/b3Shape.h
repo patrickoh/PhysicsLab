@@ -65,7 +65,7 @@ public :
 	virtual b3ShapeType GetType() const = 0;
 	virtual void ComputeMass(b3MassData* massData, r32 density) const = 0;
 	virtual void ComputeAabb(b3AABB& output, const b3Transform& transform) const = 0;
-	virtual bool RayCast(const b3RayCastInput& input, b3RayCastOutput& output, const b3Transform& transform) const = 0;
+	//virtual bool RayCast(const b3RayCastInput& input, b3RayCastOutput& output, const b3Transform& transform) const = 0;
 
 	// Manipulating a shape transform during the simulation may cause non-physical behaviours.
 	const b3Transform& GetTransform() const;

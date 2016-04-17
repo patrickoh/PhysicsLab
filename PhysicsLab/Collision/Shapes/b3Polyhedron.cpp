@@ -70,60 +70,60 @@ void b3Polyhedron::ComputeAabb(b3AABB& output, const b3Transform& transform) con
 }
 
 // Christer Ericson, Real-Time Collision Detection (2005), p. 198.
-bool b3Polyhedron::RayCast(const b3RayCastInput& input, b3RayCastOutput& output, const b3Transform& transform) const {
-	b3Assert(m_hull);
-	b3Assert(m_hull->faceCount >= 3);
-
-	// Perform computations in the local space of the hull.
-	b3Vec3 a = b3MulT(transform.rotation, input.p1 - transform.translation);
-	b3Vec3 b = b3MulT(transform.rotation, input.p2 - transform.translation);
-	b3Vec3 direction = b - a;
-	
-	r32 tfirst = B3_ZERO;
-	r32 tlast = input.maxFraction;
-	i32 index = -1;
-
-	// Test ray against each plane.
-	for (u32 i = 0; i < m_hull->faceCount; i++) {
-		const b3Plane& plane = m_hull->facesPlanes[i];
-		r32 numerator = -b3Distance(plane, a);
-		r32 denominator = b3Dot(plane.normal, direction);
-		
-		if (denominator == B3_ZERO) {
-			// The ray is parallel to the plane.
-			if (numerator > B3_ZERO) {
-				// Then return false if ray segment lies in front (outside) of the plane.
-				return false;
-			}
-		}
-		else {
-			// Compute parameterized t value for intersection with current plane.
-			r32 t = numerator / denominator;
-			if (denominator < B3_ZERO) {
-				// When entering halfspace, update tfirst if t is larger.
-				if (t > tfirst) {
-					tfirst = t;
-					index = i;
-				}
-			}
-			else {
-				// When exiting halfspace, update tlast if t is smaller.
-				if (t < tlast) {
-					tlast = t;
-				}
-			}
-			// Exit with �no intersection� if intersection becomes empty.
-			if (tfirst > tlast) {
-				return false;
-			}
-		}
-	}
-
-	output.fraction = tfirst;
-	if (index != -1) {
-		output.normal = transform.rotation * m_hull->GetPlane(index).normal;
-	}
-
-	// If the ray is contained in all planes then it intersects.
-	return true;
-}
+//bool b3Polyhedron::RayCast(const b3RayCastInput& input, b3RayCastOutput& output, const b3Transform& transform) const {
+//	b3Assert(m_hull);
+//	b3Assert(m_hull->faceCount >= 3);
+//
+//	// Perform computations in the local space of the hull.
+//	b3Vec3 a = b3MulT(transform.rotation, input.p1 - transform.translation);
+//	b3Vec3 b = b3MulT(transform.rotation, input.p2 - transform.translation);
+//	b3Vec3 direction = b - a;
+//	
+//	r32 tfirst = B3_ZERO;
+//	r32 tlast = input.maxFraction;
+//	i32 index = -1;
+//
+//	// Test ray against each plane.
+//	for (u32 i = 0; i < m_hull->faceCount; i++) {
+//		const b3Plane& plane = m_hull->facesPlanes[i];
+//		r32 numerator = -b3Distance(plane, a);
+//		r32 denominator = b3Dot(plane.normal, direction);
+//		
+//		if (denominator == B3_ZERO) {
+//			// The ray is parallel to the plane.
+//			if (numerator > B3_ZERO) {
+//				// Then return false if ray segment lies in front (outside) of the plane.
+//				return false;
+//			}
+//		}
+//		else {
+//			// Compute parameterized t value for intersection with current plane.
+//			r32 t = numerator / denominator;
+//			if (denominator < B3_ZERO) {
+//				// When entering halfspace, update tfirst if t is larger.
+//				if (t > tfirst) {
+//					tfirst = t;
+//					index = i;
+//				}
+//			}
+//			else {
+//				// When exiting halfspace, update tlast if t is smaller.
+//				if (t < tlast) {
+//					tlast = t;
+//				}
+//			}
+//			// Exit with �no intersection� if intersection becomes empty.
+//			if (tfirst > tlast) {
+//				return false;
+//			}
+//		}
+//	}
+//
+//	output.fraction = tfirst;
+//	if (index != -1) {
+//		output.normal = transform.rotation * m_hull->GetPlane(index).normal;
+//	}
+//
+//	// If the ray is contained in all planes then it intersects.
+//	return true;
+//}

@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysicsLab", "PhysicsLab\PhysicsLab.vcxproj", "{991CF8F1-217A-4421-BF57-4A5470049DDC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bounce", "Bounce\Bounce.vcxproj", "{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -17,6 +19,12 @@ Global
 		{991CF8F1-217A-4421-BF57-4A5470049DDC}.Release|Win32.ActiveCfg = Release|Win32
 		{991CF8F1-217A-4421-BF57-4A5470049DDC}.Release|Win32.Build.0 = Release|Win32
 		{991CF8F1-217A-4421-BF57-4A5470049DDC}.Release|x64.ActiveCfg = Release|Win32
+		{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}.Debug|Win32.Build.0 = Debug|Win32
+		{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}.Debug|x64.ActiveCfg = Debug|Win32
+		{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}.Release|Win32.ActiveCfg = Release|Win32
+		{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}.Release|Win32.Build.0 = Release|Win32
+		{DFC1BAAD-82AF-4A51-972D-848BC2C37BAC}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

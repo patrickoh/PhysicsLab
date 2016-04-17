@@ -59,8 +59,8 @@ public :
 	// Keep notifying the client callback all AABBs that are overlapping with
 	// the given ray. The client callback must return the new intersection fraction 
 	// (real). If the fraction == 0 then the query is cancelled immediatly.
-	template<class T>
-	void RayCast(T* callback, const b3RayCastInput& input) const;
+	//template<class T>
+	//void RayCast(T* callback, const b3RayCastInput& input) const;
 
 	// Validate a given node.
 	void Validate(i32 node) const;
@@ -164,53 +164,53 @@ inline void b3DynamicAABBTree::Query(T* callback, const b3AABB& aabb) const {
 	}
 }
 
-template<class T>
-inline void b3DynamicAABBTree::RayCast(T* callback, const b3RayCastInput& input) const {
-	b3Vec3 p1 = input.p1;
-	b3Vec3 p2 = input.p2;
-	b3Vec3 direction = p2 - p1;
-	r32 maxFraction = input.maxFraction;
-
-	r32 dirSqLen = b3LenSq(direction);
-	b3Assert(dirSqLen > B3_ZERO);
-
-	direction *= B3_ONE / b3Sqrt(dirSqLen);
-	
-	b3ArrayPOD<i32, u32, 512> stack;
-	stack.PushBack(m_root);
-
-	while (!stack.Empty()) {
-		i32 nodeIndex = stack.Back();
-		
-		stack.PopBack();
-
-		if (nodeIndex == NULL_NODE) {
-			continue;
-		}
-
-		const b3Node* node = m_nodes + nodeIndex;
-
-		r32 minFraction = B3_ZERO;
-		if (node->aabb.RayCast(p1, p2 - p1, maxFraction, minFraction)) {
-			if (node->IsLeaf()) {
-				b3RayCastInput subInput;
-				subInput.p1 = input.p1;
-				subInput.p2 = input.p2;
-				subInput.maxFraction = maxFraction;
-
-				r32 newMaxFraction = callback->RayCastCallback(subInput, nodeIndex);
-
-				if (newMaxFraction == B3_ZERO) {
-					// The client has stopped the ray cast.
-					return;
-				}
-			}
-			else {
-				stack.PushBack(node->child1);
-				stack.PushBack(node->child2);
-			}
-		}
-	}
-}
+//template<class T>
+//inline void b3DynamicAABBTree::RayCast(T* callback, const b3RayCastInput& input) const {
+//	b3Vec3 p1 = input.p1;
+//	b3Vec3 p2 = input.p2;
+//	b3Vec3 direction = p2 - p1;
+//	r32 maxFraction = input.maxFraction;
+//
+//	r32 dirSqLen = b3LenSq(direction);
+//	b3Assert(dirSqLen > B3_ZERO);
+//
+//	direction *= B3_ONE / b3Sqrt(dirSqLen);
+//	
+//	b3ArrayPOD<i32, u32, 512> stack;
+//	stack.PushBack(m_root);
+//
+//	while (!stack.Empty()) {
+//		i32 nodeIndex = stack.Back();
+//		
+//		stack.PopBack();
+//
+//		if (nodeIndex == NULL_NODE) {
+//			continue;
+//		}
+//
+//		const b3Node* node = m_nodes + nodeIndex;
+//
+//		r32 minFraction = B3_ZERO;
+//		if (node->aabb.RayCast(p1, p2 - p1, maxFraction, minFraction)) {
+//			if (node->IsLeaf()) {
+//				b3RayCastInput subInput;
+//				subInput.p1 = input.p1;
+//				subInput.p2 = input.p2;
+//				subInput.maxFraction = maxFraction;
+//
+//				r32 newMaxFraction = callback->RayCastCallback(subInput, nodeIndex);
+//
+//				if (newMaxFraction == B3_ZERO) {
+//					// The client has stopped the ray cast.
+//					return;
+//				}
+//			}
+//			else {
+//				stack.PushBack(node->child1);
+//				stack.PushBack(node->child2);
+//			}
+//		}
+//	}
+//}
 
 #endif

@@ -90,42 +90,42 @@ struct b3AABB {
 	}
 	
 	// Intersect ray R(t) = p + t*d against this AABB.
-	bool RayCast(const b3Vec3& p, const b3Vec3& d, r32 tmax, r32& tmin) const {
-		// Christer Ericson, Real-Time Collision Detection (2005), p. 180.
-		// Correction: http://realtimecollisiondetection.net/books/rtcd/errata/
+	//bool RayCast(const b3Vec3& p, const b3Vec3& d, r32 tmax, r32& tmin) const {
+	//	// Christer Ericson, Real-Time Collision Detection (2005), p. 180.
+	//	// Correction: http://realtimecollisiondetection.net/books/rtcd/errata/
 
-		// Test all three slabs.
-		for (u32 i = 0; i < 3; i++) {
-			if (b3Abs(d[i]) < B3_EPSILON) {
-				// The segment is parallel to slab. No hit if origin not within slab.
-				if (p[i] < min[i] || p[i] > max[i]) {
-					return false; 
-				}
-			}
-			else {
-				// Compute intersection t value of segment with near and far plane of slab.
-				r32 ood = B3_ONE / d[i];
-				r32 t1 = ood * (min[i] - p[i]);
-				r32 t2 = ood * (max[i] - p[i]);
+	//	// Test all three slabs.
+	//	for (u32 i = 0; i < 3; i++) {
+	//		if (b3Abs(d[i]) < B3_EPSILON) {
+	//			// The segment is parallel to slab. No hit if origin not within slab.
+	//			if (p[i] < min[i] || p[i] > max[i]) {
+	//				return false; 
+	//			}
+	//		}
+	//		else {
+	//			// Compute intersection t value of segment with near and far plane of slab.
+	//			r32 ood = B3_ONE / d[i];
+	//			r32 t1 = ood * (min[i] - p[i]);
+	//			r32 t2 = ood * (max[i] - p[i]);
 
-				// Make t1 be intersection with near plane, t2 with far plane.
-				if (t1 > t2) {
-					b3Swap(t1, t2);
-				}
+	//			// Make t1 be intersection with near plane, t2 with far plane.
+	//			if (t1 > t2) {
+	//				b3Swap(t1, t2);
+	//			}
 
-				// Compute the intersection of slab intersection intervals
-				tmin = b3Max(tmin, t1); // Rather than: if (t1 > tmin) tmin = t1;
-				tmax = b3Min(tmax, t2); // Rather than: if (t2 < tmax) tmax = t2;
+	//			// Compute the intersection of slab intersection intervals
+	//			tmin = b3Max(tmin, t1); // Rather than: if (t1 > tmin) tmin = t1;
+	//			tmax = b3Min(tmax, t2); // Rather than: if (t2 < tmax) tmax = t2;
 
-				// Exit with no collision as soon as slab intersection becomes empty.
-				if (tmin > tmax) { 
-					return false; 
-				}
-			}
-		}
+	//			// Exit with no collision as soon as slab intersection becomes empty.
+	//			if (tmin > tmax) { 
+	//				return false; 
+	//			}
+	//		}
+	//	}
 
-		return true;
-	}
+	//	return true;
+	//}
 
 	b3Vec3 min;
 	b3Vec3 max;

@@ -46,7 +46,7 @@ protected :
 	b3BroadPhase m_broadPhase;
 	b3Contact* m_contactList;
 	u32 m_contactCount;
-	b3ContactListener* m_contactListener;
+	//b3ContactListener* m_contactListener;
 };
 
 #endif

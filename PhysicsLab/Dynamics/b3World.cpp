@@ -19,7 +19,7 @@
 #include "b3World.h"
 #include "b3Body.h"
 #include "b3Island.h"
-#include "b3WorldListeners.h"
+//#include "b3WorldListeners.h"
 #include "Contacts\b3Contact.h"
 //#include "Joints\b3Joint.h"
 #include "..\Collision\Shapes\b3Shape.h"
@@ -202,7 +202,7 @@ void b3World::Solve(const b3TimeStep& step) {
 				stack[stackCount++] = other;
 				other->m_flags |= b3Body::e_islandFlag;
 			}
-
+#pragma region joints
 			// Get all joints connected with the body.
 			//for (b3JointEdge* je = b->m_jointList; je; je = je->next) {
 			//	b3Joint* joint = je->joint;
@@ -228,6 +228,7 @@ void b3World::Solve(const b3TimeStep& step) {
 			//	stack[stackCount++] = other;
 			//	other->m_flags |= b3Body::e_islandFlag;
 			//}
+#pragma endregion
 		}
 
 		// Integrate velocities, solve velocity constraints, integrate positions.
@@ -283,7 +284,7 @@ void b3World::Step(const b3TimeStep& step) {
 	{
 		b3Time time;
 		// Update contact constraints. Destroy ones if they aren't intersecting.
-		m_contactGraph.UpdateContacts();
+		m_contactGraph.UpdateContacts(); //Broadphase + narrowphase
 		time.Update();
 		m_profile.narrowPhaseTime = time.GetDeltaMilisecs();
 	}
@@ -303,59 +304,59 @@ void b3World::Step(const b3TimeStep& step) {
 	m_profile.totalTime = stepTime.GetDeltaMilisecs();
 }
 
-struct b3QueryCallback {
-	bool QueryCallback(i32 proxyID) {
-		b3Shape* shape = (b3Shape*)broadPhase->GetUserData(proxyID);
-		return listener->ReportShape(shape);
-	}
-	b3QueryListener* listener;
-	const b3BroadPhase* broadPhase;
-};
+//struct b3QueryCallback {
+//	bool QueryCallback(i32 proxyID) {
+//		b3Shape* shape = (b3Shape*)broadPhase->GetUserData(proxyID);
+//		return listener->ReportShape(shape);
+//	}
+//	b3QueryListener* listener;
+//	const b3BroadPhase* broadPhase;
+//};
+//
+//void b3World::QueryAABB(b3QueryListener* listener, const b3AABB& aabb) const {
+//	b3QueryCallback callback;
+//	callback.broadPhase = &m_contactGraph.m_broadPhase;
+//	callback.listener = listener;
+//	m_contactGraph.m_broadPhase.Query(&callback, aabb);
+//}
 
-void b3World::QueryAABB(b3QueryListener* listener, const b3AABB& aabb) const {
-	b3QueryCallback callback;
-	callback.broadPhase = &m_contactGraph.m_broadPhase;
-	callback.listener = listener;
-	m_contactGraph.m_broadPhase.Query(&callback, aabb);
-}
+//struct b3RayCastCallback {
+//	r32 RayCastCallback(const b3RayCastInput& input, i32 proxyID) {
+//		b3Shape* shape = (b3Shape*)broadPhase->GetUserData(proxyID);
+//
+//		b3Transform transform = shape->GetBody()->GetTransform() * shape->GetTransform();
+//
+//		b3RayCastOutput output;
+//		bool hit = shape->RayCast(input, output, transform);
+//		if (hit) {
+//			r32 fraction = output.fraction;
+//			b3Vec3 point = (B3_ONE - fraction) * input.p1 + fraction * input.p2;
+//			b3Vec3 normal = output.normal;
+//
+//			// Report the intersection and get the new ray cast fraction.
+//			return listener->ReportShape(shape, point, normal, fraction);
+//		}
+//
+//		// Continue from where we stopped.
+//		return input.maxFraction;
+//	}
+//
+//	b3RayCastListener* listener;
+//	const b3BroadPhase* broadPhase;
+//};
 
-struct b3RayCastCallback {
-	r32 RayCastCallback(const b3RayCastInput& input, i32 proxyID) {
-		b3Shape* shape = (b3Shape*)broadPhase->GetUserData(proxyID);
-
-		b3Transform transform = shape->GetBody()->GetTransform() * shape->GetTransform();
-
-		b3RayCastOutput output;
-		bool hit = shape->RayCast(input, output, transform);
-		if (hit) {
-			r32 fraction = output.fraction;
-			b3Vec3 point = (B3_ONE - fraction) * input.p1 + fraction * input.p2;
-			b3Vec3 normal = output.normal;
-
-			// Report the intersection and get the new ray cast fraction.
-			return listener->ReportShape(shape, point, normal, fraction);
-		}
-
-		// Continue from where we stopped.
-		return input.maxFraction;
-	}
-
-	b3RayCastListener* listener;
-	const b3BroadPhase* broadPhase;
-};
-
-void b3World::RayCast(b3RayCastListener* listener, const b3Vec3& p1, const b3Vec3& p2) const {
-	b3RayCastInput input;
-	input.p1 = p1;
-	input.p2 = p2;
-	input.maxFraction = B3_ONE;// Use B3_MAX_FLOAT for a ray.
-
-	b3RayCastCallback callback;
-	callback.listener = listener;
-	callback.broadPhase = &m_contactGraph.m_broadPhase;
-
-	m_contactGraph.m_broadPhase.RayCast(&callback, input);
-}
+//void b3World::RayCast(b3RayCastListener* listener, const b3Vec3& p1, const b3Vec3& p2) const {
+//	b3RayCastInput input;
+//	input.p1 = p1;
+//	input.p2 = p2;
+//	input.maxFraction = B3_ONE;// Use B3_MAX_FLOAT for a ray.
+//
+//	b3RayCastCallback callback;
+//	callback.listener = listener;
+//	callback.broadPhase = &m_contactGraph.m_broadPhase;
+//
+//	m_contactGraph.m_broadPhase.RayCast(&callback, input);
+//}
 
 void b3World::Draw(const b3Draw* draw, u32 flags) const {
 	b3Assert(draw);

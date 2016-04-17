@@ -52,8 +52,8 @@ public :
 	
 	// Notify the callback client the AABBs that are overlapping the 
 	// passed ray and compute intersection information.
-	template<class T>
-	void RayCast(T* callback, const b3RayCastInput& input) const;
+	//template<class T>
+	//void RayCast(T* callback, const b3RayCastInput& input) const;
 protected :
 	friend class b3World;
 	friend class b3ContactGraph;
@@ -96,10 +96,10 @@ inline void b3BroadPhase::Query(T* callback, const b3AABB& aabb) const {
 	return m_dynamicAabbTree.Query(callback, aabb);
 }
 
-template<class T>
-inline void b3BroadPhase::RayCast(T* callback, const b3RayCastInput& input) const {
-	return m_dynamicAabbTree.RayCast(callback, input);
-}
+//template<class T>
+//inline void b3BroadPhase::RayCast(T* callback, const b3RayCastInput& input) const {
+//	return m_dynamicAabbTree.RayCast(callback, input);
+//}
 
 inline bool operator<(const b3Pair& pair1, const b3Pair& pair2) {
 	if (pair1.proxy1 < pair2.proxy1) {

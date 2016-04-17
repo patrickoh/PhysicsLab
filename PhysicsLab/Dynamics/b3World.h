@@ -27,8 +27,8 @@
 
 struct b3BodyDef;
 class b3Body;
-class b3QueryListener;
-class b3RayCastListener;
+//class b3QueryListener;
+//class b3RayCastListener;
 class b3ContactListener;
 class b3Draw;
 
@@ -60,11 +60,11 @@ public :
 	// The query listener will be notified when two shape AABBs are overlapping.
 	// If the listener returns false then the query is stopped immediately.
 	// Otherwise, it continues searching for new overlapping shape AABBs.
-	void QueryAABB(b3QueryListener* listener, const b3AABB& aabb) const;
+	//void QueryAABB(b3QueryListener* listener, const b3AABB& aabb) const;
 	
 	// The ray cast listener will be notified when a ray intersects a world shape.
 	// The ray cast output is the intercepted shape, the intersection point, normal, and fraction.
-	void RayCast(b3RayCastListener* listener, const b3Vec3& p1, const b3Vec3& p2) const;
+	//void RayCast(b3RayCastListener* listener, const b3Vec3& p1, const b3Vec3& p2) const;
 
 	// Call the function below to simulate a physics frame.
 	// The function parameter is the time step definition, which must contain 
@@ -100,12 +100,17 @@ protected :
 	
 	b3StackAllocator m_stackAllocator;
 	b3BlockAllocator m_blockAllocator;
+	
 	b3ContactGraph m_contactGraph;
 	//b3JointGraph m_jointGraph;
+	
 	u32 m_flags;
+	
 	b3Vec3 m_gravityDir;
+	
 	b3Body* m_bodyList;
 	u32 m_bodyCount;
+	
 	b3StepProfile m_profile;
 };
 
@@ -117,9 +122,9 @@ inline void b3World::SetGravityDirection(const b3Vec3& direction) {
 	m_gravityDir = direction;
 }
 
-inline void b3World::SetContactListener(b3ContactListener* listener) {
-	m_contactGraph.m_contactListener = listener;
-}
+//inline void b3World::SetContactListener(b3ContactListener* listener) {
+//	m_contactGraph.m_contactListener = listener;
+//}
 
 inline u32 b3World::GetBodyCount() const {
 	return m_bodyCount;

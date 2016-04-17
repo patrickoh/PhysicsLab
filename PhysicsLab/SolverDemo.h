@@ -161,7 +161,7 @@ public:
 
 		for(auto body : rigidBodies)
 		{
-			glm::vec3 translation = glm::vec3(body->m_worldCenter.x,
+			glm::vec3 translation = glm::vec3(body->GetTransform().translation.x,
 				body->m_worldCenter.y, body->m_worldCenter.z);
 			glm::quat orientation = glm::quat(body->m_orientation.d,
 				body->m_orientation.a, body->m_orientation.b, 
