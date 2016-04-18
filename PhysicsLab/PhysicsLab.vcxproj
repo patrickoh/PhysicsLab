@@ -81,28 +81,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\lib;$(SolutionDir)\PhysicsLab\ImageMagick-6\Lib;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\PhysicsLab\freeglut\lib;$(SolutionDir)\PhysicsLab\glew-1.10.0\lib\Release\Win32;$(SolutionDir)\PhysicsLab\bullet3-2.83.7\bin;C:\Users\Pad\Desktop\PhysicsLab\PhysicsLab\Bounce\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_RL_Magick++_.lib;AntTweakBar.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;LinearMath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\PhysicsLab\AntTweakBar_116\AntTweakBar\lib;$(SolutionDir)\PhysicsLab\ImageMagick-6\Lib;$(SolutionDir)\PhysicsLab\assimp--3.0.1270-sdk\lib\assimp_debug-dll_win32;$(SolutionDir)\PhysicsLab\freeglut\lib;$(SolutionDir)\PhysicsLab\glew-1.10.0\lib\Release\Win32;$(SolutionDir)\PhysicsLab\bullet3-2.83.7\bin;$(SolutionDir)\Bounce;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;CORE_RL_Magick++_.lib;AntTweakBar.lib;BulletCollision.lib;BulletDynamics.lib;BulletSoftBody.lib;LinearMath.lib;Bounce.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="BoundingSphere.cpp" />
-    <ClCompile Include="Collision\b3BroadPhase.cpp" />
-    <ClCompile Include="Collision\b3DynamicAABBTree.cpp" />
-    <ClCompile Include="Collision\b3SAT.cpp" />
-    <ClCompile Include="Collision\Shapes\b3Hull.cpp" />
-    <ClCompile Include="Collision\Shapes\b3Polyhedron.cpp" />
-    <ClCompile Include="Collision\Shapes\b3Shape.cpp" />
-    <ClCompile Include="Common\b3Settings.cpp" />
-    <ClCompile Include="Common\b3Time.cpp" />
-    <ClCompile Include="Common\Memory\b3BlockAllocator.cpp" />
-    <ClCompile Include="Common\Memory\b3StackAllocator.cpp" />
-    <ClCompile Include="Dynamics\b3Body.cpp" />
-    <ClCompile Include="Dynamics\b3Island.cpp" />
-    <ClCompile Include="Dynamics\b3World.cpp" />
-    <ClCompile Include="Dynamics\Contacts\b3ContactGraph.cpp" />
-    <ClCompile Include="Dynamics\Contacts\b3ContactSolver.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImGuiImpl.cpp" />
@@ -121,32 +106,8 @@
     <ClInclude Include="BroadphaseDemo.h" />
     <ClInclude Include="BunnyMesh.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Collision\b3AABB.h" />
-    <ClInclude Include="Collision\b3BroadPhase.h" />
-    <ClInclude Include="Collision\b3Collision.h" />
-    <ClInclude Include="Collision\b3DynamicAABBTree.h" />
-    <ClInclude Include="Collision\b3SAT.h" />
-    <ClInclude Include="Collision\Shapes\b3Hull.h" />
-    <ClInclude Include="Collision\Shapes\b3Polyhedron.h" />
-    <ClInclude Include="Collision\Shapes\b3Shape.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="Common\b3Draw.h" />
-    <ClInclude Include="Common\b3Settings.h" />
-    <ClInclude Include="Common\b3Time.h" />
-    <ClInclude Include="Common\Math\b3Mat33.h" />
-    <ClInclude Include="Common\Math\b3Math.h" />
-    <ClInclude Include="Common\Math\b3Quaternion.h" />
-    <ClInclude Include="Common\Math\b3Vec3.h" />
-    <ClInclude Include="Common\Memory\b3Array.h" />
-    <ClInclude Include="Common\Memory\b3ArrayPOD.h" />
-    <ClInclude Include="Common\Memory\b3BlockAllocator.h" />
-    <ClInclude Include="Common\Memory\b3StackAllocator.h" />
-    <ClInclude Include="Dynamics\b3Body.h" />
-    <ClInclude Include="Dynamics\b3Island.h" />
-    <ClInclude Include="Dynamics\b3World.h" />
-    <ClInclude Include="Dynamics\Contacts\b3Contact.h" />
-    <ClInclude Include="Dynamics\Contacts\b3ContactGraph.h" />
-    <ClInclude Include="Dynamics\Contacts\b3ContactSolver.h" />
+    <ClInclude Include="DebugDrawer.h" />
     <ClInclude Include="EPA.h" />
     <ClInclude Include="GJK.h" />
     <ClInclude Include="GLProgram.h" />

@@ -5,7 +5,8 @@
 #include "RigidbodyManager.h"
 #include "Inertia.h"
 
-#include "Bounce.h"
+#include "..\Bounce\Bounce.h"
+#include "DebugDrawer.h"
 
 class SolverDemo : public GLProgram
 {
