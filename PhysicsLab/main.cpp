@@ -33,10 +33,10 @@ int main(int argc, char** argv)
 
 	std::cout << "1. Particle System" << std::endl;
 	std::cout << "2. Unconstrained Rigid Body" << std::endl;
-	std::cout << "3. Broadphase" << std::endl;
+	std::cout << "3. Broadphase - Sweep and Prune" << std::endl;
 	std::cout << "4. Soft Body (Side Project)" << std::endl;
-	std::cout << "5. Narrowphase" << std::endl;
-	std::cout << "6. Response" << std::endl;
+	std::cout << "5. Narrowphase - GJK" << std::endl;
+	std::cout << "6. Response - EPA" << std::endl;
 	std::cout << "7. Solver" << std::endl;
 	std::cout << ">";
 

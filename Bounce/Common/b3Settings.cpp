@@ -25,3 +25,5 @@ void* b3Alloc(i32 size) {
 void b3Free(void* memory) {
 	return ::free(memory);
 }
+
+bool b3ExtraSettings::bWarmStart = true;

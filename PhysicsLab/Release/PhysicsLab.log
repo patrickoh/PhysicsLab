@@ -1,0 +1,1828 @@
+﻿Build started 18/04/2016 13:38:37.
+     1>Project "C:\Users\Patrick\Desktop\PhysicsLab\PhysicsLab\PhysicsLab.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IC:\Users\Patrick\Desktop\PhysicsLab\\include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt AABB.cpp BoundingSphere.cpp Helper.cpp imgui.cpp ImGuiImpl.cpp imgui_demo.cpp imgui_draw.cpp Input.cpp main.cpp Model.cpp RigidBody.cpp Shader.cpp ShaderManager.cpp
+         AABB.cpp
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(456): warning C4251: 'Magick::DrawableBezier::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawableBezier'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(498): warning C4251: 'Magick::DrawablePushClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(526): warning C4251: 'Magick::DrawableClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(959): warning C4251: 'Magick::DrawableFont::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(960): warning C4251: 'Magick::DrawableFont::_family' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1128): warning C4251: 'Magick::DrawablePath::_path' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePath'
+                 with
+                 [
+                     _Ty=Magick::VPath
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1217): warning C4251: 'Magick::DrawablePolygon::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolygon'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1237): warning C4251: 'Magick::DrawablePolyline::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolyline'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1321): warning C4251: 'Magick::DrawablePushPattern::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushPattern'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1923): warning C4251: 'Magick::DrawableText::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1924): warning C4251: 'Magick::DrawableText::_encoding' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2255): warning C4251: 'Magick::PathArcAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcAbs'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2277): warning C4251: 'Magick::PathArcRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcRel'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2428): warning C4251: 'Magick::PathCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2451): warning C4251: 'Magick::PathCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2475): warning C4251: 'Magick::PathSmoothCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2500): warning C4251: 'Magick::PathSmoothCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2609): warning C4251: 'Magick::PathQuadraticCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2633): warning C4251: 'Magick::PathQuadraticCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2657): warning C4251: 'Magick::PathSmoothQuadraticCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2681): warning C4251: 'Magick::PathSmoothQuadraticCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2709): warning C4251: 'Magick::PathLinetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2733): warning C4251: 'Magick::PathLinetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2875): warning C4251: 'Magick::PathMovetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2899): warning C4251: 'Magick::PathMovetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Exception.h(31): warning C4251: 'Magick::Exception::_what' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Exception'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(65): warning C4251: 'Magick::CoderInfo::_name' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(66): warning C4251: 'Magick::CoderInfo::_description' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(90): warning C4251: 'Magick::Montage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(92): warning C4251: 'Magick::Montage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(95): warning C4251: 'Magick::Montage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(99): warning C4251: 'Magick::Montage::_texture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(101): warning C4251: 'Magick::Montage::_title' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(134): warning C4251: 'Magick::annotateImage::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::annotateImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(213): warning C4251: 'Magick::cdlImage::_cdl' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::cdlImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(273): warning C4251: 'Magick::commentImage::_comment' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::commentImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(385): warning C4251: 'Magick::drawImage::_drawableList' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::drawImage'
+                 with
+                 [
+                     _Ty=Magick::Drawable
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(651): warning C4251: 'Magick::labelImage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::labelImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1299): warning C4251: 'Magick::backgroundTextureImage::_backgroundTexture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::backgroundTextureImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1474): warning C4251: 'Magick::fileNameImage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1498): warning C4251: 'Magick::fontImage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fontImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1558): warning C4251: 'Magick::magickImage::_magick' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::magickImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1817): warning C4251: 'Magick::tileNameImage::_tileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::tileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1854): warning C4251: 'Magick::viewImage::_view' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::viewImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1867): warning C4251: 'Magick::x11DisplayImage::_display' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::x11DisplayImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(144): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(161): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(30): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(32): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBody.h(89): warning C4018: '<' : signed/unsigned mismatch
+         GLM: pitch function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: yaw function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: roll function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         BoundingSphere.cpp
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(30): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(32): warning C4018: '<' : signed/unsigned mismatch
+         Helper.cpp
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(456): warning C4251: 'Magick::DrawableBezier::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawableBezier'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(498): warning C4251: 'Magick::DrawablePushClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(526): warning C4251: 'Magick::DrawableClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(959): warning C4251: 'Magick::DrawableFont::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(960): warning C4251: 'Magick::DrawableFont::_family' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1128): warning C4251: 'Magick::DrawablePath::_path' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePath'
+                 with
+                 [
+                     _Ty=Magick::VPath
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1217): warning C4251: 'Magick::DrawablePolygon::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolygon'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1237): warning C4251: 'Magick::DrawablePolyline::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolyline'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1321): warning C4251: 'Magick::DrawablePushPattern::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushPattern'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1923): warning C4251: 'Magick::DrawableText::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1924): warning C4251: 'Magick::DrawableText::_encoding' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2255): warning C4251: 'Magick::PathArcAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcAbs'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2277): warning C4251: 'Magick::PathArcRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcRel'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2428): warning C4251: 'Magick::PathCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2451): warning C4251: 'Magick::PathCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2475): warning C4251: 'Magick::PathSmoothCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2500): warning C4251: 'Magick::PathSmoothCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2609): warning C4251: 'Magick::PathQuadraticCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2633): warning C4251: 'Magick::PathQuadraticCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2657): warning C4251: 'Magick::PathSmoothQuadraticCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2681): warning C4251: 'Magick::PathSmoothQuadraticCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2709): warning C4251: 'Magick::PathLinetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2733): warning C4251: 'Magick::PathLinetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2875): warning C4251: 'Magick::PathMovetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2899): warning C4251: 'Magick::PathMovetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Exception.h(31): warning C4251: 'Magick::Exception::_what' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Exception'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(65): warning C4251: 'Magick::CoderInfo::_name' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(66): warning C4251: 'Magick::CoderInfo::_description' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(90): warning C4251: 'Magick::Montage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(92): warning C4251: 'Magick::Montage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(95): warning C4251: 'Magick::Montage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(99): warning C4251: 'Magick::Montage::_texture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(101): warning C4251: 'Magick::Montage::_title' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(134): warning C4251: 'Magick::annotateImage::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::annotateImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(213): warning C4251: 'Magick::cdlImage::_cdl' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::cdlImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(273): warning C4251: 'Magick::commentImage::_comment' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::commentImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(385): warning C4251: 'Magick::drawImage::_drawableList' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::drawImage'
+                 with
+                 [
+                     _Ty=Magick::Drawable
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(651): warning C4251: 'Magick::labelImage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::labelImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1299): warning C4251: 'Magick::backgroundTextureImage::_backgroundTexture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::backgroundTextureImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1474): warning C4251: 'Magick::fileNameImage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1498): warning C4251: 'Magick::fontImage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fontImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1558): warning C4251: 'Magick::magickImage::_magick' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::magickImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1817): warning C4251: 'Magick::tileNameImage::_tileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::tileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1854): warning C4251: 'Magick::viewImage::_view' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::viewImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1867): warning C4251: 'Magick::x11DisplayImage::_display' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::x11DisplayImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>Helper.cpp(10): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(11): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(11): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(12): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(12): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(13): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(13): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>Helper.cpp(193): warning C4244: 'initializing' : conversion from 'int' to 'float', possible loss of data
+     1>Helper.cpp(196): warning C4244: 'argument' : conversion from 'float' to 'GLint', possible loss of data
+         imgui.cpp
+         ImGuiImpl.cpp
+         imgui_demo.cpp
+         imgui_draw.cpp
+         Input.cpp
+     1>c:\users\patrick\desktop\physicslab\physicslab\Input.h(120): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+     1>c:\users\patrick\desktop\physicslab\physicslab\Input.h(127): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\Input.h(128): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(456): warning C4251: 'Magick::DrawableBezier::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawableBezier'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(498): warning C4251: 'Magick::DrawablePushClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(526): warning C4251: 'Magick::DrawableClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(959): warning C4251: 'Magick::DrawableFont::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(960): warning C4251: 'Magick::DrawableFont::_family' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1128): warning C4251: 'Magick::DrawablePath::_path' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePath'
+                 with
+                 [
+                     _Ty=Magick::VPath
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1217): warning C4251: 'Magick::DrawablePolygon::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolygon'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1237): warning C4251: 'Magick::DrawablePolyline::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolyline'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1321): warning C4251: 'Magick::DrawablePushPattern::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushPattern'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1923): warning C4251: 'Magick::DrawableText::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1924): warning C4251: 'Magick::DrawableText::_encoding' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2255): warning C4251: 'Magick::PathArcAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcAbs'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2277): warning C4251: 'Magick::PathArcRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcRel'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2428): warning C4251: 'Magick::PathCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2451): warning C4251: 'Magick::PathCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2475): warning C4251: 'Magick::PathSmoothCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2500): warning C4251: 'Magick::PathSmoothCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2609): warning C4251: 'Magick::PathQuadraticCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2633): warning C4251: 'Magick::PathQuadraticCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2657): warning C4251: 'Magick::PathSmoothQuadraticCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2681): warning C4251: 'Magick::PathSmoothQuadraticCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2709): warning C4251: 'Magick::PathLinetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2733): warning C4251: 'Magick::PathLinetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2875): warning C4251: 'Magick::PathMovetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2899): warning C4251: 'Magick::PathMovetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Exception.h(31): warning C4251: 'Magick::Exception::_what' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Exception'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(65): warning C4251: 'Magick::CoderInfo::_name' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(66): warning C4251: 'Magick::CoderInfo::_description' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(90): warning C4251: 'Magick::Montage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(92): warning C4251: 'Magick::Montage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(95): warning C4251: 'Magick::Montage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(99): warning C4251: 'Magick::Montage::_texture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(101): warning C4251: 'Magick::Montage::_title' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(134): warning C4251: 'Magick::annotateImage::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::annotateImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(213): warning C4251: 'Magick::cdlImage::_cdl' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::cdlImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(273): warning C4251: 'Magick::commentImage::_comment' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::commentImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(385): warning C4251: 'Magick::drawImage::_drawableList' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::drawImage'
+                 with
+                 [
+                     _Ty=Magick::Drawable
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(651): warning C4251: 'Magick::labelImage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::labelImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1299): warning C4251: 'Magick::backgroundTextureImage::_backgroundTexture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::backgroundTextureImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1474): warning C4251: 'Magick::fileNameImage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1498): warning C4251: 'Magick::fontImage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fontImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1558): warning C4251: 'Magick::magickImage::_magick' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::magickImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1817): warning C4251: 'Magick::tileNameImage::_tileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::tileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1854): warning C4251: 'Magick::viewImage::_view' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::viewImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1867): warning C4251: 'Magick::x11DisplayImage::_display' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::x11DisplayImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(144): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(161): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(118): warning C4305: 'argument' : truncation from 'double' to 'GLclampf'
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(151): warning C4244: '+=' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(163): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(172): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(208): warning C4018: '<' : signed/unsigned mismatch
+     1>Input.cpp(19): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+     1>Input.cpp(21): warning C4244: 'argument' : conversion from 'double' to 'GLfloat', possible loss of data
+         GLM: angleAxis function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: pitch function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: yaw function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: roll function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         main.cpp
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(456): warning C4251: 'Magick::DrawableBezier::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawableBezier'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(498): warning C4251: 'Magick::DrawablePushClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(526): warning C4251: 'Magick::DrawableClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(959): warning C4251: 'Magick::DrawableFont::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(960): warning C4251: 'Magick::DrawableFont::_family' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1128): warning C4251: 'Magick::DrawablePath::_path' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePath'
+                 with
+                 [
+                     _Ty=Magick::VPath
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1217): warning C4251: 'Magick::DrawablePolygon::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolygon'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1237): warning C4251: 'Magick::DrawablePolyline::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolyline'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1321): warning C4251: 'Magick::DrawablePushPattern::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushPattern'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1923): warning C4251: 'Magick::DrawableText::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1924): warning C4251: 'Magick::DrawableText::_encoding' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2255): warning C4251: 'Magick::PathArcAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcAbs'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2277): warning C4251: 'Magick::PathArcRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcRel'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2428): warning C4251: 'Magick::PathCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2451): warning C4251: 'Magick::PathCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2475): warning C4251: 'Magick::PathSmoothCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2500): warning C4251: 'Magick::PathSmoothCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2609): warning C4251: 'Magick::PathQuadraticCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2633): warning C4251: 'Magick::PathQuadraticCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2657): warning C4251: 'Magick::PathSmoothQuadraticCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2681): warning C4251: 'Magick::PathSmoothQuadraticCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2709): warning C4251: 'Magick::PathLinetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2733): warning C4251: 'Magick::PathLinetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2875): warning C4251: 'Magick::PathMovetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2899): warning C4251: 'Magick::PathMovetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Exception.h(31): warning C4251: 'Magick::Exception::_what' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Exception'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(65): warning C4251: 'Magick::CoderInfo::_name' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(66): warning C4251: 'Magick::CoderInfo::_description' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(90): warning C4251: 'Magick::Montage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(92): warning C4251: 'Magick::Montage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(95): warning C4251: 'Magick::Montage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(99): warning C4251: 'Magick::Montage::_texture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(101): warning C4251: 'Magick::Montage::_title' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(134): warning C4251: 'Magick::annotateImage::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::annotateImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(213): warning C4251: 'Magick::cdlImage::_cdl' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::cdlImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(273): warning C4251: 'Magick::commentImage::_comment' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::commentImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(385): warning C4251: 'Magick::drawImage::_drawableList' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::drawImage'
+                 with
+                 [
+                     _Ty=Magick::Drawable
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(651): warning C4251: 'Magick::labelImage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::labelImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1299): warning C4251: 'Magick::backgroundTextureImage::_backgroundTexture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::backgroundTextureImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1474): warning C4251: 'Magick::fileNameImage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1498): warning C4251: 'Magick::fontImage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fontImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1558): warning C4251: 'Magick::magickImage::_magick' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::magickImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1817): warning C4251: 'Magick::tileNameImage::_tileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::tileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1854): warning C4251: 'Magick::viewImage::_view' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::viewImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1867): warning C4251: 'Magick::x11DisplayImage::_display' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::x11DisplayImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(144): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(161): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Input.h(120): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+     1>c:\users\patrick\desktop\physicslab\physicslab\Input.h(127): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\Input.h(128): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(118): warning C4305: 'argument' : truncation from 'double' to 'GLclampf'
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(151): warning C4244: '+=' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(163): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(172): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\GLProgram.h(208): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\ParticleSystem.h(219): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\ParticleSystem.h(291): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\ParticleSystem.h(304): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\ParticleDemo.h(51): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\ParticleDemo.h(88): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(30): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(32): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBody.h(89): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\QueryPerformance.h(27): warning C4091: 'static ' : ignored on left of 'QueryPerformance' when no variable is declared
+     1>c:\users\patrick\desktop\physicslab\physicslab\Support.h(32): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\EPA.h(235): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Tetrahedron.h(89): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(101): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(131): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(133): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(147): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(196): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(234): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(236): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(260): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(262): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(351): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(353): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(379): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(380): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(418): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidbodyManager.h(466): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Inertia.h(133): warning C4091: 'static ' : ignored on left of 'Inertia' when no variable is declared
+     1>c:\users\patrick\desktop\physicslab\physicslab\Inertia.h(93): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBodyDemo.h(47): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBodyDemo.h(66): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBodyDemo.h(86): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBodyDemo.h(113): warning C4101: 'color' : unreferenced local variable
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBodyDemo.h(115): warning C4101: 'index' : unreferenced local variable
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBodyDemo.h(114): warning C4101: 'depth' : unreferenced local variable
+     1>c:\users\patrick\desktop\physicslab\physicslab\BroadphaseDemo.h(49): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\BroadphaseDemo.h(71): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\BroadphaseDemo.h(129): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\SoftBody.h(40): warning C4305: '=' : truncation from 'double' to 'btScalar'
+     1>c:\users\patrick\desktop\physicslab\physicslab\SoftBody.h(42): warning C4305: '=' : truncation from 'double' to 'btScalar'
+     1>c:\users\patrick\desktop\physicslab\physicslab\SoftBodyDemo.h(81): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\SoftBodyDemo.h(173): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\SoftBodyDemo.h(193): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\SoftBodyDemo.h(211): warning C4244: 'argument' : conversion from 'double' to 'btScalar', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\NarrowphaseDemo.h(63): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\NarrowphaseDemo.h(99): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\NarrowphaseDemo.h(161): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\ResponseDemo.h(65): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\ResponseDemo.h(189): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\SolverDemo.h(51): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\patrick\desktop\physicslab\physicslab\SolverDemo.h(140): warning C4244: '=' : conversion from 'double' to 'r32', possible loss of data
+     1>c:\users\patrick\desktop\physicslab\physicslab\SolverDemo.h(319): warning C4244: 'argument' : conversion from 'int' to 'r32', possible loss of data
+         GLM: angleAxis function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: perspective function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: rotate function taking degrees as a parameter is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: pitch function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: yaw function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: roll function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         Model.cpp
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(456): warning C4251: 'Magick::DrawableBezier::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawableBezier'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(498): warning C4251: 'Magick::DrawablePushClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(526): warning C4251: 'Magick::DrawableClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(959): warning C4251: 'Magick::DrawableFont::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(960): warning C4251: 'Magick::DrawableFont::_family' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1128): warning C4251: 'Magick::DrawablePath::_path' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePath'
+                 with
+                 [
+                     _Ty=Magick::VPath
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1217): warning C4251: 'Magick::DrawablePolygon::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolygon'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1237): warning C4251: 'Magick::DrawablePolyline::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolyline'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1321): warning C4251: 'Magick::DrawablePushPattern::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushPattern'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1923): warning C4251: 'Magick::DrawableText::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1924): warning C4251: 'Magick::DrawableText::_encoding' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2255): warning C4251: 'Magick::PathArcAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcAbs'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2277): warning C4251: 'Magick::PathArcRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcRel'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2428): warning C4251: 'Magick::PathCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2451): warning C4251: 'Magick::PathCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2475): warning C4251: 'Magick::PathSmoothCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2500): warning C4251: 'Magick::PathSmoothCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2609): warning C4251: 'Magick::PathQuadraticCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2633): warning C4251: 'Magick::PathQuadraticCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2657): warning C4251: 'Magick::PathSmoothQuadraticCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2681): warning C4251: 'Magick::PathSmoothQuadraticCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2709): warning C4251: 'Magick::PathLinetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2733): warning C4251: 'Magick::PathLinetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2875): warning C4251: 'Magick::PathMovetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2899): warning C4251: 'Magick::PathMovetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Exception.h(31): warning C4251: 'Magick::Exception::_what' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Exception'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(65): warning C4251: 'Magick::CoderInfo::_name' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(66): warning C4251: 'Magick::CoderInfo::_description' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(90): warning C4251: 'Magick::Montage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(92): warning C4251: 'Magick::Montage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(95): warning C4251: 'Magick::Montage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(99): warning C4251: 'Magick::Montage::_texture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(101): warning C4251: 'Magick::Montage::_title' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(134): warning C4251: 'Magick::annotateImage::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::annotateImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(213): warning C4251: 'Magick::cdlImage::_cdl' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::cdlImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(273): warning C4251: 'Magick::commentImage::_comment' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::commentImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(385): warning C4251: 'Magick::drawImage::_drawableList' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::drawImage'
+                 with
+                 [
+                     _Ty=Magick::Drawable
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(651): warning C4251: 'Magick::labelImage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::labelImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1299): warning C4251: 'Magick::backgroundTextureImage::_backgroundTexture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::backgroundTextureImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1474): warning C4251: 'Magick::fileNameImage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1498): warning C4251: 'Magick::fontImage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fontImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1558): warning C4251: 'Magick::magickImage::_magick' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::magickImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1817): warning C4251: 'Magick::tileNameImage::_tileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::tileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1854): warning C4251: 'Magick::viewImage::_view' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::viewImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1867): warning C4251: 'Magick::x11DisplayImage::_display' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::x11DisplayImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(144): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(161): warning C4018: '<' : signed/unsigned mismatch
+     1>Model.cpp(63): warning C4018: '<' : signed/unsigned mismatch
+     1>Model.cpp(84): warning C4018: '<' : signed/unsigned mismatch
+     1>Model.cpp(98): warning C4018: '<' : signed/unsigned mismatch
+     1>Model.cpp(124): warning C4018: '<' : signed/unsigned mismatch
+     1>Model.cpp(197): warning C4018: '<' : signed/unsigned mismatch
+         GLM: pitch function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: yaw function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: roll function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         RigidBody.cpp
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(456): warning C4251: 'Magick::DrawableBezier::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawableBezier'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(498): warning C4251: 'Magick::DrawablePushClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(526): warning C4251: 'Magick::DrawableClipPath::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableClipPath'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(959): warning C4251: 'Magick::DrawableFont::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(960): warning C4251: 'Magick::DrawableFont::_family' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableFont'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1128): warning C4251: 'Magick::DrawablePath::_path' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePath'
+                 with
+                 [
+                     _Ty=Magick::VPath
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1217): warning C4251: 'Magick::DrawablePolygon::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolygon'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1237): warning C4251: 'Magick::DrawablePolyline::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePolyline'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1321): warning C4251: 'Magick::DrawablePushPattern::_id' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawablePushPattern'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1923): warning C4251: 'Magick::DrawableText::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(1924): warning C4251: 'Magick::DrawableText::_encoding' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::DrawableText'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2255): warning C4251: 'Magick::PathArcAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcAbs'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2277): warning C4251: 'Magick::PathArcRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathArcRel'
+                 with
+                 [
+                     _Ty=Magick::PathArcArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2428): warning C4251: 'Magick::PathCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2451): warning C4251: 'Magick::PathCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2475): warning C4251: 'Magick::PathSmoothCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2500): warning C4251: 'Magick::PathSmoothCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2609): warning C4251: 'Magick::PathQuadraticCurvetoAbs::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2633): warning C4251: 'Magick::PathQuadraticCurvetoRel::_args' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::PathQuadraticCurvetoArgs
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2657): warning C4251: 'Magick::PathSmoothQuadraticCurvetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2681): warning C4251: 'Magick::PathSmoothQuadraticCurvetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathSmoothQuadraticCurvetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2709): warning C4251: 'Magick::PathLinetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2733): warning C4251: 'Magick::PathLinetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathLinetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2875): warning C4251: 'Magick::PathMovetoAbs::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoAbs'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Drawable.h(2899): warning C4251: 'Magick::PathMovetoRel::_coordinates' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::PathMovetoRel'
+                 with
+                 [
+                     _Ty=Magick::Coordinate
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Exception.h(31): warning C4251: 'Magick::Exception::_what' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Exception'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(65): warning C4251: 'Magick::CoderInfo::_name' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/CoderInfo.h(66): warning C4251: 'Magick::CoderInfo::_description' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::CoderInfo'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(90): warning C4251: 'Magick::Montage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(92): warning C4251: 'Magick::Montage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(95): warning C4251: 'Magick::Montage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(99): warning C4251: 'Magick::Montage::_texture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\include\Magick++/Montage.h(101): warning C4251: 'Magick::Montage::_title' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::Montage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(134): warning C4251: 'Magick::annotateImage::_text' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::annotateImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(213): warning C4251: 'Magick::cdlImage::_cdl' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::cdlImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(273): warning C4251: 'Magick::commentImage::_comment' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::commentImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(385): warning C4251: 'Magick::drawImage::_drawableList' : class 'std::list<_Ty>' needs to have dll-interface to be used by clients of class 'Magick::drawImage'
+                 with
+                 [
+                     _Ty=Magick::Drawable
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(651): warning C4251: 'Magick::labelImage::_label' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::labelImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1299): warning C4251: 'Magick::backgroundTextureImage::_backgroundTexture' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::backgroundTextureImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1474): warning C4251: 'Magick::fileNameImage::_fileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1498): warning C4251: 'Magick::fontImage::_font' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::fontImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1558): warning C4251: 'Magick::magickImage::_magick' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::magickImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1817): warning C4251: 'Magick::tileNameImage::_tileName' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::tileNameImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1854): warning C4251: 'Magick::viewImage::_view' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::viewImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>C:\Users\Patrick\Desktop\PhysicsLab\include\Magick++/STL.h(1867): warning C4251: 'Magick::x11DisplayImage::_display' : class 'std::basic_string<_Elem,_Traits,_Alloc>' needs to have dll-interface to be used by clients of class 'Magick::x11DisplayImage'
+                 with
+                 [
+                     _Elem=char,
+                     _Traits=std::char_traits<char>,
+                     _Alloc=std::allocator<char>
+                 ]
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(144): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Model.h(161): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(30): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\BoundingSphere.h(32): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\RigidBody.h(89): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\patrick\desktop\physicslab\physicslab\Inertia.h(133): warning C4091: 'static ' : ignored on left of 'Inertia' when no variable is declared
+     1>c:\users\patrick\desktop\physicslab\physicslab\Inertia.h(93): warning C4018: '<' : signed/unsigned mismatch
+     1>RigidBody.cpp(42): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>RigidBody.cpp(65): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>RigidBody.cpp(156): warning C4018: '<' : signed/unsigned mismatch
+         GLM: pitch function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: yaw function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         GLM: roll function returning degrees is deprecated. #define GLM_FORCE_RADIANS before including GLM headers to remove this message.
+         Shader.cpp
+         ShaderManager.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Patrick\Desktop\PhysicsLab\\build\Release\PhysicsLab.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\Users\Patrick\Desktop\PhysicsLab\\lib freeglut.lib glew32.lib assimp.lib CORE_RL_Magick++_.lib AntTweakBar.lib BulletCollision.lib BulletDynamics.lib BulletSoftBody.lib LinearMath.lib Bounce.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Patrick\Desktop\PhysicsLab\\build\Release\PhysicsLab.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Patrick\Desktop\PhysicsLab\\build\Release\PhysicsLab.lib" /MACHINE:X86 /SAFESEH Release\AABB.obj
+         Release\BoundingSphere.obj
+         Release\Helper.obj
+         Release\imgui.obj
+         Release\ImGuiImpl.obj
+         Release\imgui_demo.obj
+         Release\imgui_draw.obj
+         Release\Input.obj
+         Release\main.obj
+         Release\Model.obj
+         Release\RigidBody.obj
+         Release\Shader.obj
+         Release\ShaderManager.obj
+         Generating code
+         Finished generating code
+         PhysicsLab.vcxproj -> C:\Users\Patrick\Desktop\PhysicsLab\\build\Release\PhysicsLab.exe
+     1>Done Building Project "C:\Users\Patrick\Desktop\PhysicsLab\PhysicsLab\PhysicsLab.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:18.48

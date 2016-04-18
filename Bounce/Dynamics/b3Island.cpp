@@ -138,7 +138,9 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 	contactSolver.InitializeVelocityConstraints();
 	
 	//jointSolver.WarmStart();
-	contactSolver.WarmStart();
+
+	if(b3ExtraSettings::bWarmStart)
+		contactSolver.WarmStart();
 	
 	// Solve velocity constraints.
 	for (u32 i = 0; i < velocityIterations; ++i) {

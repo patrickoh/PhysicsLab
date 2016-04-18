@@ -87,4 +87,9 @@ inline T b3Abs(T x) {
 	return ::abs(x);
 }
 
+struct b3ExtraSettings
+{
+	static bool bWarmStart;
+};
+
 #endif

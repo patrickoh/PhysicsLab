@@ -1,0 +1,28 @@
+﻿Build started 18/04/2016 13:17:39.
+     1>Project "C:\Users\Patrick\Desktop\PhysicsLab\Bounce\Bounce.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(346,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Dynamics\b3Island.cpp
+         b3Island.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"C:\Users\Patrick\Desktop\PhysicsLab\\lib\Bounce.lib" /NOLOGO /LTCG Release\b3BroadPhase.obj
+         Release\b3DynamicAABBTree.obj
+         Release\b3SAT.obj
+         Release\b3Hull.obj
+         Release\b3Polyhedron.obj
+         Release\b3Shape.obj
+         Release\b3Settings.obj
+         Release\b3Time.obj
+         Release\b3BlockAllocator.obj
+         Release\b3StackAllocator.obj
+         Release\b3Body.obj
+         Release\b3Island.obj
+         Release\b3World.obj
+         Release\b3ContactGraph.obj
+         Release\b3ContactSolver.obj
+         Bounce.vcxproj -> C:\Users\Patrick\Desktop\PhysicsLab\\lib\Bounce.lib
+     1>Done Building Project "C:\Users\Patrick\Desktop\PhysicsLab\Bounce\Bounce.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.34
