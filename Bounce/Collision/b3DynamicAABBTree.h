@@ -166,9 +166,9 @@ inline void b3DynamicAABBTree::Query(T* callback, const b3AABB& aabb) const {
 
 //template<class T>
 //inline void b3DynamicAABBTree::RayCast(T* callback, const b3RayCastInput& input) const {
-//	glm::vec3 p1 = input.p1;
-//	glm::vec3 p2 = input.p2;
-//	glm::vec3 direction = p2 - p1;
+//	b3Vec3 p1 = input.p1;
+//	b3Vec3 p2 = input.p2;
+//	b3Vec3 direction = p2 - p1;
 //	r32 maxFraction = input.maxFraction;
 //
 //	r32 dirSqLen = b3LenSq(direction);

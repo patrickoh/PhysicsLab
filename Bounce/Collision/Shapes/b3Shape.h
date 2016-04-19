@@ -48,7 +48,7 @@ struct b3ShapeDef {
 struct b3MassData {
 	r32 mass;
 	b3Mat33 I;
-	glm::vec3 center;
+	b3Vec3 center;
 };
 
 enum b3ShapeType {
@@ -69,7 +69,7 @@ public :
 
 	// Manipulating a shape transform during the simulation may cause non-physical behaviours.
 	const b3Transform& GetTransform() const;
-	void SetTransform(const glm::vec3& position, const glm::vec3& axis, r32 radians);
+	void SetTransform(const b3Vec3& position, const b3Vec3& axis, r32 radians);
 
 	b3Body* GetBody();
 	const b3Body* GetBody() const;
@@ -118,7 +118,7 @@ inline const b3Transform& b3Shape::GetTransform() const {
 	return m_local; 
 }
 
-inline void b3Shape::SetTransform(const glm::vec3& position, const glm::vec3& axis, r32 radians) {
+inline void b3Shape::SetTransform(const b3Vec3& position, const b3Vec3& axis, r32 radians) {
 	b3Quaternion q;
 	q.Set(axis, radians);
 	q.ToRotationMatrix(m_local.rotation);

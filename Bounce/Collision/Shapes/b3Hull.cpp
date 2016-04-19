@@ -38,7 +38,7 @@ b3Hull::~b3Hull() {
 	b3Free(edges);
 }
 
-glm::vec3 b3Hull::GetSupport(const glm::vec3& direction) const {
+b3Vec3 b3Hull::GetSupport(const b3Vec3& direction) const {
 	u32 index = 0;
 	r32 max = b3Dot(direction, vertices[index]);
 	for (u32 i = 1; i < vertexCount; ++i) {
@@ -51,7 +51,7 @@ glm::vec3 b3Hull::GetSupport(const glm::vec3& direction) const {
 	return vertices[index];
 }
 
-glm::vec3 b3Hull::GetSupport(const glm::vec3& direction, const b3Transform& transform) const {
+b3Vec3 b3Hull::GetSupport(const b3Vec3& direction, const b3Transform& transform) const {
 	u32 index = 0;
 	r32 max = b3Dot(direction, transform * vertices[index]);
 	for (u32 i = 1; i < vertexCount; ++i) {
@@ -64,8 +64,8 @@ glm::vec3 b3Hull::GetSupport(const glm::vec3& direction, const b3Transform& tran
 	return transform * vertices[index];
 }
 
-glm::vec3 Newell(const glm::vec3& a, const glm::vec3& b) {
-	return glm::vec3(
+b3Vec3 Newell(const b3Vec3& a, const b3Vec3& b) {
+	return b3Vec3(
 		(a.y - b.y) * (a.z + b.z),
 		(a.z - b.z) * (a.x + b.x),
 		(a.x - b.x) * (a.y + b.y));
@@ -82,22 +82,22 @@ void b3Hull::CreateFacesPlanes(const b3HullDef& def) {
 		b3Assert(vertCount >= 3);
 		const u32* indices = face.vertices;
 
-		glm::vec3 normal;
-		normal = glm::vec3(0); 
-		glm::vec3 centroid;
-		centroid = glm::vec3(0); 
+		b3Vec3 normal;
+		normal.SetZero();
+		b3Vec3 centroid;
+		centroid.SetZero();
 		for (u32 j = 0; j < vertCount; ++j) {
 			u32 i1 = indices[j];
 			u32 i2 = j + 1 < vertCount ? indices[j + 1] : indices[0];
 
-			glm::vec3 v1 = def.vertices[i1];
-			glm::vec3 v2 = def.vertices[i2];
+			b3Vec3 v1 = def.vertices[i1];
+			b3Vec3 v2 = def.vertices[i2];
 
 			normal += Newell(v1, v2);
 			centroid += v1;
 		}
 
-		glm::vec3 newell = b3Normalize(normal);
+		b3Vec3 newell = b3Normalize(normal);
 		facesPlanes[i].normal = newell;
 		facesPlanes[i].offset = b3Dot(centroid, newell) / r32(vertCount);
 	}
@@ -108,8 +108,8 @@ void b3Hull::SetFromFaces(const b3HullDef& def) {
 	b3Assert(def.vertexCount);
 
 	vertexCount = def.vertexCount;
-	vertices = (glm::vec3*)b3Alloc(def.vertexCount * sizeof(glm::vec3));
-	::memcpy(vertices, def.vertices, def.vertexCount * sizeof(glm::vec3));
+	vertices = (b3Vec3*)b3Alloc(def.vertexCount * sizeof(b3Vec3));
+	::memcpy(vertices, def.vertices, def.vertexCount * sizeof(b3Vec3));
 
 	faceCount = def.faceCount;
 	faces = (b3Face*)b3Alloc(def.faceCount * sizeof(b3Face));
@@ -214,16 +214,16 @@ void b3Hull::SetFromFaces(const b3HullDef& def) {
 	Validate();
 }
 
-void b3Hull::SetAsBox(const glm::vec3& scale) {
-	glm::vec3 cubeVertices[8] = {
-		glm::vec3(B3_ONE, B3_ONE, -B3_ONE),
-		glm::vec3(-B3_ONE, B3_ONE, -B3_ONE),
-		glm::vec3(-B3_ONE, -B3_ONE, -B3_ONE),
-		glm::vec3(B3_ONE, -B3_ONE, -B3_ONE),
-		glm::vec3(B3_ONE, B3_ONE, B3_ONE),
-		glm::vec3(-B3_ONE, B3_ONE, B3_ONE),
-		glm::vec3(-B3_ONE, -B3_ONE, B3_ONE),
-		glm::vec3(B3_ONE, -B3_ONE, B3_ONE),
+void b3Hull::SetAsBox(const b3Vec3& scale) {
+	b3Vec3 cubeVertices[8] = {
+		b3Vec3(B3_ONE, B3_ONE, -B3_ONE),
+		b3Vec3(-B3_ONE, B3_ONE, -B3_ONE),
+		b3Vec3(-B3_ONE, -B3_ONE, -B3_ONE),
+		b3Vec3(B3_ONE, -B3_ONE, -B3_ONE),
+		b3Vec3(B3_ONE, B3_ONE, B3_ONE),
+		b3Vec3(-B3_ONE, B3_ONE, B3_ONE),
+		b3Vec3(-B3_ONE, -B3_ONE, B3_ONE),
+		b3Vec3(B3_ONE, -B3_ONE, B3_ONE),
 	};
 
 	// CW

@@ -35,7 +35,7 @@ b3World::b3World() {
 	m_bodyList = nullptr;
 	m_bodyCount = 0;
 	
-	m_gravityDir = glm::vec3(B3_ZERO, -B3_ONE, B3_ZERO);
+	m_gravityDir.Set(B3_ZERO, -B3_ONE, B3_ZERO);
 	
 	m_profile.broadPhaseTime = B3_ZERO;
 	m_profile.narrowPhaseTime = B3_ZERO;
@@ -273,8 +273,8 @@ void b3World::Solve(const b3TimeStep& step) {
 
 void b3World::ClearForces() {
 	for (b3Body* b = m_bodyList; b; b = b->m_next) {
-		b->m_force = glm::vec3(0); 
-		b->m_torque = glm::vec3(0); 
+		b->m_force.SetZero();
+		b->m_torque.SetZero();
 	}
 }
 
@@ -336,8 +336,8 @@ void b3World::Step(const b3TimeStep& step) {
 //		bool hit = shape->RayCast(input, output, transform);
 //		if (hit) {
 //			r32 fraction = output.fraction;
-//			glm::vec3 point = (B3_ONE - fraction) * input.p1 + fraction * input.p2;
-//			glm::vec3 normal = output.normal;
+//			b3Vec3 point = (B3_ONE - fraction) * input.p1 + fraction * input.p2;
+//			b3Vec3 normal = output.normal;
 //
 //			// Report the intersection and get the new ray cast fraction.
 //			return listener->ReportShape(shape, point, normal, fraction);
@@ -351,7 +351,7 @@ void b3World::Step(const b3TimeStep& step) {
 //	const b3BroadPhase* broadPhase;
 //};
 
-//void b3World::RayCast(b3RayCastListener* listener, const glm::vec3& p1, const glm::vec3& p2) const {
+//void b3World::RayCast(b3RayCastListener* listener, const b3Vec3& p1, const b3Vec3& p2) const {
 //	b3RayCastInput input;
 //	input.p1 = p1;
 //	input.p2 = p2;

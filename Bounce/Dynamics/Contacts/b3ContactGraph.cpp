@@ -238,22 +238,22 @@ void b3ContactGraph::UpdateContacts() {
 			// Look up the contact cache for identical contact points.
 			b3Manifold* newManifold = &c->m_manifold;
 
-			glm::vec3 normal = newManifold->normal;
+			b3Vec3 normal = newManifold->normal;
 
-			glm::vec3 xA = bodyA->m_worldCenter;
-			glm::vec3 vA = bodyA->m_linearVelocity;
-			glm::vec3 wA = bodyA->m_angularVelocity;
+			b3Vec3 xA = bodyA->m_worldCenter;
+			b3Vec3 vA = bodyA->m_linearVelocity;
+			b3Vec3 wA = bodyA->m_angularVelocity;
 
-			glm::vec3 xB = bodyB->m_worldCenter;
-			glm::vec3 vB = bodyB->m_linearVelocity;
-			glm::vec3 wB = bodyB->m_angularVelocity;
+			b3Vec3 xB = bodyB->m_worldCenter;
+			b3Vec3 vB = bodyB->m_linearVelocity;
+			b3Vec3 wB = bodyB->m_angularVelocity;
 
 			for (u32 i = 0; i < newManifold->pointCount; ++i) {
 				b3ContactPoint* p2 = newManifold->points + i;
 
-				glm::vec3 position = p2->position;
-				glm::vec3 tangent1;
-				glm::vec3 tangent2;
+				b3Vec3 position = p2->position;
+				b3Vec3 tangent1;
+				b3Vec3 tangent2;
 
 				p2->normalImpulse = B3_ZERO;
 				p2->tangentImpulse[0] = B3_ZERO;
@@ -261,10 +261,10 @@ void b3ContactGraph::UpdateContacts() {
 				p2->warmStarted = false;
 
 				// Compute the (two) new tangent directions.
-				glm::vec3 rA = position - xA;
-				glm::vec3 rB = position - xB;
+				b3Vec3 rA = position - xA;
+				b3Vec3 rB = position - xB;
 
-				glm::vec3 dv = vB + b3Cross(wB, rB) - vA - b3Cross(wA, rA);
+				b3Vec3 dv = vB + b3Cross(wB, rB) - vA - b3Cross(wA, rA);
 
 				tangent1 = dv - b3Dot(dv, normal) * normal;
 				r32 tangentMag = b3Dot(tangent1, tangent1);
@@ -273,7 +273,7 @@ void b3ContactGraph::UpdateContacts() {
 					tangent2 = b3Cross(tangent1, normal);
 				}
 				else {
-					b3ComputeBasis(normal, tangent1, tangent2);
+					b3ComputeBasis(normal, &tangent1, &tangent2);
 				}
 
 				p2->tangents[0] = tangent1;
@@ -287,7 +287,7 @@ void b3ContactGraph::UpdateContacts() {
 						p2->warmStarted = true;
 						p2->normalImpulse = p1->normalImpulse;
 						// Project old friction solutions into the new tangential directions.
-						glm::vec3 oldFrictionSolution = p1->tangentImpulse[0] * p1->tangents[0] + p1->tangentImpulse[1] * p1->tangents[1];
+						b3Vec3 oldFrictionSolution = p1->tangentImpulse[0] * p1->tangents[0] + p1->tangentImpulse[1] * p1->tangents[1];
 						p2->tangentImpulse[0] = b3Dot(oldFrictionSolution, p2->tangents[0]);
 						p2->tangentImpulse[1] = b3Dot(oldFrictionSolution, p2->tangents[1]);
 						break;

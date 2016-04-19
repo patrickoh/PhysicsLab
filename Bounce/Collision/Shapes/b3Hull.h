@@ -57,7 +57,7 @@ struct b3HullDef {
 	u32 faceCount;
 	const b3FaceDef* faces;
 	u32 vertexCount;
-	const glm::vec3* vertices;
+	const b3Vec3* vertices;
 };
 
 struct b3Hull {
@@ -71,7 +71,7 @@ struct b3Hull {
 	// @todo Shift vertices to origin.
 	void CreateFacesPlanes(const b3HullDef& def);
 	// Set the hull as a box given the box extents.
-	void SetAsBox(const glm::vec3& scale);
+	void SetAsBox(const b3Vec3& scale);
 		
 	// Validate the half-edge data structure.
 	// This function must be called after you have setup the hull 
@@ -81,18 +81,18 @@ struct b3Hull {
 	void Validate(const b3HalfEdge* halfEdge) const;
 
 	// Get a supporting vertex of the hull in a given direction.
-	glm::vec3 GetSupport(const glm::vec3& direction) const;
+	b3Vec3 GetSupport(const b3Vec3& direction) const;
 
 	// Get a supporting vertex given a direction an transform.
-	glm::vec3 GetSupport(const glm::vec3& direction, const b3Transform& transform) const;
+	b3Vec3 GetSupport(const b3Vec3& direction, const b3Transform& transform) const;
 
-	const glm::vec3& GetVertex(u32 i) const;
+	const b3Vec3& GetVertex(u32 i) const;
 	const b3Plane& GetPlane(u32 i) const;
 	const b3Face* GetFace(u32 i) const;
 	const b3HalfEdge* GetEdge(u32 i) const;
 
 	u32 vertexCount;
-	glm::vec3* vertices;
+	b3Vec3* vertices;
 
 	u32 faceCount;
 	b3Face* faces;
@@ -102,7 +102,7 @@ struct b3Hull {
 	b3HalfEdge* edges;
 };
 
-inline const glm::vec3& b3Hull::GetVertex(u32 i) const { 
+inline const b3Vec3& b3Hull::GetVertex(u32 i) const { 
 	return vertices[i]; 
 }
 

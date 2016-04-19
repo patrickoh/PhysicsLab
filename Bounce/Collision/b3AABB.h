@@ -23,7 +23,7 @@
 
 struct b3AABB {
 	// Compute this AABB from a list of points.
-	void ComputeAabbFromPointArray(const glm::vec3* verts, u32 vertCount) {
+	void ComputeAabbFromPointArray(const b3Vec3* verts, u32 vertCount) {
 		min = max = verts[0];		
 		for (u32 i = 1; i < vertCount; ++i) {
 			min = b3Min(min, verts[i]);
@@ -32,10 +32,10 @@ struct b3AABB {
 	}
 	
 	// Compute this AABB from a list of points and a transform.
-	void ComputeAabbFromPointArray(const glm::vec3* verts, u32 vertCount, const b3Transform& transform) {
+	void ComputeAabbFromPointArray(const b3Vec3* verts, u32 vertCount, const b3Transform& transform) {
 		min = max = transform * verts[0];
 		for (u32 i = 1; i < vertCount; ++i) {
-			glm::vec3 v = transform * verts[i];
+			b3Vec3 v = transform * verts[i];
 			min = b3Min(min, v);
 			max = b3Max(max, v);
 		}
@@ -53,7 +53,7 @@ struct b3AABB {
 	}
 
 	// Get the this AABB center.
-	glm::vec3 GetCenter() const {
+	b3Vec3 GetCenter() const {
 		return  B3_HALF * (min + max);
 	}
 
@@ -78,7 +78,7 @@ struct b3AABB {
 	}
 
 	// Test if a point is inside the AABB.
-	bool ContainsPoint(const glm::vec3& point) const {
+	bool ContainsPoint(const b3Vec3& point) const {
 		return min.x <= point.x && point.x <= max.x &&
 			min.y <= point.y && point.y <= max.y &&
 			min.z <= point.z && point.z <= max.z;
@@ -90,7 +90,7 @@ struct b3AABB {
 	}
 	
 	// Intersect ray R(t) = p + t*d against this AABB.
-	//bool RayCast(const glm::vec3& p, const glm::vec3& d, r32 tmax, r32& tmin) const {
+	//bool RayCast(const b3Vec3& p, const b3Vec3& d, r32 tmax, r32& tmin) const {
 	//	// Christer Ericson, Real-Time Collision Detection (2005), p. 180.
 	//	// Correction: http://realtimecollisiondetection.net/books/rtcd/errata/
 
@@ -127,8 +127,8 @@ struct b3AABB {
 	//	return true;
 	//}
 
-	glm::vec3 min;
-	glm::vec3 max;
+	b3Vec3 min;
+	b3Vec3 max;
 };
 
 // Compute an AABB from two AABBs.

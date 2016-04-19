@@ -60,7 +60,7 @@ public:
 		Stack1(NULL);
 		
 		//float gs = m_body->GetGravityScale();
-		//m_world->SetGravityDirection(glm::vec3(0.0f, -10.0f, 0.0f));
+		//m_world->SetGravityDirection(b3Vec3(0.0f, -10.0f, 0.0f));
 		
 		tweakBars["main"] = TwNewBar("Main");
 		TwDefine(" Main size='250 400' position='10 10' color='125 125 125' "); // change default tweak bar size and color
@@ -68,13 +68,13 @@ public:
 		SetUpTweakBars();
 	}
 
-	void AddABox(glm::vec3 position, b3BodyType bodyType, glm::vec3 scale)
+	void AddABox(b3Vec3 position, b3BodyType bodyType, b3Vec3 scale)
 	{
 		//Make rigid body
 		{
 			b3BodyDef* bodyDef = new b3BodyDef;
 			bodyDef->gravityScale = 1.0f;
-			bodyDef->position = glm::vec3(position.x, 
+			bodyDef->position = b3Vec3(position.x, 
 				position.y, position.z);
 			bodyDef->awake = true;
 			bodyDef->type = bodyType;
@@ -83,7 +83,7 @@ public:
 		
 		//Give it a shape
 		{
-			scale = glm::vec3(scale.x / 2.0f, scale.y / 2.0f,
+			scale = b3Vec3(scale.x / 2.0f, scale.y / 2.0f,
 				scale.z / 2.0f);
 			b3Hull* hull = new b3Hull;
 			hull->SetAsBox(scale);
@@ -248,13 +248,13 @@ public:
 	static void Shoot()
 	{
 		SolverDemo::Instance->AddABox(
-			glm::vec3(Camera::Instance->viewProperties.position.x,
+			b3Vec3(Camera::Instance->viewProperties.position.x,
 				   Camera::Instance->viewProperties.position.y, 
 				   Camera::Instance->viewProperties.position.z),
-			e_dynamicBody, glm::vec3(1,1,1));
+			e_dynamicBody, b3Vec3(1,1,1));
 		SolverDemo::Instance->rigidBodies[
 			SolverDemo::Instance->rigidBodies.size()-1]->SetLinearVelocity(
-				glm::vec3(
+				b3Vec3(
 					Camera::Instance->viewProperties.forward.x*2.0f,
 					Camera::Instance->viewProperties.forward.y*2.0f,
 					Camera::Instance->viewProperties.forward.z*2.0f)
@@ -265,64 +265,64 @@ public:
 	{
 		SolverDemo::Instance->ClearBoxes();
 
-		SolverDemo::Instance->AddABox(glm::vec3(0,0,0), e_staticBody, 
-			glm::vec3(10,0.5f,10));
-		SolverDemo::Instance->AddABox(glm::vec3(0,10,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0,20,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0,30,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0.5f,40,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,30,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
 	}
 
 	static void TW_CALL Stack2(void *clientData)
 	{
 		SolverDemo::Instance->ClearBoxes();
 
-		SolverDemo::Instance->AddABox(glm::vec3(0,0,0), e_staticBody, 
-			glm::vec3(10,0.5f,10));
-		SolverDemo::Instance->AddABox(glm::vec3(0,10,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0,20,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0.5f,40,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
 	}
 
 	static void TW_CALL Stack3(void *clientData)
 	{
 		SolverDemo::Instance->ClearBoxes();
-		SolverDemo::Instance->AddABox(glm::vec3(0,0,0), e_staticBody, 
-			glm::vec3(10,0.5f,10));
-		SolverDemo::Instance->AddABox(glm::vec3(0,10,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0,20,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(5.2f,30,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0.5f,40,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(5.2f,30,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
 	}
 
 	static void TW_CALL Stack4(void *clientData)
 	{
 		SolverDemo::Instance->ClearBoxes();
 		
-		SolverDemo::Instance->AddABox(glm::vec3(-0.5,0,-0.5), e_staticBody, 
-			glm::vec3(10,0.5f,10));
+		SolverDemo::Instance->AddABox(b3Vec3(-0.5,0,-0.5), e_staticBody, 
+			b3Vec3(10,0.5f,10));
 
 		for(int i = -3; i < 3; i++)
 			for(int j = -3; j < 3; j++)
 				for(int k = 1; k < 7; k++)
-					SolverDemo::Instance->AddABox(glm::vec3(i,k*2,j), e_dynamicBody, 
-						glm::vec3(1,1,1));
+					SolverDemo::Instance->AddABox(b3Vec3(i,k*2,j), e_dynamicBody, 
+						b3Vec3(1,1,1));
 	
-		/*SolverDemo::Instance->AddABox(glm::vec3(0.5f,30,0), e_dynamicBody, 
-			glm::vec3(1,1,1));
-		SolverDemo::Instance->AddABox(glm::vec3(0.5f,40,0.8f), e_dynamicBody, 
-			glm::vec3(1,1,1));*/
+		/*SolverDemo::Instance->AddABox(b3Vec3(0.5f,30,0), e_dynamicBody, 
+			b3Vec3(1,1,1));
+		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0.8f), e_dynamicBody, 
+			b3Vec3(1,1,1));*/
 	}
 
 	void SetUpTweakBars()

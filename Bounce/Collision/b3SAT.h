@@ -26,7 +26,7 @@ class b3Shape;
 struct b3Hull;
 
 struct b3ClipVertex {
-	glm::vec3 position;
+	b3Vec3 position;
 	b3FeaturePair featurePair;
 };
 

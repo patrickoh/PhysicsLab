@@ -45,8 +45,8 @@ public :
 		e_broadPhaseFlag = 0x0004
 	};
 
-	virtual void DrawPoint(const glm::vec3& position, const b3Color& color) const = 0;
-	virtual void DrawLine(const glm::vec3& a, const glm::vec3& b, const b3Color& color) const = 0;
+	virtual void DrawPoint(const b3Vec3& position, const b3Color& color) const = 0;
+	virtual void DrawLine(const b3Vec3& a, const b3Vec3& b, const b3Color& color) const = 0;
 	virtual void DrawAABB(const b3AABB& aabb, const b3Color& color) const = 0;
 };
 
@@ -55,12 +55,12 @@ public :
 //
 //public:
 //
-//	void DrawPoint(const glm::vec3& position, const b3Color& color) const
+//	void DrawPoint(const b3Vec3& position, const b3Color& color) const
 //	{
 //
 //	}
 //
-//	void DrawLine(const glm::vec3& a, const glm::vec3& b, const b3Color& color) const
+//	void DrawLine(const b3Vec3& a, const b3Vec3& b, const b3Color& color) const
 //	{
 //		/*glColor3f(color.R, color.G, color.B);
 //		glBegin(GL_LINES);

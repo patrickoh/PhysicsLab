@@ -39,7 +39,7 @@ void b3QueryFaceDirections(b3FaceQuery& out, const b3Transform& transform1, cons
 
 	for (u32 i = 0; i < hull1->faceCount; ++i) {
 		b3Plane plane = transform * hull1->GetPlane(i);
-		glm::vec3 support = hull2->GetSupport(-plane.normal);
+		b3Vec3 support = hull2->GetSupport(-plane.normal);
 		r32 distance = b3Distance(plane, support);
 
 		if (distance > out.distance) {
@@ -50,7 +50,7 @@ void b3QueryFaceDirections(b3FaceQuery& out, const b3Transform& transform1, cons
 }
 
 // If an edge pair doesn't build a face on the MD then it isn't a supporting edge.
-bool b3IsMinkowskiFace(const glm::vec3& A, const glm::vec3& B, const glm::vec3& B_x_A, const glm::vec3& C, const glm::vec3& D, const glm::vec3& D_x_C) {
+bool b3IsMinkowskiFace(const b3Vec3& A, const b3Vec3& B, const b3Vec3& B_x_A, const b3Vec3& C, const b3Vec3& D, const b3Vec3& D_x_C) {
 	// Test if arcs AB and CD intersect on the unit sphere 
 	r32 CBA = b3Dot(C, B_x_A);
 	r32 DBA = b3Dot(D, B_x_A);
@@ -62,11 +62,11 @@ bool b3IsMinkowskiFace(const glm::vec3& A, const glm::vec3& B, const glm::vec3& 
 		CBA * BDC > B3_ZERO;
 }
 
-r32 b3Project(const glm::vec3& P1, const glm::vec3& E1, const glm::vec3& P2, const glm::vec3& E2, const glm::vec3& C1) {
+r32 b3Project(const b3Vec3& P1, const b3Vec3& E1, const b3Vec3& P2, const b3Vec3& E2, const b3Vec3& C1) {
 	// The given edge pair must create a face on the MD.
 
 	// Compute search direction.
-	glm::vec3 E1_x_E2 = b3Cross(E1, E2);
+	b3Vec3 E1_x_E2 = b3Cross(E1, E2);
 
 	// Skip if the edges are significantly parallel to each other.
 	const r32 kTol = r32(0.005);
@@ -76,7 +76,7 @@ r32 b3Project(const glm::vec3& P1, const glm::vec3& E1, const glm::vec3& P2, con
 	}
 
 	// Assure the normal points from hull1 to hull2.
-	glm::vec3 N = (B3_ONE / L) * E1_x_E2;
+	b3Vec3 N = (B3_ONE / L) * E1_x_E2;
 	if (b3Dot(N, P1 - C1) < B3_ZERO) {
 		N = -N;
 	}
@@ -90,7 +90,7 @@ void b3QueryEdgeDirections(b3EdgeQuery& out, const b3Transform& transform1, cons
 	
 	// Perform computations in the local space of the second hull.
 	b3Transform transform = b3MulT(transform2, transform1);
-	glm::vec3 C1 = transform.translation /* * hull1.centroid*/;
+	b3Vec3 C1 = transform.translation /* * hull1.centroid*/;
 
 	out.distance = -B3_MAX_FLOAT;
 	out.index1 = -1;
@@ -102,12 +102,12 @@ void b3QueryEdgeDirections(b3EdgeQuery& out, const b3Transform& transform1, cons
 
 		b3Assert(edge1->twin == i + 1 && twin1->twin == i);
 
-		glm::vec3 P1 = transform * hull1->GetVertex(edge1->origin);
-		glm::vec3 Q1 = transform * hull1->GetVertex(twin1->origin);
-		glm::vec3 E1 = Q1 - P1;
+		b3Vec3 P1 = transform * hull1->GetVertex(edge1->origin);
+		b3Vec3 Q1 = transform * hull1->GetVertex(twin1->origin);
+		b3Vec3 E1 = Q1 - P1;
 
-		glm::vec3 U1 = transform.rotation * hull1->GetPlane(edge1->face).normal;
-		glm::vec3 V1 = transform.rotation * hull1->GetPlane(twin1->face).normal;
+		b3Vec3 U1 = transform.rotation * hull1->GetPlane(edge1->face).normal;
+		b3Vec3 V1 = transform.rotation * hull1->GetPlane(twin1->face).normal;
 
 		for (u32 j = 0; j < hull2->edgeCount; j += 2) {
 			const b3HalfEdge* edge2 = hull2->GetEdge(j);
@@ -115,12 +115,12 @@ void b3QueryEdgeDirections(b3EdgeQuery& out, const b3Transform& transform1, cons
 
 			b3Assert(edge2->twin == j + 1 && twin2->twin == j);
 
-			glm::vec3 P2 = hull2->GetVertex(edge2->origin);
-			glm::vec3 Q2 = hull2->GetVertex(twin2->origin);
-			glm::vec3 E2 = Q2 - P2;
+			b3Vec3 P2 = hull2->GetVertex(edge2->origin);
+			b3Vec3 Q2 = hull2->GetVertex(twin2->origin);
+			b3Vec3 E2 = Q2 - P2;
 
-			glm::vec3 U2 = hull2->GetPlane(edge2->face).normal;
-			glm::vec3 V2 = hull2->GetPlane(twin2->face).normal;
+			b3Vec3 U2 = hull2->GetPlane(edge2->face).normal;
+			b3Vec3 V2 = hull2->GetPlane(twin2->face).normal;
 
 			if ( b3IsMinkowskiFace(U1, V1, -E1, -U2, -V2, -E2) ) {
 				r32 distance = b3Project(P1, E1, P2, E2, C1);
@@ -134,11 +134,11 @@ void b3QueryEdgeDirections(b3EdgeQuery& out, const b3Transform& transform1, cons
 	}
 }
 
-void b3ClosestPointsSegmentSegment(const glm::vec3& P1, const glm::vec3& Q1, const glm::vec3& P2, const glm::vec3& Q2, glm::vec3& C1, glm::vec3& C2) {
-	glm::vec3 P2P1 = P1 - P2;
+void b3ClosestPointsSegmentSegment(const b3Vec3& P1, const b3Vec3& Q1, const b3Vec3& P2, const b3Vec3& Q2, b3Vec3& C1, b3Vec3& C2) {
+	b3Vec3 P2P1 = P1 - P2;
 	
-	glm::vec3 E1 = Q1 - P1;
-	glm::vec3 E2 = Q2 - P2;
+	b3Vec3 E1 = Q1 - P1;
+	b3Vec3 E2 = Q2 - P2;
 
 	r32 D1 = b3LenSq(E1);
 	r32 D2 = b3LenSq(E2);
@@ -163,20 +163,20 @@ void b3CreateEdgeContact(b3Manifold& output, const b3EdgeQuery& input, const b3T
 	const b3HalfEdge* edge1 = hull1->GetEdge(input.index1);
 	const b3HalfEdge* twin1 = hull1->GetEdge(input.index1 + 1);
 
-	glm::vec3 P1 = transform1 * hull1->GetVertex(edge1->origin);
-	glm::vec3 Q1 = transform1 * hull1->GetVertex(twin1->origin);
-	glm::vec3 E1 = Q1 - P1;
+	b3Vec3 P1 = transform1 * hull1->GetVertex(edge1->origin);
+	b3Vec3 Q1 = transform1 * hull1->GetVertex(twin1->origin);
+	b3Vec3 E1 = Q1 - P1;
 
 	const b3HalfEdge* edge2 = hull2->GetEdge(input.index2);
 	const b3HalfEdge* twin2 = hull2->GetEdge(input.index2 + 1);
 
-	glm::vec3 P2 = transform2 * hull2->GetVertex(edge2->origin);
-	glm::vec3 Q2 = transform2 * hull2->GetVertex(twin2->origin);
-	glm::vec3 E2 = Q2 - P2;
+	b3Vec3 P2 = transform2 * hull2->GetVertex(edge2->origin);
+	b3Vec3 Q2 = transform2 * hull2->GetVertex(twin2->origin);
+	b3Vec3 E2 = Q2 - P2;
 
-	glm::vec3 normal = b3Normalize(b3Cross(Q1 - P1, Q2 - P2));
+	b3Vec3 normal = b3Normalize(b3Cross(Q1 - P1, Q2 - P2));
 
-	glm::vec3 C2C1 = transform2.translation - transform1.translation;
+	b3Vec3 C2C1 = transform2.translation - transform1.translation;
 
 	b3ContactID id;
 
@@ -200,10 +200,10 @@ void b3CreateEdgeContact(b3Manifold& output, const b3EdgeQuery& input, const b3T
 	}
 
 	// Compute the closest points between the two edges.
-	glm::vec3 C1, C2;
+	b3Vec3 C1, C2;
 	b3ClosestPointsSegmentSegment(P1, Q1, P2, Q2, C1, C2);
 	// Use the point between them.
-	glm::vec3 position = B3_HALF * (C1 + C2);
+	b3Vec3 position = B3_HALF * (C1 + C2);
 	output.AddEntry(position, input.distance, id);
 }
 
@@ -230,7 +230,7 @@ void b3Clip(const b3ClipPlane& plane, const b3ClipPolygon& input, b3ClipPolygon&
 		else if (distance1 <= B3_ZERO && distance2 > B3_ZERO) {
 			// vertex1 is behind the plane, vertex2 is in front -> intersection point
 			r32 fraction = distance1 / (distance1 - distance2);
-			glm::vec3 position = vertex1.position + fraction * (vertex2.position - vertex1.position);
+			b3Vec3 position = vertex1.position + fraction * (vertex2.position - vertex1.position);
 
 			// Keep intersection point 
 			b3ClipVertex vertex;
@@ -245,7 +245,7 @@ void b3Clip(const b3ClipPlane& plane, const b3ClipPolygon& input, b3ClipPolygon&
 		else if (distance2 <= B3_ZERO && distance1 > B3_ZERO)	{
 			// vertex2 is behind of the plane, vertex1 is in front -> intersection point
 			r32 fraction = distance1 / (distance1 - distance2);
-			glm::vec3 position = vertex1.position + fraction * (vertex2.position - vertex1.position);
+			b3Vec3 position = vertex1.position + fraction * (vertex2.position - vertex1.position);
 
 			// Keep intersection point 
 			b3ClipVertex vertex;
@@ -273,8 +273,8 @@ void b3ComputeReferenceFaceSidePlanes(b3ClipPlanes& output, const b3Plane& faceP
 	do {
 		const b3HalfEdge* twin = hull->GetEdge(current->twin);
 
-		glm::vec3 P = transform * hull->GetVertex(current->origin);
-		glm::vec3 Q = transform * hull->GetVertex(twin->origin);
+		b3Vec3 P = transform * hull->GetVertex(current->origin);
+		b3Vec3 Q = transform * hull->GetVertex(twin->origin);
 		
 		b3ClipPlane clipPlane;
 		clipPlane.edgeId = twin->twin; //edge ID.
@@ -305,8 +305,8 @@ void b3ComputeIncidentFacePolygon(b3ClipPolygon& output, const b3Plane& facePlan
 	do {
 		const b3HalfEdge* twin = hull->GetEdge(current->twin);
 
-		glm::vec3 vertex = hull->GetVertex(current->origin);
-		glm::vec3 P = transform * vertex;
+		b3Vec3 vertex = hull->GetVertex(current->origin);
+		b3Vec3 P = transform * vertex;
 
 		//@todo I'm not completely sure if the contact IDs are correct.
 		b3ClipVertex clipVertex;
@@ -362,7 +362,7 @@ void b3CreateFaceContact(b3Manifold& output, const b3FaceQuery& input, const b3T
 			}
 
 			// Project clipped point onto reference plane.
-			glm::vec3 position = b3ClosestPoint(referencePlane, vertex.position);
+			b3Vec3 position = b3ClosestPoint(referencePlane, vertex.position);
 			// Add point and distance to the plane to the manifold.
 			output.AddEntry(position, distance, id);
 		}
