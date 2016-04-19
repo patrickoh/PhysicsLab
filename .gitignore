@@ -1,4 +1,8 @@
 build/
+Bounce/Release/
+PhysicsLab/Release/
+Bounce/Debug/
+Bounce/Release/
 *.opensdf
 *.sdf
 *.suo
