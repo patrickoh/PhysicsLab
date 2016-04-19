@@ -31,9 +31,6 @@
     <Filter Include="Source Files\ImGui">
       <UniqueIdentifier>{ba5a4782-f136-4c7a-a06d-a8d0259e4720}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Demos">
-      <UniqueIdentifier>{198d397d-76dd-4a2d-89d4-b81f56be0878}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Demos">
       <UniqueIdentifier>{fa7ad2a3-a275-4341-8831-889ae31ad9bc}</UniqueIdentifier>
     </Filter>

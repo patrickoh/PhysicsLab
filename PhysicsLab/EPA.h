@@ -79,8 +79,10 @@ bool operator==(const TriangleEPA& left, const TriangleEPA& right)
 struct ContactInfo
 {
 	glm::vec3 c1, c2;
+	
 	float depth; //Not using it (yet?)
-	glm::vec3 normal;
+	glm::vec3 normal; //A->B ?
+	
 	TriangleEPA f;
 
 	ContactInfo(glm::vec3 p1, glm::vec3 p2, float p_depth, glm::vec3 norm) 
@@ -92,6 +94,8 @@ struct ContactInfo
 	{
 	}
 };
+
+//struct ContactManifold
 
 //The EPA (Expanding Polytope Algorithm) computes the penetration depth, penetration vector, and contact points between two objects.
 //The goal of EPA is to find the closest face (to the origin) on the minkowski difference boundary.
