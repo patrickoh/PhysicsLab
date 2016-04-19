@@ -330,10 +330,16 @@ public:
 		TwBar* bar = tweakBars["main"];
 
 		TwAddVarRW(bar, "Sleeping", TW_TYPE_BOOL8, &m_step.sleeping, "");
+		TwAddVarRW(bar, "Sleep time", TW_TYPE_FLOAT, 
+			&b3ExtraSettings::timeToSleep, "");
+		TwAddVarRW(bar, "Damping", TW_TYPE_BOOL8, 
+			&b3ExtraSettings::bApplyDamping, "");
 		TwAddVarRW(bar, "Velocity Iterations", TW_TYPE_UINT32, 
 			&m_step.velocityIterations, "");
 		TwAddVarRW(bar, "Warm start", TW_TYPE_BOOL8, 
 			&b3ExtraSettings::bWarmStart, "");
+		
+
 		/*TwAddVarRW(bar, "Friction coefficient", TW_TYPE_FLOAT, 
 			&, "min=0.0 max=1.0 step=0.1");*/
 

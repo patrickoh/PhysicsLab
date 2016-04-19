@@ -61,7 +61,7 @@ typedef double r64;
 
 #define B3_ONE_SECOND_MICROSECONDS (1000000ULL) //1s=1000000us
 #define B3_ONE_MILISECOND_MICROSECONDS (1000ULL) //1ms=1000us
-#define B3_TIME_TO_SLEEP static_cast<r32>(1.0)
+//#define B3_TIME_TO_SLEEP static_cast<r32>(1.0)
 
 #define B3_SLEEP_LINEAR_TOL static_cast<r32>( 0.05 ) //50cm
 #define B3_SLEEP_ANGULAR_TOL static_cast<r32>( (2.0 / 180.0) * B3_PI )
@@ -90,6 +90,8 @@ inline T b3Abs(T x) {
 struct b3ExtraSettings
 {
 	static bool bWarmStart;
+	static r32 timeToSleep;
+	static bool bApplyDamping;
 };
 
 #endif

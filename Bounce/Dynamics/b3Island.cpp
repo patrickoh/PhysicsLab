@@ -25,29 +25,36 @@
 #include "..\Common\Memory\b3StackAllocator.h"
 #include "..\Common\b3Time.h"
 
-b3Island::b3Island(const b3IslandDef& def) {
+//Made every frame
+b3Island::b3Island(const b3IslandDef& def) 
+{
 	allocator = def.allocator;
+	
 	dt = def.dt;
 	allowSleep = def.allowSleep;
+	
 	velocityIterations = def.velocityIterations;
+	
 	bodyCapacity = def.bodyCapacity;
 	contactCapacity = def.contactCapacity;
-	jointCapacity = def.jointCapacity;
+	//jointCapacity = def.jointCapacity;
 
 	bodies = (b3Body**)allocator->Allocate(bodyCapacity * sizeof(b3Body*));
+	
 	velocities = (b3Velocity*)allocator->Allocate(bodyCapacity * sizeof(b3Velocity));
 	positions = (b3Position*)allocator->Allocate(bodyCapacity * sizeof(b3Position));
+	
 	contacts = (b3Contact**)allocator->Allocate(contactCapacity * sizeof(b3Contact*));
-	joints = (b3Joint**)allocator->Allocate(jointCapacity * sizeof(b3Joint*));
+	//joints = (b3Joint**)allocator->Allocate(jointCapacity * sizeof(b3Joint*));
 
 	bodyCount = 0;
 	contactCount = 0;
-	jointCount = 0;
+	//jointCount = 0;
 }
 
 b3Island::~b3Island() {
 	// @note Reverse order of construction.
-	allocator->Free(joints);
+	//allocator->Free(joints);
 	allocator->Free(contacts);
 	allocator->Free(positions);
 	allocator->Free(velocities);
@@ -57,7 +64,7 @@ b3Island::~b3Island() {
 void b3Island::Reset() {
 	bodyCount = 0;
 	contactCount = 0;
-	jointCount = 0;
+	//jointCount = 0;
 }
 
 void b3Island::Add(b3Body* b) {
@@ -73,18 +80,20 @@ void b3Island::Add(b3Contact* c) {
 	++contactCount;
 }
 
-void b3Island::Add(b3Joint* j) {
-	b3Assert(jointCount < jointCapacity);
-	joints[jointCount] = j;
-	++jointCount;
-}
+//void b3Island::Add(b3Joint* j) {
+//	b3Assert(jointCount < jointCapacity);
+//	joints[jointCount] = j;
+//	++jointCount;
+//}
 
-void b3Island::Solve(const b3Vec3& gravityDir) {
+void b3Island::Solve(const b3Vec3& gravityDir) 
+{
 	r32 h = dt;
 	b3Vec3 gravityForce = B3_GRAVITY_ACC * gravityDir;
 
 	// Integrate velocities.
-	for (u32 i = 0; i < bodyCount; ++i) {
+	for (u32 i = 0; i < bodyCount; ++i) 
+	{
 		b3Body* b = bodies[i];
 
 		b3Vec3 v = b->m_linearVelocity;
@@ -92,7 +101,8 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 		b3Vec3 x = b->m_worldCenter;
 		b3Quaternion q = b->m_orientation;
 
-		if (b->m_type == e_dynamicBody) {
+		if (b->m_type == e_dynamicBody) 
+		{
 			// Use semi-implitic Euler.
 			b3Vec3 force = b->m_gravityScale * gravityForce + b->m_force;
 			v += (h * b->m_invMass) * force;
@@ -106,8 +116,12 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 			// v2 = exp(-c * dt) * v1
 			// Pade approximation:
 			// v2 = v1 * 1 / (1 + c * dt)
-			v *= B3_ONE / (B3_ONE + h * r32(0.1));
-			w *= B3_ONE / (B3_ONE + h * r32(0.1));
+
+			if(b3ExtraSettings::bApplyDamping)
+			{
+				v *= B3_ONE / (B3_ONE + h * r32(0.1));
+				w *= B3_ONE / (B3_ONE + h * r32(0.1));
+			}
 		}
 
 		velocities[i].v = v;
@@ -128,18 +142,22 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 
 	b3ContactSolverDef contactSolverDef;
 	contactSolverDef.dt = h;
+	
+	//All this stuff is shared down to the contact solver
 	contactSolverDef.contacts = contacts;
 	contactSolverDef.count = contactCount;
 	contactSolverDef.positions = positions;
 	contactSolverDef.velocities = velocities;
+	
 	contactSolverDef.allocator = allocator;
 
+	//A new contact solver is made
 	b3ContactSolver contactSolver(&contactSolverDef);
 	contactSolver.InitializeVelocityConstraints();
 	
 	//jointSolver.WarmStart();
 
-	if(b3ExtraSettings::bWarmStart)
+	//if(b3ExtraSettings::bWarmStart)
 		contactSolver.WarmStart();
 	
 	// Solve velocity constraints.
@@ -150,6 +168,7 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 
 	contactSolver.StoreImpulses();
 
+	//Do real integration
 	for (u32 i = 0; i < bodyCount; ++i) {
 		b3Body* b = bodies[i];
 		if (b->m_type == e_staticBody) {
@@ -161,8 +180,7 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 		b3Vec3 v = velocities[i].v;
 		b3Vec3 w = velocities[i].w;
 		
-		x += h * v;
-		
+		x += h * v;	
 		b3Quaternion q2 = Integrate(q1, w, h);
 
 		positions[i].x = x;
@@ -171,6 +189,7 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 		velocities[i].w = w;
 	}
 
+	//update body
 	for (u32 i = 0; i < bodyCount; ++i) {
 		b3Body* b = bodies[i];
 		if (b->m_type == e_staticBody) {
@@ -183,10 +202,14 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 		b->m_angularVelocity = velocities[i].w;
 	}
 
-	if (allowSleep) {
+	if (allowSleep) 
+	{
 		r32 minSleepTime = B3_MAX_FLOAT;
-		for (u32 i = 0; i < bodyCount; ++i) {
+
+		for (u32 i = 0; i < bodyCount; ++i) 
+		{
 			b3Body* b = bodies[i];
+			
 			if (b->m_type == e_staticBody) {
 				continue;
 			}
@@ -195,11 +218,14 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 			const r32 sqrLinVel = b3LenSq(b->m_linearVelocity);
 			const r32 sqrAngVel = b3LenSq(b->m_angularVelocity);
 
-			if (sqrLinVel > B3_SLEEP_LINEAR_TOL || sqrAngVel > B3_SLEEP_ANGULAR_TOL) {
+			//if linear and angular velocity are greather than some threshold
+			if (sqrLinVel > B3_SLEEP_LINEAR_TOL || sqrAngVel > B3_SLEEP_ANGULAR_TOL) 
+			{
 				minSleepTime = B3_ZERO;
 				b->m_sleepTime = B3_ZERO;
 			}
-			else {
+			else 
+			{
 				b->m_sleepTime += h;
 				minSleepTime = b3Min(minSleepTime, b->m_sleepTime);
 			}
@@ -207,7 +233,9 @@ void b3Island::Solve(const b3Vec3& gravityDir) {
 
 		// Put the island to sleep so long as the minimum found sleep time
 		// is below the threshold. 
-		if (minSleepTime >= B3_TIME_TO_SLEEP) {
+		if (minSleepTime >= b3ExtraSettings::timeToSleep/*B3_TIME_TO_SLEEP*/) //if all the bodies in the island have been asleep
+			// for at least (timeToSleep) seconds
+		{
 			for (u32 i = 0; i < bodyCount; ++i) {
 				bodies[i]->SetAwake(false);
 			}

@@ -95,7 +95,7 @@ b3Shape* b3Body::CreateShape(const b3ShapeDef& def) {
 	shape->m_density = def.density;
 	shape->m_friction = def.friction;
 	shape->m_restitution = def.restitution;
-	shape->m_isSensor = def.sensor;
+	//shape->m_isSensor = def.sensor;
 
 	// Link the new shape into the singly-linked list of shapes of this body.
 	shape->m_next = m_shapeList;

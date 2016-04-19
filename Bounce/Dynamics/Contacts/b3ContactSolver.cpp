@@ -23,7 +23,8 @@
 #include "..\..\Common\Memory\b3StackAllocator.h"
 #include "..\..\Common\b3Time.h"
 
-b3ContactSolver::b3ContactSolver(const b3ContactSolverDef* def) {
+b3ContactSolver::b3ContactSolver(const b3ContactSolverDef* def) 
+{
 	m_allocator = def->allocator;
 	m_contacts = def->contacts;
 	m_count = def->count; //the amount of contacts
@@ -33,7 +34,9 @@ b3ContactSolver::b3ContactSolver(const b3ContactSolverDef* def) {
 
 	m_velocityConstraints = (b3ContactVelocityConstraint*)m_allocator->Allocate(m_count * sizeof(b3ContactVelocityConstraint));
 
-	for (u32 i = 0; i < m_count; ++i) {
+	//for every contact
+	for (u32 i = 0; i < m_count; ++i) 
+	{
 		b3Contact* c = m_contacts[i];
 		b3ContactVelocityConstraint* vc = m_velocityConstraints + i;
 		
@@ -55,17 +58,23 @@ b3ContactSolver::b3ContactSolver(const b3ContactSolverDef* def) {
 		vc->indexB = bodyB->m_islandID;
 		vc->pointCount = pointCount;
 
-		for (u32 j = 0; j < pointCount; ++j) {
-			b3ContactPoint* cp = c->m_manifold.points + j;
-			b3VelocityConstraintPoint* vcp = vc->points + j;
 
+		//if(b3ExtraSettings::bWarmStart)
+		//{
 			// Setup warm start.
-			vcp->normalImpulse = cp->normalImpulse;
-			vcp->tangentImpulse[0] = cp->tangentImpulse[0];
-			vcp->tangentImpulse[1] = cp->tangentImpulse[1];
-			vcp->tangents[0] = cp->tangents[0];
-			vcp->tangents[1] = cp->tangents[1];
-		}
+			//For all contact points in the contact
+			for (u32 j = 0; j < pointCount; ++j) 
+			{
+				b3ContactPoint* cp = c->m_manifold.points + j;
+				b3VelocityConstraintPoint* vcp = vc->points + j;
+
+				vcp->normalImpulse = cp->normalImpulse;
+				vcp->tangentImpulse[0] = cp->tangentImpulse[0];
+				vcp->tangentImpulse[1] = cp->tangentImpulse[1];
+				vcp->tangents[0] = cp->tangents[0];
+				vcp->tangents[1] = cp->tangents[1];
+			}
+		//}
 	}
 }
 
@@ -73,8 +82,11 @@ b3ContactSolver::~b3ContactSolver() {
 	m_allocator->Free(m_velocityConstraints);
 }
 
-void b3ContactSolver::InitializeVelocityConstraints() {
-	for (u32 i = 0; i < m_count; ++i) {
+void b3ContactSolver::InitializeVelocityConstraints() 
+{
+	//For every contact
+	for (u32 i = 0; i < m_count; ++i) 
+	{
 		b3Contact* c = m_contacts[i];
 		b3ContactVelocityConstraint* vc = m_velocityConstraints + i;
 		
@@ -96,12 +108,14 @@ void b3ContactSolver::InitializeVelocityConstraints() {
 		b3Vec3 xB = m_positions[indexB].x;
 		b3Quaternion qB = m_positions[indexB].q;
 
-		for (u32 j = 0; j < pointCount; ++j) {
+		//for every point in contact manifold
+		for (u32 j = 0; j < pointCount; ++j) 
+		{
 			b3ContactPoint* cp = c->m_manifold.points + j;
 			b3VelocityConstraintPoint* vcp = vc->points + j;
 
-			vcp->rA = cp->position - xA;
-			vcp->rB = cp->position - xB;
+			vcp->rA = cp->position - xA; //rA: contact point minus com
+			vcp->rB = cp->position - xB; //rB 
 
 			// Compute tangent mass.
 			b3Vec3 rt1A = b3Cross(vcp->rA, vcp->tangents[0]);
@@ -128,9 +142,8 @@ void b3ContactSolver::InitializeVelocityConstraints() {
 
 			// Add restitution in the velocity constraint.			
 			r32 vn = b3Dot(vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA), vc->normal);
-			if (vn < -B3_ONE) {
+			if (vn < -B3_ONE) 
 				vcp->velocityBias += -(c->m_restitution) * vn;
-			}
 		}
 	}
 }

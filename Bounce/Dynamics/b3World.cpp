@@ -28,11 +28,15 @@
 b3World::b3World() {
 	m_contactGraph.m_blockAllocator = &m_blockAllocator;
 	//m_jointGraph.m_blockAllocator = &m_blockAllocator;
+	
 	m_flags = 0;
 	m_flags |= e_clearForcesFlag;
+	
 	m_bodyList = nullptr;
 	m_bodyCount = 0;
+	
 	m_gravityDir.Set(B3_ZERO, -B3_ONE, B3_ZERO);
+	
 	m_profile.broadPhaseTime = B3_ZERO;
 	m_profile.narrowPhaseTime = B3_ZERO;
 	m_profile.solverTime = B3_ZERO;
@@ -120,10 +124,12 @@ void b3World::Solve(const b3TimeStep& step) {
 	b3IslandDef islandDef;
 	islandDef.dt = step.dt;
 	islandDef.allowSleep = step.sleeping;
+
 	islandDef.allocator = &m_stackAllocator;
 	islandDef.bodyCapacity = m_bodyCount;
 	islandDef.contactCapacity = m_contactGraph.m_contactCount;
 	//islandDef.jointCapacity = m_jointGraph.m_jointCount;
+
 	islandDef.velocityIterations = step.velocityIterations;
 
 	b3Island island(islandDef);
@@ -145,7 +151,7 @@ void b3World::Solve(const b3TimeStep& step) {
 		}
 
 		// Reset island and stack.
-		island.Reset();
+		island.Reset(); //body + contact count = 0
 		u32 stackCount = 0;
 		stack[stackCount++] = seed;
 		seed->m_flags |= b3Body::e_islandFlag;
@@ -180,11 +186,11 @@ void b3World::Solve(const b3TimeStep& step) {
 				}
 
 				// Skip sensors.
-				bool sensorA = contact->m_shapeA->m_isSensor;
+				/*bool sensorA = contact->m_shapeA->m_isSensor;
 				bool sensorB = contact->m_shapeB->m_isSensor;
 				if (sensorA || sensorB) {
 					continue;
-				}
+				}*/
 
 				// Add contact onto the island and mark it.
 				island.Add(contact);

@@ -29,7 +29,7 @@ struct b3BodyDef;
 class b3Body;
 //class b3QueryListener;
 //class b3RayCastListener;
-class b3ContactListener;
+//class b3ContactListener;
 class b3Draw;
 
 class b3World {
@@ -55,7 +55,7 @@ public :
 
 	// The contact listener passed will be notified when two body shapes begin/stays/ends
 	// touching with each other.
-	void SetContactListener(b3ContactListener* listener);
+	//void SetContactListener(b3ContactListener* listener);
 
 	// The query listener will be notified when two shape AABBs are overlapping.
 	// If the listener returns false then the query is stopped immediately.

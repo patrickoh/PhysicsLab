@@ -84,9 +84,6 @@
     <ClInclude Include="Collision\b3Collision.h">
       <Filter>Header Files\Bounce\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Math\b3Mat33.h">
-      <Filter>Header Files\Bounce\Common\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Math\b3Math.h">
       <Filter>Header Files\Bounce\Common\Math</Filter>
     </ClInclude>
@@ -135,6 +132,9 @@
     <ClInclude Include="Dynamics\Contacts\b3Contact.h">
       <Filter>Header Files\Bounce\Dynamics\Contacts</Filter>
     </ClInclude>
+    <ClInclude Include="Common\Math\b3Mat33.h">
+      <Filter>Header Files\Bounce\Common\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dynamics\Contacts\b3ContactGraph.cpp">
@@ -172,9 +172,6 @@
     </ClCompile>
     <ClCompile Include="Collision\b3SAT.cpp">
       <Filter>Source Files\Bounce\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Collision\Shapes\b3Shape.cpp">
-      <Filter>Source Files\Bounce\Collision\Shapes</Filter>
     </ClCompile>
     <ClCompile Include="Collision\Shapes\b3Hull.cpp">
       <Filter>Source Files\Bounce\Collision\Shapes</Filter>

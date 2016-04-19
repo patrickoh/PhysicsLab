@@ -32,13 +32,13 @@ struct b3ShapeDef {
 		restitution = B3_ZERO;
 		shape = nullptr;
 		userData = nullptr;
-		sensor = false;
+		//sensor = false;
 		local.SetIdentity();
 	}
 
 	const b3Shape* shape;
 	void* userData;
-	bool sensor;
+	//bool sensor;
 	r32 density;
 	r32 friction;
 	r32 restitution;
@@ -74,8 +74,8 @@ public :
 	b3Body* GetBody();
 	const b3Body* GetBody() const;
 
-	bool IsSensor() const;
-	void SetSensor(bool flag);
+	//bool IsSensor() const;
+	//void SetSensor(bool flag);
 
 	r32 GetDensity() const;
 	void SetDensity(r32 density);
@@ -97,7 +97,7 @@ protected :
 	r32 m_restitution;
 	r32 m_friction;
 	i32 broadPhaseID;
-	bool m_isSensor;
+	//bool m_isSensor;
 	void* m_userData;
 
 	b3Body* m_body;
@@ -125,9 +125,9 @@ inline void b3Shape::SetTransform(const b3Vec3& position, const b3Vec3& axis, r3
 	m_local.translation = position;
 }
 
-inline bool b3Shape::IsSensor() const { 
-	return m_isSensor; 
-}
+//inline bool b3Shape::IsSensor() const { 
+//	return m_isSensor; 
+//}
 
 inline r32 b3Shape::GetDensity() const { 
 	return m_density; 

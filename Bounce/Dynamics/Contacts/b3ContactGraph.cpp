@@ -100,10 +100,10 @@ void b3ContactGraph::AddPair(void* data1, void* data2) {
 	bodyB->m_contactList = &c->m_nodeB;
 
 	// Awake the bodies if both are not sensors.
-	if (!shapeA->IsSensor() && !shapeB->IsSensor()) {
+	//if (!shapeA->IsSensor() && !shapeB->IsSensor()) {
 		bodyA->SetAwake(true);
 		bodyB->SetAwake(true);
-	}
+	//}
 
 	++m_contactCount;
 }
@@ -203,14 +203,14 @@ void b3ContactGraph::UpdateContacts() {
 
 		bool wasTouching = c->IsTouching();
 		bool isTouching = false;
-		bool isSensorContact = shapeA->IsSensor() || shapeB->IsSensor();
+		//bool isSensorContact = shapeA->IsSensor() || shapeB->IsSensor();
 
-		if (isSensorContact) {
+		//if (isSensorContact) {
 			// Simply, a sensor is active if its bounds is touching with another other shape's bounds.
-			isTouching = m_broadPhase.TestOverlap(shapeA->broadPhaseID, shapeB->broadPhaseID);
-			c->m_manifold.pointCount = 0;
-		}
-		else {
+			//isTouching = m_broadPhase.TestOverlap(shapeA->broadPhaseID, shapeB->broadPhaseID);
+			//c->m_manifold.pointCount = 0;
+		//}
+		//else {
 			// For the time being, Bounce can compute the closest distance between convex objects only.
 			typedef void(*b3DistanceQuery) (b3Manifold&, const b3Transform&, const b3Shape*, const b3Transform&, const b3Shape*);
 
@@ -300,7 +300,7 @@ void b3ContactGraph::UpdateContacts() {
 				bodyA->SetAwake(true);
 				bodyB->SetAwake(true);
 			}
-		}
+		//}
 
 		// Mark the contact as touching.
 		if (isTouching) {

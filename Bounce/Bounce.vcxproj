@@ -46,6 +46,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\lib</OutDir>
+    <IntDir>$(SolutionDir)\build\$(Configuration)\Intermediate\Bounce</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,7 +111,6 @@
     <ClCompile Include="Collision\b3SAT.cpp" />
     <ClCompile Include="Collision\Shapes\b3Hull.cpp" />
     <ClCompile Include="Collision\Shapes\b3Polyhedron.cpp" />
-    <ClCompile Include="Collision\Shapes\b3Shape.cpp" />
     <ClCompile Include="Common\b3Settings.cpp" />
     <ClCompile Include="Common\b3Time.cpp" />
     <ClCompile Include="Common\Memory\b3BlockAllocator.cpp" />

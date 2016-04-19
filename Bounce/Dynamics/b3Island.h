@@ -36,7 +36,7 @@ struct b3IslandDef {
 	b3StackAllocator* allocator;
 	u32 bodyCapacity;
 	u32 contactCapacity;
-	u32 jointCapacity;
+	//u32 jointCapacity;
 };
 
 class b3Island {
@@ -47,7 +47,7 @@ public :
 	void Reset();
 	void Add(b3Body* b);
 	void Add(b3Contact* c);
-	void Add(b3Joint* j);
+	//void Add(b3Joint* j);
 	void Solve(const b3Vec3& gravity);
 protected :
 	friend class b3World;
@@ -64,9 +64,9 @@ protected :
 	u32 contactCount;	
 	u32 contactCapacity;
 
-	b3Joint** joints;
+	/*b3Joint** joints;
 	u32 jointCount;
-	u32 jointCapacity;
+	u32 jointCapacity;*/
 	
 	b3StackAllocator* allocator;
 	b3Position* positions;
