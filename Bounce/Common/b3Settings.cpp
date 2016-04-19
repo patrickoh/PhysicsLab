@@ -29,3 +29,6 @@ void b3Free(void* memory) {
 bool b3ExtraSettings::bWarmStart = true;
 r32 b3ExtraSettings::timeToSleep = 1.0f;
 bool b3ExtraSettings::bApplyDamping = true;
+bool b3ExtraSettings::bEnforceFrictionConstraints = true;
+bool b3ExtraSettings::bEnforceNonPenetrationContraint = true;
+float b3ExtraSettings::baumgarte = 0.2f;

@@ -53,7 +53,6 @@ public:
 
 		simulationSpeed = 1.0f;
 
-		//BOUNCE
 		m_world = new b3World();
 		m_step.velocityIterations = 10;
 
@@ -331,14 +330,21 @@ public:
 
 		TwAddVarRW(bar, "Sleeping", TW_TYPE_BOOL8, &m_step.sleeping, "");
 		TwAddVarRW(bar, "Sleep time", TW_TYPE_FLOAT, 
-			&b3ExtraSettings::timeToSleep, "");
+			&b3ExtraSettings::timeToSleep, "min=0");
 		TwAddVarRW(bar, "Damping", TW_TYPE_BOOL8, 
 			&b3ExtraSettings::bApplyDamping, "");
 		TwAddVarRW(bar, "Velocity Iterations", TW_TYPE_UINT32, 
-			&m_step.velocityIterations, "");
+			&m_step.velocityIterations, "min=0");
 		TwAddVarRW(bar, "Warm start", TW_TYPE_BOOL8, 
 			&b3ExtraSettings::bWarmStart, "");
-		
+		TwAddVarRW(bar, "Bias Factor", TW_TYPE_FLOAT, 
+			&b3ExtraSettings::baumgarte, "min=0.0 step=0.1");
+		TwAddVarRW(bar, "Enforce Non-penetration constraint", TW_TYPE_BOOL8,
+			&b3ExtraSettings::bEnforceNonPenetrationContraint,"");
+		TwAddVarRW(bar, "Enforce friction constraints", TW_TYPE_BOOL8,
+			&b3ExtraSettings::bEnforceFrictionConstraints,"");
+
+		//m_world->GetStepProfile().broadPhaseTime	
 
 		/*TwAddVarRW(bar, "Friction coefficient", TW_TYPE_FLOAT, 
 			&, "min=0.0 max=1.0 step=0.1");*/

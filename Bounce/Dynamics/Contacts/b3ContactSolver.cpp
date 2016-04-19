@@ -138,7 +138,7 @@ void b3ContactSolver::InitializeVelocityConstraints()
 			vcp->normalMass = B3_ONE / kNormal;
 
 			r32 C = b3Min(B3_ZERO, c->m_manifold.distances[j] + B3_LINEAR_SLOP);
-			vcp->velocityBias = -m_invDt * B3_BAUMGARTE * C;
+			vcp->velocityBias = -m_invDt * b3ExtraSettings::baumgarte * C;
 
 			// Add restitution in the velocity constraint.			
 			r32 vn = b3Dot(vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA), vc->normal);
@@ -219,6 +219,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 			b3VelocityConstraintPoint* vcp = vc->points + j;
 			
 			//NON-PENETRATION CONSTRAINT
+			if(b3ExtraSettings::bEnforceNonPenetrationContraint)
 			{
 				// Compute J * u.
 				b3Vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
@@ -241,30 +242,33 @@ void b3ContactSolver::SolveVelocityConstraints() {
 			}
 
 			//FRICTION CONSTRAINTS
-			for (u32 k = 0; k < 2; ++k) 
+			if(b3ExtraSettings::bEnforceFrictionConstraints) 
 			{
-				// Compute tangential impulse.
-				r32 hi = vc->friction * vcp->normalImpulse;
-				r32 lo = -hi;
+				for (u32 k = 0; k < 2; ++k) 
+				{
+					// Compute tangential impulse.
+					r32 hi = vc->friction * vcp->normalImpulse;
+					r32 lo = -hi;
 
-				// Compute J * u.
-				b3Vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
-				r32 dCdt = b3Dot(dv, vcp->tangents[k]);
+					// Compute J * u.
+					b3Vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
+					r32 dCdt = b3Dot(dv, vcp->tangents[k]);
 
-				// Compute new lambda values.
-				r32 lambda = vcp->tangentMass[k] * -dCdt;
-				r32 newLambda = b3Clamp(vcp->tangentImpulse[k] + lambda, lo, hi);
-				r32 deltaLambda = newLambda - vcp->tangentImpulse[k];
+					// Compute new lambda values.
+					r32 lambda = vcp->tangentMass[k] * -dCdt;
+					r32 newLambda = b3Clamp(vcp->tangentImpulse[k] + lambda, lo, hi);
+					r32 deltaLambda = newLambda - vcp->tangentImpulse[k];
 				
-				vcp->tangentImpulse[k] = newLambda;
+					vcp->tangentImpulse[k] = newLambda;
 
-				b3Vec3 deltaImpulse = deltaLambda * vcp->tangents[k];
+					b3Vec3 deltaImpulse = deltaLambda * vcp->tangents[k];
 
-				vA -= mA * deltaImpulse;
-				wA -= iA * b3Cross(vcp->rA, deltaImpulse);
+					vA -= mA * deltaImpulse;
+					wA -= iA * b3Cross(vcp->rA, deltaImpulse);
 
-				vB += mB * deltaImpulse;
-				wB += iB * b3Cross(vcp->rB, deltaImpulse);
+					vB += mB * deltaImpulse;
+					wB += iB * b3Cross(vcp->rB, deltaImpulse);
+				}
 			}
 		}
 

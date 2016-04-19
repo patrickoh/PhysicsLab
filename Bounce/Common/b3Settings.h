@@ -92,6 +92,9 @@ struct b3ExtraSettings
 	static bool bWarmStart;
 	static r32 timeToSleep;
 	static bool bApplyDamping;
+	static bool bEnforceFrictionConstraints;
+	static bool bEnforceNonPenetrationContraint;
+	static float b3ExtraSettings::baumgarte;
 };
 
 #endif

@@ -52,6 +52,6 @@ struct b3EdgeQuery {
 
 // SAT collision detection entry point.
 void b3HullHullShapeContact(b3Manifold& output, const b3Transform& transform1, const b3Shape* shape1, const b3Transform& transform2, const b3Shape* shape2);
-void b3HullHullContact(b3Manifold& output, const b3Transform& transform1, const b3Hull* hull1, const b3Transform& transform2, const b3Hull* hull2);
+//void b3HullHullContact(b3Manifold& output, const b3Transform& transform1, const b3Hull* hull1, const b3Transform& transform2, const b3Hull* hull2);
 
 #endif
