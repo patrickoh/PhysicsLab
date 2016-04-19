@@ -48,11 +48,11 @@ b3Body::b3Body(const b3BodyDef& def, b3World* world) {
 	m_gravityScale = def.gravityScale;
 
 	// Calculate the world transform.
-	m_localCenter.SetZero();
+	m_localCenter = glm::vec3(0); 
 	m_transform.translation = m_worldCenter;
 	m_orientation.ToRotationMatrix(m_transform.rotation);
-	m_force.SetZero();
-	m_torque.SetZero();
+	m_force = glm::vec3(0); 
+	m_torque = glm::vec3(0); 
 	m_invLocalInertia.SetZero();
 	m_invWorldInertia.SetZero();
 	
@@ -290,8 +290,8 @@ void b3Body::ResetMassData() {
 	}
 
 	// Compute the local center of mass of this body based on the body shape centroids.
-	b3Vec3 localCenter;
-	localCenter.SetZero();
+	glm::vec3 localCenter;
+	localCenter = glm::vec3(0); 
 	b3Mat33 localInertia;
 	localInertia.SetZero();
 	for (b3Shape* s = m_shapeList; s; s = s->m_next) {
@@ -319,7 +319,7 @@ void b3Body::ResetMassData() {
 
 	// Update this body world center of mass position and velocity.
 	m_localCenter = localCenter;
-	b3Vec3 oldWorldCenter = m_worldCenter;
+	glm::vec3 oldWorldCenter = m_worldCenter;
 	m_worldCenter = m_transform * m_localCenter;
 	m_linearVelocity += b3Cross(m_angularVelocity, m_worldCenter - oldWorldCenter);
 }

@@ -56,7 +56,7 @@ void b3Polyhedron::ComputeMass(b3MassData* massData, r32 density) const {
 	massData->I.z.z = invTwelveMass * (ww + hh);
 
 	// Compute average particle positions.
-	massData->center.SetZero();
+	massData->center = glm::vec3(0);
 	for ( u32 i = 0; i < m_hull->vertexCount; ++i ) {
 		massData->center += m_hull->vertices[i];
 	}
@@ -75,9 +75,9 @@ void b3Polyhedron::ComputeAabb(b3AABB& output, const b3Transform& transform) con
 //	b3Assert(m_hull->faceCount >= 3);
 //
 //	// Perform computations in the local space of the hull.
-//	b3Vec3 a = b3MulT(transform.rotation, input.p1 - transform.translation);
-//	b3Vec3 b = b3MulT(transform.rotation, input.p2 - transform.translation);
-//	b3Vec3 direction = b - a;
+//	glm::vec3 a = b3MulT(transform.rotation, input.p1 - transform.translation);
+//	glm::vec3 b = b3MulT(transform.rotation, input.p2 - transform.translation);
+//	glm::vec3 direction = b - a;
 //	
 //	r32 tfirst = B3_ZERO;
 //	r32 tlast = input.maxFraction;

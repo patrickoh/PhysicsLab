@@ -38,7 +38,7 @@ struct b3Quaternion {
 
 	// Compute this quaternion given an axis and the angle of rotation about
 	// the axis.
-	void Set(const b3Vec3& axis, r32 radians) {
+	void Set(const glm::vec3& axis, r32 radians) {
 		r32 theta = B3_HALF * radians;
 		r32 s = ::sin(theta);
 		a = s * axis.x;
@@ -120,7 +120,7 @@ inline b3Quaternion operator*(const b3Quaternion& a, const b3Quaternion& b) {
 		);
 }
 
-inline b3Quaternion Integrate(const b3Quaternion& q, const b3Vec3& w, r32 h) {
+inline b3Quaternion Integrate(const b3Quaternion& q, const glm::vec3& w, r32 h) {
 	b3Quaternion spin(B3_HALF * w.x, B3_HALF * w.y, B3_HALF * w.z, B3_ZERO);
 	b3Quaternion dqdt = spin * q;	
 	b3Quaternion out = q + h * dqdt;	

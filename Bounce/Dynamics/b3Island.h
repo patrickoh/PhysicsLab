@@ -48,7 +48,7 @@ public :
 	void Add(b3Body* b);
 	void Add(b3Contact* c);
 	//void Add(b3Joint* j);
-	void Solve(const b3Vec3& gravity);
+	void Solve(const glm::vec3& gravity);
 protected :
 	friend class b3World;
 

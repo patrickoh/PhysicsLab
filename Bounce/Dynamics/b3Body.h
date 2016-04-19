@@ -43,20 +43,20 @@ struct b3BodyDef {
 		type = e_staticBody;
 		awake = true;
 		userData = nullptr;
-		position.SetZero();
+		position = glm::vec3(0); 
 		orientation.SetIdentity();
-		linearVelocity.SetZero();
-		angularVelocity.SetZero();
+		linearVelocity = glm::vec3(0); 
+		angularVelocity = glm::vec3(0); 
 		gravityScale = B3_ONE;
 	}
 
 	b3BodyType type;
 	bool awake;
 	void* userData;
-	b3Vec3 position;
+	glm::vec3 position;
 	b3Quaternion orientation;
-	b3Vec3 linearVelocity;
-	b3Vec3 angularVelocity;
+	glm::vec3 linearVelocity;
+	glm::vec3 angularVelocity;
 	r32 gravityScale;
 };
 
@@ -110,7 +110,7 @@ public :
 	// @warning 
 	// Manipulating a body transform during the simulation may cause non-physical behaviour.
 	const b3Transform& GetTransform() const;
-	void SetTransform(const b3Vec3& position, const b3Vec3& axis, r32 radians);
+	void SetTransform(const glm::vec3& position, const glm::vec3& axis, r32 radians);
 
 	// Get the user data associated with the body.
 	// The user data is usually a game entity.
@@ -134,36 +134,36 @@ public :
 	// Apply a force to a specific point (particle) of the body. 
 	// If the point isn't the center of mass then a non-zero torque is applied.
 	// The body must be dynamic.
-	void ApplyForce(const b3Vec3& force, const b3Vec3& point, bool wake);
+	void ApplyForce(const glm::vec3& force, const glm::vec3& point, bool wake);
 	
 	// Apply a force to the body center of mass. Generally this is a external force. 
 	// The body must be dynamic.
-	void ApplyForceToCenter(const b3Vec3& force, bool wake);
+	void ApplyForceToCenter(const glm::vec3& force, bool wake);
 	
 	// Apply a torque (angular momentum change) to the body.
 	// The body must be dynamic.
-	void ApplyTorque(const b3Vec3& torque, bool wake);
+	void ApplyTorque(const glm::vec3& torque, bool wake);
 
 	// Apply a linear impulse (linear velocity change) to a specific point (particle) of the body. 
 	// If the point isn't the center of mass then a non-zero angular impulse is applied.
 	// The body must be dynamic.
-	void ApplyLinearImpulse(const b3Vec3& impulse, const b3Vec3& point, bool wake);
+	void ApplyLinearImpulse(const glm::vec3& impulse, const glm::vec3& point, bool wake);
 	
 	// Apply a angular impulse (angular velocity change) to the body.
 	// The body must be dynamic.
-	void ApplyAngularImpulse(const b3Vec3& impulse, bool wake);
+	void ApplyAngularImpulse(const glm::vec3& impulse, bool wake);
 
 	// Set the linear velocity of the body. If is a non-zero velocity then the body awakes.
 	// The body must be dynamic or kinematic.
-	void SetLinearVelocity(const b3Vec3& linearVelocity);
+	void SetLinearVelocity(const glm::vec3& linearVelocity);
 	
 	// Set the angular velocity of the body. If is a non-zero velocity then the body awakes.
 	// The body must be dynamic or kinematic.
-	void SetAngularVelocity(const b3Vec3& angularVelocity);
+	void SetAngularVelocity(const glm::vec3& angularVelocity);
 
-	b3Vec3 m_worldCenter;
+	glm::vec3 m_worldCenter;
 	b3Quaternion m_orientation;
-	b3Vec3 m_scale;
+	glm::vec3 m_scale;
 
 protected :
 	friend class b3World;
@@ -229,12 +229,12 @@ protected :
 	r32 m_gravityScale;
 
 	// The applied forces.
-	b3Vec3 m_force;
-	b3Vec3 m_torque;
+	glm::vec3 m_force;
+	glm::vec3 m_torque;
 
-	b3Vec3 m_linearVelocity;
-	b3Vec3 m_angularVelocity;
-	b3Vec3 m_localCenter;
+	glm::vec3 m_linearVelocity;
+	glm::vec3 m_angularVelocity;
+	glm::vec3 m_localCenter;
 	
 	// The body transform.
 	b3Transform m_transform;
@@ -268,15 +268,15 @@ inline void b3Body::SetType(b3BodyType type) {
 	ResetMassData();
 
 	if (m_type == e_staticBody) {
-		m_linearVelocity.SetZero();
-		m_angularVelocity.SetZero();
+		m_linearVelocity = glm::vec3(0); 
+		m_angularVelocity = glm::vec3(0); 
 		SynchronizeShapes();
 	}
 
 	SetAwake(true);
 
-	m_force.SetZero();
-	m_torque.SetZero();
+	m_force = glm::vec3(0); 
+	m_torque = glm::vec3(0); 
 
 	DestroyContacts();
 }
@@ -287,7 +287,7 @@ inline void b3Body::SetUserData(void* userData) { m_userData = userData; }
 
 inline const b3Shape* b3Body::GetShapeList() const { return m_shapeList; }
 
-inline void b3Body::SetTransform(const b3Vec3& position, const b3Vec3& axis, r32 radians) {
+inline void b3Body::SetTransform(const glm::vec3& position, const glm::vec3& axis, r32 radians) {
 	m_worldCenter = position;
 	m_orientation.Set(axis, radians);
 
@@ -307,10 +307,10 @@ inline void b3Body::SetAwake(bool flag) {
 	else {
 		m_flags &= ~e_awakeFlag;
 		m_sleepTime = B3_ZERO;
-		m_force.SetZero();
-		m_torque.SetZero();
-		m_linearVelocity.SetZero();
-		m_angularVelocity.SetZero();		
+		m_force = glm::vec3(0); 
+		m_torque = glm::vec3(0); 
+		m_linearVelocity = glm::vec3(0); 
+		m_angularVelocity = glm::vec3(0); 		
 	}
 }
 
@@ -326,7 +326,7 @@ inline void b3Body::SetGravityScale(r32 scale) {
 	}
 }
 
-inline void b3Body::SetLinearVelocity(const b3Vec3& linearVelocity) {
+inline void b3Body::SetLinearVelocity(const glm::vec3& linearVelocity) {
 	if (m_type == e_staticBody) {
 		return;
 	}
@@ -338,7 +338,7 @@ inline void b3Body::SetLinearVelocity(const b3Vec3& linearVelocity) {
 	m_linearVelocity = linearVelocity;
 }
 
-inline void b3Body::SetAngularVelocity(const b3Vec3& angularVelocity) {
+inline void b3Body::SetAngularVelocity(const glm::vec3& angularVelocity) {
 	if (m_type == e_staticBody) {
 		return;
 	}
@@ -350,7 +350,7 @@ inline void b3Body::SetAngularVelocity(const b3Vec3& angularVelocity) {
 	m_angularVelocity = angularVelocity;
 }
 
-inline void b3Body::ApplyForce(const b3Vec3& force, const b3Vec3& point, bool wake) {
+inline void b3Body::ApplyForce(const glm::vec3& force, const glm::vec3& point, bool wake) {
 	if (m_type != e_dynamicBody) {
 		return;
 	}
@@ -365,7 +365,7 @@ inline void b3Body::ApplyForce(const b3Vec3& force, const b3Vec3& point, bool wa
 	}
 }
 
-inline void b3Body::ApplyForceToCenter(const b3Vec3& force, bool wake) {
+inline void b3Body::ApplyForceToCenter(const glm::vec3& force, bool wake) {
 	if (m_type != e_dynamicBody) {
 		return;
 	}
@@ -379,7 +379,7 @@ inline void b3Body::ApplyForceToCenter(const b3Vec3& force, bool wake) {
 	}
 }
 
-inline void b3Body::ApplyTorque(const b3Vec3& torque, bool wake) {
+inline void b3Body::ApplyTorque(const glm::vec3& torque, bool wake) {
 	if (m_type != e_dynamicBody) {
 		return;
 	}
@@ -393,7 +393,7 @@ inline void b3Body::ApplyTorque(const b3Vec3& torque, bool wake) {
 	}
 }
 
-inline void b3Body::ApplyLinearImpulse(const b3Vec3& impulse, const b3Vec3& point, bool wake) {
+inline void b3Body::ApplyLinearImpulse(const glm::vec3& impulse, const glm::vec3& point, bool wake) {
 	if (m_type != e_dynamicBody) {
 		return;
 	}
@@ -408,7 +408,7 @@ inline void b3Body::ApplyLinearImpulse(const b3Vec3& impulse, const b3Vec3& poin
 	}
 }
 
-inline void b3Body::ApplyAngularImpulse(const b3Vec3& impulse, bool wake) {
+inline void b3Body::ApplyAngularImpulse(const glm::vec3& impulse, bool wake) {
 	if (m_type != e_dynamicBody) {
 		return;
 	}

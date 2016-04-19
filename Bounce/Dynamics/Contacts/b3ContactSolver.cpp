@@ -98,14 +98,14 @@ void b3ContactSolver::InitializeVelocityConstraints()
 		u32 indexB = vc->indexB;
 		u32 pointCount = c->m_manifold.pointCount;
 
-		b3Vec3 vA = m_velocities[indexA].v;
-		b3Vec3 wA = m_velocities[indexA].w;
-		b3Vec3 xA = m_positions[indexA].x;
+		glm::vec3 vA = m_velocities[indexA].v;
+		glm::vec3 wA = m_velocities[indexA].w;
+		glm::vec3 xA = m_positions[indexA].x;
 		b3Quaternion qA = m_positions[indexA].q;
 
-		b3Vec3 vB = m_velocities[indexB].v;
-		b3Vec3 wB = m_velocities[indexB].w;
-		b3Vec3 xB = m_positions[indexB].x;
+		glm::vec3 vB = m_velocities[indexB].v;
+		glm::vec3 wB = m_velocities[indexB].w;
+		glm::vec3 xB = m_positions[indexB].x;
 		b3Quaternion qB = m_positions[indexB].q;
 
 		//for every point in contact manifold
@@ -118,11 +118,11 @@ void b3ContactSolver::InitializeVelocityConstraints()
 			vcp->rB = cp->position - xB; //rB 
 
 			// Compute tangent mass.
-			b3Vec3 rt1A = b3Cross(vcp->rA, vcp->tangents[0]);
-			b3Vec3 rt1B = b3Cross(vcp->rB, vcp->tangents[0]);
+			glm::vec3 rt1A = b3Cross(vcp->rA, vcp->tangents[0]);
+			glm::vec3 rt1B = b3Cross(vcp->rB, vcp->tangents[0]);
 
-			b3Vec3 rt2A = b3Cross(vcp->rA, vcp->tangents[1]);
-			b3Vec3 rt2B = b3Cross(vcp->rB, vcp->tangents[1]);
+			glm::vec3 rt2A = b3Cross(vcp->rA, vcp->tangents[1]);
+			glm::vec3 rt2B = b3Cross(vcp->rB, vcp->tangents[1]);
 
 			r32 kTangent1 = mA + mB + b3Dot(rt1A, iA * rt1A) + b3Dot(rt1B, iB * rt1B);
 			r32 kTangent2 = mA + mB + b3Dot(rt2A, iA * rt2A) + b3Dot(rt2B, iB * rt2B);
@@ -131,8 +131,8 @@ void b3ContactSolver::InitializeVelocityConstraints()
 			vcp->tangentMass[1] = B3_ONE / kTangent2;
 
 			// Compute normal mass.
-			b3Vec3 rnA = b3Cross(vcp->rA, vc->normal);
-			b3Vec3 rnB = b3Cross(vcp->rB, vc->normal);
+			glm::vec3 rnA = b3Cross(vcp->rA, vc->normal);
+			glm::vec3 rnB = b3Cross(vcp->rB, vc->normal);
 
 			r32 kNormal = mA + mB + b3Dot(rnA, iA * rnA) + b3Dot(rnB, iB * rnB);
 			vcp->normalMass = B3_ONE / kNormal;
@@ -153,7 +153,7 @@ void b3ContactSolver::WarmStart() {
 	for (u32 i = 0; i < m_count; ++i) {
 		b3ContactVelocityConstraint* vc = m_velocityConstraints + i;
 
-		b3Vec3 normal = vc->normal;
+		glm::vec3 normal = vc->normal;
 		r32 mA = vc->invMassA;
 		r32 mB = vc->invMassB;
 		b3Mat33 iA = vc->invIA;
@@ -162,10 +162,10 @@ void b3ContactSolver::WarmStart() {
 		u32 indexB = vc->indexB;
 		u32 pointCount = vc->pointCount;
 
-		b3Vec3 vA = m_velocities[indexA].v;
-		b3Vec3 wA = m_velocities[indexA].w;
-		b3Vec3 vB = m_velocities[indexB].v;
-		b3Vec3 wB = m_velocities[indexB].w;
+		glm::vec3 vA = m_velocities[indexA].v;
+		glm::vec3 wA = m_velocities[indexA].w;
+		glm::vec3 vB = m_velocities[indexB].v;
+		glm::vec3 wB = m_velocities[indexB].w;
 
 		for (u32 j = 0; j < pointCount; ++j) {
 			// Project old solutions into the new transposed Jacobians.
@@ -175,11 +175,11 @@ void b3ContactSolver::WarmStart() {
 			r32 lastTangentLambda1 = vcp->tangentImpulse[0];
 			r32 lastTangentLambda2 = vcp->tangentImpulse[1];
 
-			b3Vec3 normalImpulse = lastNormalLambda * normal;
-			b3Vec3 tangentImpulse1 = lastTangentLambda1 * vcp->tangents[0];
-			b3Vec3 tangentImpulse2 = lastTangentLambda2 * vcp->tangents[1];
+			glm::vec3 normalImpulse = lastNormalLambda * normal;
+			glm::vec3 tangentImpulse1 = lastTangentLambda1 * vcp->tangents[0];
+			glm::vec3 tangentImpulse2 = lastTangentLambda2 * vcp->tangents[1];
 
-			b3Vec3 impulse = normalImpulse + tangentImpulse1 + tangentImpulse2;
+			glm::vec3 impulse = normalImpulse + tangentImpulse1 + tangentImpulse2;
 			
 			vA -= mA * impulse;
 			wA -= iA * b3Cross(vcp->rA, impulse);
@@ -200,7 +200,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 	{ 
 		b3ContactVelocityConstraint* vc = m_velocityConstraints + i;
 
-		b3Vec3 normal = vc->normal;
+		glm::vec3 normal = vc->normal;
 		r32 mA = vc->invMassA;
 		r32 mB = vc->invMassB;
 		b3Mat33 iA = vc->invIA;
@@ -209,10 +209,10 @@ void b3ContactSolver::SolveVelocityConstraints() {
 		u32 indexB = vc->indexB;
 		u32 pointCount = vc->pointCount; //amount of contact points
 
-		b3Vec3 vA = m_velocities[indexA].v;
-		b3Vec3 wA = m_velocities[indexA].w;
-		b3Vec3 vB = m_velocities[indexB].v;
-		b3Vec3 wB = m_velocities[indexB].w;
+		glm::vec3 vA = m_velocities[indexA].v;
+		glm::vec3 wA = m_velocities[indexA].w;
+		glm::vec3 vB = m_velocities[indexB].v;
+		glm::vec3 wB = m_velocities[indexB].w;
 
 		for (u32 j = 0; j < pointCount; ++j) {
 			
@@ -221,7 +221,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 			//NON-PENETRATION CONSTRAINT
 			{
 				// Compute J * u.
-				b3Vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
+				glm::vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
 				r32 dCdt = b3Dot(dv, normal);
 
 				// Compute new lambda values.
@@ -231,7 +231,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 				
 				vcp->normalImpulse = newLambda;
 
-				b3Vec3 deltaImpulse = deltaLambda * normal;
+				glm::vec3 deltaImpulse = deltaLambda * normal;
 
 				vA -= mA * deltaImpulse;
 				wA -= iA * b3Cross(vcp->rA, deltaImpulse);
@@ -248,7 +248,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 				r32 lo = -hi;
 
 				// Compute J * u.
-				b3Vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
+				glm::vec3 dv = vB + b3Cross(wB, vcp->rB) - vA - b3Cross(wA, vcp->rA);
 				r32 dCdt = b3Dot(dv, vcp->tangents[k]);
 
 				// Compute new lambda values.
@@ -258,7 +258,7 @@ void b3ContactSolver::SolveVelocityConstraints() {
 				
 				vcp->tangentImpulse[k] = newLambda;
 
-				b3Vec3 deltaImpulse = deltaLambda * vcp->tangents[k];
+				glm::vec3 deltaImpulse = deltaLambda * vcp->tangents[k];
 
 				vA -= mA * deltaImpulse;
 				wA -= iA * b3Cross(vcp->rA, deltaImpulse);

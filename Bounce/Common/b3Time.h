@@ -23,12 +23,12 @@
 #include "b3Settings.h"
 
 struct b3Velocity {
-	b3Vec3 v;
-	b3Vec3 w;
+	glm::vec3 v;
+	glm::vec3 w;
 };
 
 struct b3Position {
-	b3Vec3 x;
+	glm::vec3 x;
 	b3Quaternion q;
 };
 

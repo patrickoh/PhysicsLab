@@ -51,7 +51,7 @@ public :
 	//void DestroyJoint(b3Joint* joint);
 
 	// Set the gravity direction (usually y-down (0, -1, 0)).
-	void SetGravityDirection(const b3Vec3& direction);
+	void SetGravityDirection(const glm::vec3& direction);
 
 	// The contact listener passed will be notified when two body shapes begin/stays/ends
 	// touching with each other.
@@ -64,7 +64,7 @@ public :
 	
 	// The ray cast listener will be notified when a ray intersects a world shape.
 	// The ray cast output is the intercepted shape, the intersection point, normal, and fraction.
-	//void RayCast(b3RayCastListener* listener, const b3Vec3& p1, const b3Vec3& p2) const;
+	//void RayCast(b3RayCastListener* listener, const glm::vec3& p1, const glm::vec3& p2) const;
 
 	// Call the function below to simulate a physics frame.
 	// The function parameter is the time step definition, which must contain 
@@ -106,7 +106,7 @@ protected :
 	
 	u32 m_flags;
 	
-	b3Vec3 m_gravityDir;
+	glm::vec3 m_gravityDir;
 	
 	b3Body* m_bodyList;
 	u32 m_bodyCount;
@@ -118,7 +118,7 @@ inline const b3StepProfile& b3World::GetStepProfile() const {
 	return m_profile;
 }
 
-inline void b3World::SetGravityDirection(const b3Vec3& direction) {
+inline void b3World::SetGravityDirection(const glm::vec3& direction) {
 	m_gravityDir = direction;
 }
 

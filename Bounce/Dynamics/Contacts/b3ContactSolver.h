@@ -32,9 +32,9 @@ struct b3Velocity;
 // It is rapidly executed, but it takes some time to completely solve a constraint.
 
 struct b3VelocityConstraintPoint {
-	b3Vec3 rA;
-	b3Vec3 rB;
-	b3Vec3 tangents[B3_MAX_TANGENT_DIRECTIONS];
+	glm::vec3 rA;
+	glm::vec3 rB;
+	glm::vec3 tangents[B3_MAX_TANGENT_DIRECTIONS];
 	r32 normalMass;
 	r32 tangentMass[B3_MAX_TANGENT_DIRECTIONS];
 	r32 normalImpulse;
@@ -44,7 +44,7 @@ struct b3VelocityConstraintPoint {
 
 struct b3ContactVelocityConstraint {
 	b3VelocityConstraintPoint points[B3_MAX_MANIFOLD_POINTS];
-	b3Vec3 normal;
+	glm::vec3 normal;
 	r32 invMassA;
 	r32 invMassB;
 	b3Mat33 invIA;

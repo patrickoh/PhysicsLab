@@ -25,7 +25,7 @@
 struct b3Mat33 {
 	b3Mat33() { }
 
-	b3Mat33(const b3Vec3& _x, const b3Vec3& _y, const b3Vec3& _z) : 
+	b3Mat33(const glm::vec3& _x, const glm::vec3& _y, const glm::vec3& _z) : 
 		x(_x), 
 		y(_y), 
 		z(_z) {
@@ -39,30 +39,30 @@ struct b3Mat33 {
 	}
 
 	// Get a column vector of this matrix.
-	const b3Vec3& operator[](u32 i) const {
+	const glm::vec3& operator[](u32 i) const {
 		return (&x)[i];
 	}
 	
 	// Get a column vector of this matrix.
-	b3Vec3& operator[](u32 i) {
+	glm::vec3& operator[](u32 i) {
 		return (&x)[i];
 	}
 
 	// Set this matrix to the zero matrix.
 	void SetZero() {
-		x.SetZero();
-		y.SetZero();
-		z.SetZero();
+		x = glm::vec3(0);//.SetZero();
+		y = glm::vec3(0);
+		z = glm::vec3(0);
 	}
 
 	// Set this matrix to the identity matrix.
 	void SetIdentity() {
-		x.Set(B3_ONE, B3_ZERO, B3_ZERO);
-		y.Set(B3_ZERO, B3_ONE, B3_ZERO);
-		z.Set(B3_ZERO, B3_ZERO, B3_ONE);
+		x = glm::vec3(B3_ONE, B3_ZERO, B3_ZERO);
+		y = glm::vec3(B3_ZERO, B3_ONE, B3_ZERO);
+		z = glm::vec3(B3_ZERO, B3_ZERO, B3_ONE);
 	}
 
-	b3Vec3 x, y, z;
+	glm::vec3 x, y, z;
 };
 
 // Compute C = A + B.
@@ -71,7 +71,7 @@ inline b3Mat33 operator+(const b3Mat33& A, const b3Mat33& B) {
 }
 
 // Compute u = Av.
-inline b3Vec3 operator*(const b3Mat33& A, const b3Vec3& v) {
+inline glm::vec3 operator*(const b3Mat33& A, const glm::vec3& v) {
 	return v.x * A.x + v.y * A.y + v.z * A.z;
 }
 
@@ -83,27 +83,27 @@ inline b3Mat33 operator*(const b3Mat33& A, const b3Mat33& B) {
 // Compute the transpose of a 3x3 matrix (A^T).
 inline b3Mat33 b3Transpose(const b3Mat33& A) {
 	return b3Mat33(
-		b3Vec3(A.x.x, A.y.x, A.z.x),
-		b3Vec3(A.x.y, A.y.y, A.z.y),
-		b3Vec3(A.x.z, A.y.z, A.z.z)
+		glm::vec3(A.x.x, A.y.x, A.z.x),
+		glm::vec3(A.x.y, A.y.y, A.z.y),
+		glm::vec3(A.x.z, A.y.z, A.z.z)
 		);
 }
 
 // Compute the transpose of a 3x3 matrix (A^T).
 inline b3Mat33 b3Diagonal(r32 s) {
 	return b3Mat33(
-		b3Vec3(s, B3_ZERO, B3_ZERO),
-		b3Vec3(B3_ZERO, s, B3_ZERO),
-		b3Vec3(B3_ZERO, B3_ZERO, s)
+		glm::vec3(s, B3_ZERO, B3_ZERO),
+		glm::vec3(B3_ZERO, s, B3_ZERO),
+		glm::vec3(B3_ZERO, B3_ZERO, s)
 		);
 }
 
 // Compute the inverse of a 3x3 matrix (A^-1).
 inline b3Mat33 b3Inverse(const b3Mat33& A) {
 	// Return the zero matrix if isn't invertable.
-	b3Vec3 c1 = b3Cross(A.x, A.y);
-	b3Vec3 c2 = b3Cross(A.y, A.z);
-	b3Vec3 c3 = b3Cross(A.z, A.x);
+	glm::vec3 c1 = b3Cross(A.x, A.y);
+	glm::vec3 c2 = b3Cross(A.y, A.z);
+	glm::vec3 c3 = b3Cross(A.z, A.x);
 
 	r32 det = b3Dot(c1, A.z);
 	if (det != B3_ZERO) {
@@ -128,7 +128,7 @@ inline b3Mat33 b3Inverse(const b3Mat33& A) {
 }
 
 // Compute a skew-symmetric matrix given a vector.
-inline b3Mat33 b3SkewSymmetric(const b3Vec3& v) {
+inline b3Mat33 b3SkewSymmetric(const glm::vec3& v) {
 	b3Mat33 A;
 
 	A.x.x = B3_ZERO;

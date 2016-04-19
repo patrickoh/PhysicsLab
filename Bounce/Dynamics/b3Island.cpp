@@ -86,25 +86,25 @@ void b3Island::Add(b3Contact* c) {
 //	++jointCount;
 //}
 
-void b3Island::Solve(const b3Vec3& gravityDir) 
+void b3Island::Solve(const glm::vec3& gravityDir) 
 {
 	r32 h = dt;
-	b3Vec3 gravityForce = B3_GRAVITY_ACC * gravityDir;
+	glm::vec3 gravityForce = B3_GRAVITY_ACC * gravityDir;
 
 	// Integrate velocities.
 	for (u32 i = 0; i < bodyCount; ++i) 
 	{
 		b3Body* b = bodies[i];
 
-		b3Vec3 v = b->m_linearVelocity;
-		b3Vec3 w = b->m_angularVelocity;
-		b3Vec3 x = b->m_worldCenter;
+		glm::vec3 v = b->m_linearVelocity;
+		glm::vec3 w = b->m_angularVelocity;
+		glm::vec3 x = b->m_worldCenter;
 		b3Quaternion q = b->m_orientation;
 
 		if (b->m_type == e_dynamicBody) 
 		{
 			// Use semi-implitic Euler.
-			b3Vec3 force = b->m_gravityScale * gravityForce + b->m_force;
+			glm::vec3 force = b->m_gravityScale * gravityForce + b->m_force;
 			v += (h * b->m_invMass) * force;
 			w += h * (b->m_invWorldInertia * b->m_torque);
 
@@ -175,10 +175,10 @@ void b3Island::Solve(const b3Vec3& gravityDir)
 			continue;
 		}
 
-		b3Vec3 x = positions[i].x;
+		glm::vec3 x = positions[i].x;
 		b3Quaternion q1 = positions[i].q;
-		b3Vec3 v = velocities[i].v;
-		b3Vec3 w = velocities[i].w;
+		glm::vec3 v = velocities[i].v;
+		glm::vec3 w = velocities[i].w;
 		
 		x += h * v;	
 		b3Quaternion q2 = Integrate(q1, w, h);

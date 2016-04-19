@@ -33,14 +33,14 @@ struct b3Pair {
 };
 
 //struct b3RayCastInput {
-//	b3Vec3 p1;
-//	b3Vec3 p2;
+//	glm::vec3 p1;
+//	glm::vec3 p2;
 //	r32 maxFraction;
 //};
 //
 //struct b3RayCastOutput {
 //	r32 fraction;
-//	b3Vec3 normal;
+//	glm::vec3 normal;
 //};
 
 #define NULL_EDGE 0xff
@@ -58,24 +58,24 @@ union b3ContactID {
 };
 
 struct b3ContactPoint {
-	b3Vec3 position;
+	glm::vec3 position;
 	r32 normalImpulse;
-	b3Vec3 tangents[B3_MAX_TANGENT_DIRECTIONS];
+	glm::vec3 tangents[B3_MAX_TANGENT_DIRECTIONS];
 	r32 tangentImpulse[B3_MAX_TANGENT_DIRECTIONS];
 	b3ContactID id;
 	bool warmStarted;
 };
 
 struct b3Manifold {
-	void AddEntry(const b3Vec3& position, r32 distance, b3ContactID id);
+	void AddEntry(const glm::vec3& position, r32 distance, b3ContactID id);
 
-	b3Vec3 normal; //A -> B.
+	glm::vec3 normal; //A -> B.
 	b3ContactPoint points[B3_MAX_MANIFOLD_POINTS];
 	r32 distances[B3_MAX_MANIFOLD_POINTS];
 	u32 pointCount;
 };
 
-inline void b3Manifold::AddEntry(const b3Vec3& position, r32 distance, b3ContactID id) {
+inline void b3Manifold::AddEntry(const glm::vec3& position, r32 distance, b3ContactID id) {
 	if (pointCount == B3_MAX_MANIFOLD_POINTS) {
 		return;
 	}
