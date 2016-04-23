@@ -24,8 +24,12 @@ SolverDemo* SolverDemo::Instance;
 
 Camera* Camera::Instance;
 
-glm::vec3 GLProgram::normal[6] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
-glm::vec3 GLProgram::plane[6] = { glm::vec3(0,-5,0), glm::vec3(0,5,0), glm::vec3(-5,0,0), glm::vec3(5,0,0), glm::vec3(0,0,5), glm::vec3(0,0,-5) };
+glm::vec3 GLProgram::normal[6] = { glm::vec3(0,1,0), glm::vec3(0,-1,0), 
+	glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec3(0,0,-1), glm::vec3(0,0,1) };
+glm::vec3 GLProgram::plane[6] = { glm::vec3(0,-5,0), glm::vec3(0,5,0), 
+	glm::vec3(-5,0,0), glm::vec3(5,0,0), glm::vec3(0,0,5), glm::vec3(0,0,-5) };
+
+int SolverDemo::stackHeight = 5;
 
 int main(int argc, char** argv)
 {

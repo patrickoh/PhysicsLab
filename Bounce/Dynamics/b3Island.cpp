@@ -219,7 +219,8 @@ void b3Island::Solve(const b3Vec3& gravityDir)
 			const r32 sqrAngVel = b3LenSq(b->m_angularVelocity);
 
 			//if linear and angular velocity are greather than some threshold
-			if (sqrLinVel > B3_SLEEP_LINEAR_TOL || sqrAngVel > B3_SLEEP_ANGULAR_TOL) 
+			if (sqrLinVel > b3ExtraSettings::sleepLinearTolerance 
+				|| sqrAngVel > b3ExtraSettings::sleepAngularTolerance) 
 			{
 				minSleepTime = B3_ZERO;
 				b->m_sleepTime = B3_ZERO;

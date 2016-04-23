@@ -16,6 +16,11 @@ private:
 	float simulationSpeed;
 	std::vector<b3Body*> rigidBodies;
 
+	float shootSpeed;
+	float shootMass;
+
+	static int stackHeight;
+
 public:
 
 	b3World* m_world;
@@ -52,6 +57,9 @@ public:
 			shaderManager.GetShaderProgramID("diffuse")));
 
 		simulationSpeed = 1.0f;
+		
+		shootSpeed = 1.0f;
+		shootMass = 1.0f;
 
 		m_world = new b3World();
 		m_step.velocityIterations = 10;
@@ -67,7 +75,8 @@ public:
 		SetUpTweakBars();
 	}
 
-	void AddABox(b3Vec3 position, b3BodyType bodyType, b3Vec3 scale)
+	void AddABox(b3Vec3 position, b3BodyType bodyType, b3Vec3 scale, 
+		float density = 1.0)
 	{
 		//Make rigid body
 		{
@@ -77,6 +86,7 @@ public:
 				position.y, position.z);
 			bodyDef->awake = true;
 			bodyDef->type = bodyType;
+			//bodyDef->userData = 
 			rigidBodies.push_back(m_world->CreateBody(*bodyDef));
 		}
 		
@@ -89,21 +99,11 @@ public:
 			b3Polyhedron* polyhedron = new b3Polyhedron;
 			polyhedron->SetHull(hull);
 
-			//polyhedron->ComputeMass(
-
-			/*shape->m_body = this;
-			shape->m_userData = def.userData;
-			shape->m_local = def.local;
-			shape->m_density = def.density;
-			shape->m_friction = def.friction;
-			shape->m_restitution = def.restitution;
-			shape->m_isSensor = def.sensor;
-			*/
 			b3ShapeDef* shapeDef = new b3ShapeDef; 
 			shapeDef->shape = polyhedron;
 			shapeDef->friction = 0.5f;
 			shapeDef->restitution = 0.0f;
-			shapeDef->density = 0.5f;
+			shapeDef->density = density;
 
 			rigidBodies[rigidBodies.size()-1]->CreateShape(*shapeDef);
 			rigidBodies[rigidBodies.size()-1]->m_scale = scale;
@@ -131,10 +131,6 @@ public:
 	void update()
 	{
 		GLProgram::update();
-
-		//rigidBodyManager.Update(deltaTime * simulationSpeed);	
-		//rigidBodyManager.Broadphase(broadphaseMode); //Make them always be potentially colliding for purposes of demo		
-		//rigidBodyManager.Narrowphase(deltaTime);
 
 		m_step.dt = deltaTime*.001f;
 		m_world->Step(m_step);
@@ -211,21 +207,26 @@ public:
 	void printouts()
 	{
 		//shaderManager.SetShaderProgram(shaderManager.GetShaderProgramID("text"));
-		ss << " Press 'spacebar' or 'esc' to toggle camera/cursor";
+		ss << "Press 'spacebar' or 'esc' to toggle camera/cursor";
 		printStream();
 
-		ss << " Press 'c' to switch camera modes";
+		ss << "Press 'c' to switch camera modes";
 		printStream();
 
-		ss << " fps: " << fps;
+		ss << "Press 'b' to shoot a box";
 		printStream();
 
+		ss << "fps: " << fps;
+		printStream();
+
+		ss << "solverTime: " << m_world->GetStepProfile().solverTime;
+		printStream();
+
+		ss << "Camera dir: ";
 		toStringStream(camera->viewProperties.forward, ss);
 		printStream();
 
-		toStringStream(camera->viewProperties.position, ss);
-		printStream();
-
+		ss << "Camera pos: ";
 		toStringStream(camera->viewProperties.position, ss);
 		printStream();
 
@@ -238,25 +239,25 @@ public:
 
 		if(Input::wasKeyPressed)
 		{
-			if(Input::keyPress == KEY::KEY_S ||
-				Input::keyPress == KEY::KEY_s)
-				Shoot();
+			if(Input::keyPress == KEY::KEY_B ||
+				Input::keyPress == KEY::KEY_b)
+				Shoot(shootSpeed, shootMass);
 		}
 	}
 
-	static void Shoot()
+	static void Shoot(float speed, float mass)
 	{
 		SolverDemo::Instance->AddABox(
 			b3Vec3(Camera::Instance->viewProperties.position.x,
 				   Camera::Instance->viewProperties.position.y, 
 				   Camera::Instance->viewProperties.position.z),
-			e_dynamicBody, b3Vec3(1,1,1));
+			e_dynamicBody, b3Vec3(1,1,1), mass);
 		SolverDemo::Instance->rigidBodies[
 			SolverDemo::Instance->rigidBodies.size()-1]->SetLinearVelocity(
 				b3Vec3(
-					Camera::Instance->viewProperties.forward.x*2.0f,
-					Camera::Instance->viewProperties.forward.y*2.0f,
-					Camera::Instance->viewProperties.forward.z*2.0f)
+					Camera::Instance->viewProperties.forward.x * speed,
+					Camera::Instance->viewProperties.forward.y * speed,
+					Camera::Instance->viewProperties.forward.z * speed)
 				);
 	}
 
@@ -314,8 +315,23 @@ public:
 
 		for(int i = -3; i < 3; i++)
 			for(int j = -3; j < 3; j++)
-				for(int k = 1; k < 7; k++)
-					SolverDemo::Instance->AddABox(b3Vec3(i,k*2,j), e_dynamicBody, 
+				for(int k = 1; k < stackHeight; k++)
+					SolverDemo::Instance->AddABox(b3Vec3(i,k*1.01,j), e_dynamicBody, 
+						b3Vec3(1,1,1));
+	}
+
+	
+	static void TW_CALL Stack5(void *clientData)
+	{
+		SolverDemo::Instance->ClearBoxes();
+		
+		SolverDemo::Instance->AddABox(b3Vec3(-0.5,0,-0.5), e_staticBody, 
+			b3Vec3(10,0.5f,10));
+
+		for(int i = -3; i < 3; i++)
+			for(int j = -3; j < 3; j++)
+				for(int k = 1; k < stackHeight; k++)
+					SolverDemo::Instance->AddABox(b3Vec3(i+(k%2*0.5f),k*1.1f,j), e_dynamicBody, 
 						b3Vec3(1,1,1));
 	
 		/*SolverDemo::Instance->AddABox(b3Vec3(0.5f,30,0), e_dynamicBody, 
@@ -331,23 +347,49 @@ public:
 		TwAddVarRW(bar, "Sleeping", TW_TYPE_BOOL8, &m_step.sleeping, "");
 		TwAddVarRW(bar, "Sleep time", TW_TYPE_FLOAT, 
 			&b3ExtraSettings::timeToSleep, "min=0");
-		TwAddVarRW(bar, "Damping", TW_TYPE_BOOL8, 
-			&b3ExtraSettings::bApplyDamping, "");
+		TwAddVarRW(bar, "Angular Tolerance", TW_TYPE_FLOAT, 
+			&b3ExtraSettings::sleepAngularTolerance, "min=0 step=0.01");
+		TwAddVarRW(bar, "Linear Tolerance", TW_TYPE_FLOAT, 
+			&b3ExtraSettings::sleepLinearTolerance, "min=0 step=0.01");
+
+		TwAddSeparator(bar, "", "");
+
+		/*TwAddVarRW(bar, "Damping", TW_TYPE_BOOL8, 
+			&b3ExtraSettings::bApplyDamping, "");*/
+
 		TwAddVarRW(bar, "Velocity Iterations", TW_TYPE_UINT32, 
 			&m_step.velocityIterations, "min=0");
 		TwAddVarRW(bar, "Warm start", TW_TYPE_BOOL8, 
 			&b3ExtraSettings::bWarmStart, "");
 		TwAddVarRW(bar, "Bias Factor", TW_TYPE_FLOAT, 
 			&b3ExtraSettings::baumgarte, "min=0.0 step=0.1");
+
+		TwAddSeparator(bar, "", "");
+
+		TwAddButton(bar, "Press 'B' to shoot a box!", NULL, NULL, 
+			"label='Press 'B' to shoot a box! ");
+		TwAddVarRW(bar, "Shoot speed", TW_TYPE_FLOAT,
+			&shootSpeed, "min=0.0 step=0.5");
+		TwAddVarRW(bar, "Shoot mass", TW_TYPE_FLOAT,
+			&shootMass, "min=0.0 step=0.5");
+
+		TwAddSeparator(bar, "", "");
+
 		TwAddVarRW(bar, "Enforce Non-penetration constraint", TW_TYPE_BOOL8,
 			&b3ExtraSettings::bEnforceNonPenetrationContraint,"");
 		TwAddVarRW(bar, "Enforce friction constraints", TW_TYPE_BOOL8,
 			&b3ExtraSettings::bEnforceFrictionConstraints,"");
 
-		//m_world->GetStepProfile().broadPhaseTime	
+		TwAddSeparator(bar, "", "");
 
+		TwAddVarRW(bar, "Stack height", TW_TYPE_INT32,
+			&stackHeight, "group='Stacks'");
+
+		//m_world->GetStepProfile().solverTime	
 		/*TwAddVarRW(bar, "Friction coefficient", TW_TYPE_FLOAT, 
 			&, "min=0.0 max=1.0 step=0.1");*/
+
+		TwAddSeparator(bar, "", "");
 
 		TwAddButton(bar, "Stack 1", 
 			Stack1, NULL, "group='Stacks'");
@@ -357,7 +399,9 @@ public:
 			Stack3, NULL, "group='Stacks'");
 		TwAddButton(bar, "Stack 4", 
 			Stack4, NULL, "group='Stacks'");
+		TwAddButton(bar, "Stack 5", 
+			Stack5, NULL, "group='Stacks'");
 
-		TwAddSeparator(bar, "", "");
+		
 	}
 };

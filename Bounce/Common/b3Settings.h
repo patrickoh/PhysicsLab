@@ -95,6 +95,8 @@ struct b3ExtraSettings
 	static bool bEnforceFrictionConstraints;
 	static bool bEnforceNonPenetrationContraint;
 	static float b3ExtraSettings::baumgarte;
+	static float sleepLinearTolerance;
+	static float sleepAngularTolerance;
 };
 
 #endif

@@ -32,3 +32,5 @@ bool b3ExtraSettings::bApplyDamping = true;
 bool b3ExtraSettings::bEnforceFrictionConstraints = true;
 bool b3ExtraSettings::bEnforceNonPenetrationContraint = true;
 float b3ExtraSettings::baumgarte = 0.2f;
+float b3ExtraSettings::sleepAngularTolerance = B3_SLEEP_ANGULAR_TOL;
+float b3ExtraSettings::sleepLinearTolerance = B3_SLEEP_LINEAR_TOL;
