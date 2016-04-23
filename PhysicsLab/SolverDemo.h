@@ -5,7 +5,7 @@
 #include "RigidbodyManager.h"
 #include "Inertia.h"
 
-#include "..\Bounce\Bounce.h"
+#include "Bounce\Bounce.h"
 #include "DebugDrawer.h"
 
 class SolverDemo : public GLProgram
@@ -20,6 +20,8 @@ private:
 	float shootMass;
 
 	static int stackHeight;
+
+	bool bColourCodedIslands;
 
 public:
 
@@ -60,6 +62,8 @@ public:
 		
 		shootSpeed = 1.0f;
 		shootMass = 1.0f;
+
+		bColourCodedIslands = false;
 
 		m_world = new b3World();
 		m_step.velocityIterations = 10;
@@ -172,8 +176,50 @@ public:
 			shaderManager.SetShaderProgram("bounding");
 			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
 				"mvpMatrix", MVP);
-			ShaderManager::SetUniform(shaderManager.GetCurrentShaderProgramID(), 
-				"boundColour", glm::vec4(1,1,1,1));
+
+			if(body->GetType() != b3BodyType::e_staticBody
+				&& bColourCodedIslands)
+			{
+				glm::vec4 colour;
+
+				switch(body->whichIsland)
+				{
+					case 0:
+						colour = glm::vec4(0,0,0,1);
+						break;
+					case 1:
+						colour = glm::vec4(0,0,1,1);
+						break;
+					case 2:
+						colour = glm::vec4(0,1,0,1);
+						break;
+					case 3:
+						colour = glm::vec4(0,1,1,1);
+						break;
+					case 4:
+						colour = glm::vec4(1,0,0,1);
+						break;
+					case 5:
+						colour = glm::vec4(1,0,1,1);
+						break;
+					case 6:
+						colour = glm::vec4(1,1,0,1);
+						break;
+					default:
+						colour = glm::vec4(1,1,1,1);
+				}
+
+				ShaderManager::SetUniform(
+							shaderManager.GetCurrentShaderProgramID(), 
+							"boundColour", colour);
+			}
+			else
+			{
+				ShaderManager::SetUniform(
+					shaderManager.GetCurrentShaderProgramID(), 
+							"boundColour", glm::vec4(1,1,1,1));
+			}
+
 			glutWireCube(1);
 			shaderManager.SetShaderProgram(0);
 		}
@@ -391,16 +437,21 @@ public:
 
 		TwAddSeparator(bar, "", "");
 
-		TwAddButton(bar, "Stack 1", 
+		/*TwAddButton(bar, "Stack 1", 
 			Stack1, NULL, "group='Stacks'");
 		TwAddButton(bar, "Stack 2", 
 			Stack2, NULL, "group='Stacks'");
 		TwAddButton(bar, "Stack 3", 
-			Stack3, NULL, "group='Stacks'");
-		TwAddButton(bar, "Stack 4", 
+			Stack3, NULL, "group='Stacks'");*/
+		TwAddButton(bar, "Stack 1", 
 			Stack4, NULL, "group='Stacks'");
-		TwAddButton(bar, "Stack 5", 
+		TwAddButton(bar, "Stack 2", 
 			Stack5, NULL, "group='Stacks'");
+
+		TwAddSeparator(bar, "", "");
+
+		TwAddVarRW(bar, "Colour code islands", TW_TYPE_BOOL8,
+			&bColourCodedIslands,"");
 
 		
 	}

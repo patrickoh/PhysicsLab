@@ -179,9 +179,6 @@
     <ClInclude Include="SoftBody.h">
       <Filter>Header Files\Physics\SoftBody</Filter>
     </ClInclude>
-    <ClInclude Include="SoftBodyDemo.h">
-      <Filter>Header Files\Demos</Filter>
-    </ClInclude>
     <ClInclude Include="RigidbodyManager.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>

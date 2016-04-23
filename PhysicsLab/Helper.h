@@ -18,7 +18,7 @@
 #include "Magick++.h"
 #include <iostream>
 
-#include <btBulletDynamicsCommon.h>
+//#include <btBulletDynamicsCommon.h>
 
 glm::mat4 convertAssimpMatrix (aiMatrix4x4 m);
 glm::quat formQuaternion(double x, double y, double z, double angle);
@@ -47,4 +47,4 @@ bool isSameDirection(glm::vec3 v1, glm::vec3 v2);
 GLuint loadTexture(const char* fileName);
 glm::vec2 randomXZ(float radius);
 void toStringStream(glm::vec3 v, std::stringstream& ss);
-glm::vec3 convertBtVector3(btVector3* btv3);
+//glm::vec3 convertBtVector3(btVector3* btv3);

@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "Point.h"
 #include "Line.h"
-#include "..\Bounce\Bounce.h"
+#include "Bounce\Bounce.h"
 
 class DebugDrawer : public b3Draw {
 

@@ -1,7 +1,7 @@
 #include "ParticleDemo.h"
 #include "RigidBodyDemo.h"
 #include "BroadphaseDemo.h"
-#include "SoftBodyDemo.h"
+//#include "SoftBodyDemo.h"
 #include "NarrowphaseDemo.h"
 #include "ResponseDemo.h"
 #include "SolverDemo.h"
@@ -17,7 +17,7 @@ GLProgram* GLProgram::Instance;
 ParticleDemo* ParticleDemo::Instance;
 RigidBodyDemo* RigidBodyDemo::Instance;
 BroadphaseDemo* BroadphaseDemo::Instance;
-SoftBodyDemo* SoftBodyDemo::Instance;
+//SoftBodyDemo* SoftBodyDemo::Instance;
 NarrowphaseDemo* NarrowphaseDemo::Instance;
 ResponseDemo* ResponseDemo::Instance;
 SolverDemo* SolverDemo::Instance;
@@ -38,10 +38,10 @@ int main(int argc, char** argv)
 	std::cout << "1. Particle System" << std::endl;
 	std::cout << "2. Unconstrained Rigid Body" << std::endl;
 	std::cout << "3. Broadphase - Sweep and Prune" << std::endl;
-	std::cout << "4. Soft Body (Side Project)" << std::endl;
-	std::cout << "5. Narrowphase - GJK" << std::endl;
-	std::cout << "6. Response - EPA" << std::endl;
-	std::cout << "7. Solver" << std::endl;
+	//std::cout << "4. Soft Body (Side Project)" << std::endl;
+	std::cout << "4. Narrowphase - GJK" << std::endl;
+	std::cout << "5. Response - EPA" << std::endl;
+	std::cout << "6. Solver" << std::endl;
 	std::cout << ">";
 
 	int demoIndex = -1;
@@ -56,13 +56,13 @@ int main(int argc, char** argv)
 		demo = new RigidBodyDemo();
 	else if(demoIndex == 3)
 		demo = new BroadphaseDemo();
+	//else if(demoIndex == 4)
+		//demo = new SoftBodyDemo();
 	else if(demoIndex == 4)
-		demo = new SoftBodyDemo();
-	else if(demoIndex == 5)
 		demo = new NarrowphaseDemo();
-	else if(demoIndex == 6)
+	else if(demoIndex == 5)
 		demo = new ResponseDemo();
-	else if(demoIndex == 7)
+	else if(demoIndex == 6)
 		demo = new SolverDemo();
 
 	demo->Init(argc, argv);
