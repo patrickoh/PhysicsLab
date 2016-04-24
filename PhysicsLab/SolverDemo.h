@@ -46,6 +46,9 @@ public:
 	void Init(int argc, char** argv)
 	{
 		GLProgram::Init(argc, argv);
+		camera->projectionMatrix = glm::perspective(60.0f, 
+			(float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.f); 
+		camera->maxDistance = 30;
 
 		glutIdleFunc (updateCB);
 		
@@ -312,7 +315,7 @@ public:
 		SolverDemo::Instance->ClearBoxes();
 
 		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
-			b3Vec3(10,0.5f,10));
+			b3Vec3(20,0.5f,20));
 		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
 			b3Vec3(1,1,1));
 		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
@@ -326,38 +329,9 @@ public:
 	static void TW_CALL Stack2(void *clientData)
 	{
 		SolverDemo::Instance->ClearBoxes();
-
-		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
-			b3Vec3(10,0.5f,10));
-		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-	}
-
-	static void TW_CALL Stack3(void *clientData)
-	{
-		SolverDemo::Instance->ClearBoxes();
-		SolverDemo::Instance->AddABox(b3Vec3(0,0,0), e_staticBody, 
-			b3Vec3(10,0.5f,10));
-		SolverDemo::Instance->AddABox(b3Vec3(0,10,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-		SolverDemo::Instance->AddABox(b3Vec3(0,20,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-		SolverDemo::Instance->AddABox(b3Vec3(5.2f,30,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-	}
-
-	static void TW_CALL Stack4(void *clientData)
-	{
-		SolverDemo::Instance->ClearBoxes();
 		
 		SolverDemo::Instance->AddABox(b3Vec3(-0.5,0,-0.5), e_staticBody, 
-			b3Vec3(10,0.5f,10));
+			b3Vec3(20,0.5f,20));
 
 		for(int i = -3; i < 3; i++)
 			for(int j = -3; j < 3; j++)
@@ -367,23 +341,18 @@ public:
 	}
 
 	
-	static void TW_CALL Stack5(void *clientData)
+	static void TW_CALL Stack3(void *clientData)
 	{
 		SolverDemo::Instance->ClearBoxes();
 		
 		SolverDemo::Instance->AddABox(b3Vec3(-0.5,0,-0.5), e_staticBody, 
-			b3Vec3(10,0.5f,10));
+			b3Vec3(20,0.5f,20));
 
 		for(int i = -3; i < 3; i++)
 			for(int j = -3; j < 3; j++)
 				for(int k = 1; k < stackHeight; k++)
 					SolverDemo::Instance->AddABox(b3Vec3(i+(k%2*0.5f),k*1.1f,j), e_dynamicBody, 
 						b3Vec3(1,1,1));
-	
-		/*SolverDemo::Instance->AddABox(b3Vec3(0.5f,30,0), e_dynamicBody, 
-			b3Vec3(1,1,1));
-		SolverDemo::Instance->AddABox(b3Vec3(0.5f,40,0.8f), e_dynamicBody, 
-			b3Vec3(1,1,1));*/
 	}
 
 	void SetUpTweakBars()
@@ -402,7 +371,6 @@ public:
 
 		/*TwAddVarRW(bar, "Damping", TW_TYPE_BOOL8, 
 			&b3ExtraSettings::bApplyDamping, "");*/
-
 		TwAddVarRW(bar, "Velocity Iterations", TW_TYPE_UINT32, 
 			&m_step.velocityIterations, "min=0");
 		TwAddVarRW(bar, "Warm start", TW_TYPE_BOOL8, 
@@ -431,24 +399,12 @@ public:
 		TwAddVarRW(bar, "Stack height", TW_TYPE_INT32,
 			&stackHeight, "group='Stacks'");
 
-		//m_world->GetStepProfile().solverTime	
-		/*TwAddVarRW(bar, "Friction coefficient", TW_TYPE_FLOAT, 
-			&, "min=0.0 max=1.0 step=0.1");*/
-
 		TwAddSeparator(bar, "", "");
 
-		/*TwAddButton(bar, "Stack 1", 
-			Stack1, NULL, "group='Stacks'");
-		TwAddButton(bar, "Stack 2", 
-			Stack2, NULL, "group='Stacks'");
-		TwAddButton(bar, "Stack 3", 
-			Stack3, NULL, "group='Stacks'");*/
 		TwAddButton(bar, "Stack 1", 
-			Stack4, NULL, "group='Stacks'");
+			Stack2, NULL, "group='Stacks'");
 		TwAddButton(bar, "Stack 2", 
-			Stack5, NULL, "group='Stacks'");
-
-		TwAddSeparator(bar, "", "");
+			Stack3, NULL, "group='Stacks'");
 
 		TwAddVarRW(bar, "Colour code islands", TW_TYPE_BOOL8,
 			&bColourCodedIslands,"");
