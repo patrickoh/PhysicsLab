@@ -7,7 +7,7 @@ Build it in Release.
 The assignments 1-5 cumulative report and assignment 6 slides 
 are in this directory.
 
-I used a modified (by me) version of Irlan Robson's Bounce library (https://github.com/irlanrobson/Bounce-Lite) 
+I modified Irlan Robson's Bounce library (https://github.com/irlanrobson/Bounce-Lite) 
 for the constraint solver demo. The b3ExtraSettings class exposes variables used to demonstrate 
 the constraint solver pipeline. The modified Bounce library source code is in include/Bounce/
 
